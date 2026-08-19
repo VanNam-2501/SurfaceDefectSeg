@@ -3,7 +3,7 @@
 ## Trạng thái hiện tại
 
 - Thư mục gốc `E:\Project\TTTN` là Git repository duy nhất, nhánh `main`; lịch
-  sử bắt đầu trung thực từ lần chuẩn hóa 2026-08-19.
+  sử bắt đầu trung thực từ baseline `d91f6fd` ngày 2026-08-19.
 - Metadata Git lồng của web/VMamba đã được loại khỏi cây hoạt động để tránh
   repository con ngoài ý muốn.
 - `src/threecad_segmentation/third_party/VMamba` được vendor từ upstream commit

@@ -10,7 +10,7 @@ Ngày audit: **2026-08-19**. Trạng thái phản ánh file thực tế trong
 | Báo cáo thực tập tốt nghiệp đúng biểu mẫu | **THIẾU** | Chưa có DOCX/PDF báo cáo | Xin đúng template của khoa, viết và xuất PDF |
 | Slide bảo vệ | **THIẾU** | Chưa có PPTX/PDF slide | Tạo slide vấn đề → giải pháp → sản phẩm → kết quả → đóng góp |
 | Toàn bộ mã nguồn | **CÓ NHƯNG CHƯA ĐÓNG GÓI** | Pipeline ML, demo web, review tool đều có | Tạo source release không chứa dataset/cache/secret |
-| Lịch sử quản lý phiên bản | **MỘT PHẦN** | Repo gốc nhánh `main` được chuẩn hóa từ 2026-08-19 | Duy trì commit thật từ baseline; lịch sử trước baseline không được giả mạo |
+| Lịch sử quản lý phiên bản | **MỘT PHẦN** | Repo gốc nhánh `main`, baseline `d91f6fd` từ 2026-08-19 | Duy trì commit thật từ baseline; lịch sử trước baseline không được giả mạo |
 | Video demo dự phòng | **THIẾU** | Chưa có MP4/MOV/MKV | Quay video theo kịch bản trong `04_demo_video/README.md` |
 | Nhật ký thực tập | **THIẾU** | Chưa có hồ sơ | Điền mẫu `05_logs/INTERNSHIP_LOG.md` và ký/xác nhận nếu biểu mẫu yêu cầu |
 | Nhật ký phát triển | **MỘT PHẦN** | Có log chạy rời rạc nhưng chưa thành nhật ký | Điền `05_logs/DEVELOPMENT_LOG.md`, dẫn commit và kết quả test |

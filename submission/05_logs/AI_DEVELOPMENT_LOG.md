@@ -58,7 +58,7 @@ và làm rõ “mẫu nghi vấn” không đồng nghĩa label chắc chắn sa
 mask, kiểm tra lưu tiến độ và đường dẫn export. **Cần bổ sung test tự động và biên
 bản export dataset cụ thể trước khi nộp.**
 
-**9. Commit:** `PENDING_NO_ROOT_GIT`.
+**9. Commit:** `d91f6fd` (baseline snapshot tạo sau phiên lịch sử; không phải commit cùng thời điểm).
 
 ---
 
@@ -100,7 +100,7 @@ VRAM. Cấu hình thực tế cuối khác protocol batch ban đầu và đã đ
 SegFormer 50; checkpoint chứa config/model/optimizer và tải được local. Split
 hash được `check_protocol.py` xác nhận PASS.
 
-**9. Commit:** `PENDING_NO_ROOT_GIT`.
+**9. Commit:** `d91f6fd` (baseline snapshot tạo sau phiên lịch sử; không phải commit cùng thời điểm).
 
 ---
 
@@ -139,7 +139,7 @@ so sánh trực tiếp FPR/FNR và triển khai tự động.
 **8. Kiểm thử/xác minh:** `test_decision_policy.py` PASS 3/3; adaptive scan có
 10.720 cấu hình/model; policy khóa trên Validation rồi báo cáo Test.
 
-**9. Commit:** `PENDING_NO_ROOT_GIT`.
+**9. Commit:** `d91f6fd` (baseline snapshot tạo sau phiên lịch sử; không phải commit cùng thời điểm).
 
 ---
 
@@ -178,7 +178,7 @@ tránh dùng Test để chọn chiến lược.
 **8. Kiểm thử/xác minh:** Test verifier PASS 3/3. Hybrid U-Net+VMamba trên Test:
 FPR 10,22%, FNR 3,81%; learned fusion ba model: FPR 12,69%, FNR 3,30%.
 
-**9. Commit:** `PENDING_NO_ROOT_GIT`.
+**9. Commit:** `d91f6fd` (baseline snapshot tạo sau phiên lịch sử; không phải commit cùng thời điểm).
 
 ---
 
@@ -216,7 +216,7 @@ phình scope; tránh dùng toàn bộ data audit để tune theo Test.
 **8. Kiểm thử/xác minh:** Split/content/file checks PASS; mask integrity issues
 CSV có 0 dòng; mọi threshold/policy có metadata Validation selection.
 
-**9. Commit:** `PENDING_NO_ROOT_GIT`.
+**9. Commit:** `d91f6fd` (baseline snapshot tạo sau phiên lịch sử; không phải commit cùng thời điểm).
 
 ---
 
@@ -245,7 +245,7 @@ bar chart về baseline 0, sửa nhãn scatter chồng nhau và contact sheet.
 **8. Kiểm thử/xác minh:** Pillow verify toàn bộ 20 PNG; kiểm tra số SVG/manifest;
 QA trực quan các hình E2, FPR–FNR, audit và qualitative gallery.
 
-**9. Commit:** `PENDING_NO_ROOT_GIT`.
+**9. Commit:** `d91f6fd` (baseline snapshot tạo sau phiên lịch sử; không phải commit cùng thời điểm).
 
 ---
 
@@ -276,7 +276,7 @@ làm rõ thiếu sót thực tế.
 **8. Kiểm thử/xác minh:** Protocol PASS; CPU tests 10/10; web build/test 2/2;
 demo policy/checkpoint path được kiểm tra tồn tại.
 
-**9. Commit:** `PENDING_NO_ROOT_GIT`.
+**9. Commit:** `d91f6fd` (baseline snapshot tạo sau phiên lịch sử; không phải commit cùng thời điểm).
 
 ---
 
@@ -313,4 +313,4 @@ giúp test, bàn giao và giải trình mã dễ hơn mà không mất bằng ch
 Python compile, notebook JSON, protocol, 15 test Python, web build + 2 test và
 FastAPI path check đều PASS.
 
-**9. Commit:** `PENDING_BASELINE_COMMIT`.
+**9. Commit:** `d91f6fd`.

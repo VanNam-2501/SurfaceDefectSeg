@@ -35,6 +35,7 @@ launchers use repository-relative paths; no active default depends on drive `E:`
 - Web production build and rendered/client tests: 2/2 PASS.
 - FastAPI configuration: all three checkpoints, spatial policy, learned policy
   and learned model directory resolved successfully.
+- Git baseline: `d91f6fd` on branch `main`.
 
 Run the same maintained check with:
 
@@ -48,4 +49,3 @@ No user dataset, checkpoint, final result or Kaggle package was discarded.
 Superseded material remains under `archive/`, which is ignored by Git. Do not
 delete that directory until the new source release has been tested on a clean
 machine and the supervisor has accepted the migrated structure.
-
