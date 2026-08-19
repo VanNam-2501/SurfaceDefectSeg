@@ -1,0 +1,4 @@
+model,file,sha256,best_epoch,best_val_positive_dice_at_0_5,batch_size,grad_accum,effective_batch,max_epochs,segmentation_threshold,selection_split
+U-Net/ResNet18,kaggle_upload/all3_eval_weights_20260818/unet_best.pt,31FA194D8F2A97274E01461B223A647DD31067FE1B5B39DB5481EF64F0D2B493,48,0.7021597887840143,38,1,38,50,0.49,Validation
+SegFormer-B0,kaggle_upload/all3_eval_weights_20260818/segformer_best.pt,E3AC2538B9FCCFA7A2FD62A360DCFD5D508B0664FE396220277E70B6C4BE536D,50,0.6919855343441548,16,2,32,50,0.66,Validation
+VMamba-T,kaggle_upload/all3_eval_weights_20260818/vmamba_best.pt,F56F19DAED4BD6D36959A8F58651CC95587D357C50279156CD64551F13EC3D26,23,0.7683612236684201,16,1,16,25,0.51,Validation

@@ -1,0 +1,9 @@
+"""Make the flat research modules importable during local test runs."""
+
+import sys
+from pathlib import Path
+
+SOURCE_ROOT = Path(__file__).resolve().parents[1] / "src" / "threecad_segmentation"
+if str(SOURCE_ROOT) not in sys.path:
+    sys.path.insert(0, str(SOURCE_ROOT))
+

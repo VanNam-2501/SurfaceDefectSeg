@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Data Review Studio</title>
+  <link rel="stylesheet" href="/static/styles.css?v=fit-full-image-20260815">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">DR</div>
+      <div>
+        <h1>Data Review Studio</h1>
+        <p>Rà nhãn, sửa mask, thu thập hard-negative và xuất dataset sạch</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <span class="save-state" id="saveState">Sẵn sàng</span>
+      <button class="button secondary" id="refreshButton">Làm mới</button>
+      <button class="button primary" id="exportButton">Xuất dataset để train</button>
+    </div>
+  </header>
+
+  <section class="stats" aria-label="Tiến độ review">
+    <div class="stat"><span>Tổng mẫu</span><strong id="statTotal">—</strong></div>
+    <div class="stat"><span>Đã review</span><strong id="statReviewed">—</strong></div>
+    <div class="stat"><span>Còn lại</span><strong id="statRemaining">—</strong></div>
+    <div class="stat warn"><span>Mẫu nghi vấn</span><strong id="statCandidates">—</strong></div>
+    <div class="stat good"><span>Hard negatives</span><strong id="statHardNegatives">—</strong></div>
+    <div class="progress-wrap"><div class="progress" id="progressBar"></div></div>
+  </section>
+
+  <div class="workspace">
+    <aside class="sidebar">
+      <section class="sidebar-section">
+        <div class="section-heading">
+          <h2>Bộ lọc</h2>
+          <button class="text-button" id="resetFilters">Đặt lại</button>
+        </div>
+        <label class="field wide">
+          <span>Tìm image ID / nhóm lỗi</span>
+          <input id="searchFilter" type="search" placeholder="Ví dụ: 000220 hoặc bump">
+        </label>
+        <div class="filter-grid">
+          <label class="field"><span>Split</span><select id="splitFilter"><option value="all">Tất cả</option><option>train</option><option>val</option><option>test</option></select></label>
+          <label class="field"><span>Nhãn gốc</span><select id="labelFilter"><option value="all">Tất cả</option><option value="0">Good</option><option value="1">Defect</option></select></label>
+          <label class="field"><span>Nhóm lỗi</span><select id="groupFilter"><option value="all">Tất cả</option></select></label>
+          <label class="field"><span>Tiến độ</span><select id="reviewFilter"><option value="all">Tất cả</option><option value="unreviewed">Chưa review</option><option value="reviewed">Đã review</option></select></label>
+          <label class="field"><span>Kết luận</span><select id="decisionFilter"><option value="all">Tất cả</option></select></label>
+          <label class="field"><span>Phạm vi review</span><select id="candidateFilter"><option value="any" selected>Chỉ mẫu nghi vấn</option><option value="none">Chỉ mẫu không nghi vấn</option><option value="all">Toàn bộ dữ liệu</option><option value="false_positive">Chỉ False positive</option><option value="high_score_good">Chỉ Good score cao</option><option value="false_negative">Chỉ False negative</option><option value="zero_overlap">Chỉ Không chồng GT</option><option value="model_disagreement">Chỉ Model bất đồng</option></select></label>
+          <label class="field"><span>Model</span><select id="modelFilter"><option value="all">Tất cả</option></select></label>
+          <label class="field"><span>Score tối thiểu</span><input id="scoreFilter" type="number" min="0" max="1" step="0.01" placeholder="0.90"></label>
+          <label class="field"><span>Sắp xếp</span><select id="sortFilter"><option value="priority">Ưu tiên nghi vấn</option><option value="score">Score cao</option><option value="area">Diện tích dự đoán</option><option value="updated">Mới cập nhật</option><option value="id">Image ID</option></select></label>
+        </div>
+      </section>
+
+      <section class="sidebar-section queue-section">
+        <div class="section-heading">
+          <h2>Hàng đợi</h2>
+          <span id="queueCount">0 mẫu</span>
+        </div>
+        <div class="queue-list" id="queueList"></div>
+        <div class="pager">
+          <button class="icon-button" id="pagePrev" title="Trang trước">←</button>
+          <span id="pageInfo">0–0</span>
+          <button class="icon-button" id="pageNext" title="Trang sau">→</button>
+        </div>
+      </section>
+
+      <section class="sidebar-section bulk-section">
+        <div class="section-heading"><h2>Thao tác hàng loạt</h2><span id="selectedCount">0 đã chọn</span></div>
+        <button class="button secondary full" id="bulkApply" disabled>Áp dụng kết luận hiện tại</button>
+      </section>
+    </aside>
+
+    <main class="main-content">
+      <section class="sample-head">
+        <div>
+          <div class="eyebrow" id="samplePosition">Chưa chọn mẫu</div>
+          <h2 id="sampleId">—</h2>
+          <div class="chips" id="sampleChips"></div>
+        </div>
+        <div class="navigation">
+          <button class="button secondary" id="prevButton">← Trước</button>
+          <button class="button secondary" id="nextButton">Sau →</button>
+        </div>
+      </section>
+
+      <section class="quick-review-bar" aria-label="Thao tác review nhanh">
+        <div class="quick-review-copy">
+          <strong>Review một chạm</strong>
+          <span>Các nút màu sẽ tự lưu và sang ảnh tiếp</span>
+        </div>
+        <div class="quick-review-actions">
+          <button class="quick-action approve" type="button" id="quickApproveButton"><kbd>1</kbd><span>Giữ GT</span></button>
+          <button class="quick-action good" type="button" id="quickFalseAlarmButton"><kbd>2</kbd><span>Báo giả → Good</span></button>
+          <button class="quick-action defect" type="button" id="quickDefectButton"><kbd>3</kbd><span>Có lỗi → Defect</span></button>
+          <button class="quick-action edit" type="button" id="quickEditMaskButton"><kbd>M</kbd><span>Sửa GT mask</span></button>
+          <button class="quick-action model" type="button" id="quickModelEditButton"><kbd>P</kbd><span>Mask model → chỉnh</span></button>
+          <button class="quick-action uncertain" type="button" id="quickUncertainButton"><kbd>U</kbd><span>Chưa chắc</span></button>
+        </div>
+      </section>
+
+      <section class="review-visuals" id="predictionOverview">
+        <section class="visual-group">
+          <div class="visual-group-head"><div><div class="eyebrow">Dữ liệu hiện tại</div><h3>Ảnh và nhãn gốc</h3></div><span>Kiểm tra nhãn trước khi quyết định</span></div>
+          <div class="viewer-grid source-viewer-grid" id="viewerGrid">
+          <article class="viewer-card">
+            <div class="viewer-title"><strong>1 · Ảnh gốc</strong><button class="text-button zoom-image" data-target="originalImage">Phóng to</button></div>
+            <div class="image-stage"><img id="originalImage" alt="Ảnh gốc"></div>
+          </article>
+          <article class="viewer-card">
+            <div class="viewer-title"><strong>2 · Ground truth</strong><div><button class="text-button" id="editMaskButton">Sửa mask</button><button class="text-button zoom-image" data-target="overlayImage">Phóng to</button></div></div>
+            <div class="image-stage"><img id="overlayImage" alt="Ground-truth chồng lên ảnh gốc"></div>
+          </article>
+          <article class="viewer-card">
+            <div class="viewer-title"><strong>3 · GT mask</strong><button class="text-button zoom-image" data-target="maskImage">Phóng to</button></div>
+            <div class="image-stage mask-stage"><img id="maskImage" alt="Ground-truth mask"></div>
+          </article>
+          </div>
+        </section>
+        <section class="visual-group model-visual-group">
+          <div class="prediction-head">
+            <div><div class="eyebrow">So sánh với model</div><h3 id="qualitativeTitle">Dự báo model</h3></div>
+            <div class="quick-metrics" id="quickModelMetrics"></div>
+          </div>
+          <div class="viewer-grid model-viewer-grid">
+          <article class="viewer-card prediction-card">
+            <div class="viewer-title"><strong>1 · Model overlay</strong><button class="text-button zoom-image prediction-zoom" data-target="predictionOverlayImage">Phóng to</button></div>
+            <div class="image-stage"><img id="predictionOverlayImage" alt="Dự báo model chồng lên ảnh gốc"><div class="image-empty" id="predictionOverlayEmpty">Chưa có model overlay.</div></div>
+          </article>
+          <article class="viewer-card prediction-card">
+            <div class="viewer-title"><strong>2 · Probability</strong><button class="text-button zoom-image prediction-zoom" data-target="probabilityImage">Phóng to</button></div>
+            <div class="image-stage"><img id="probabilityImage" alt="Heatmap xác suất dự báo"><div class="image-empty" id="probabilityEmpty">Chưa có probability map.</div></div>
+          </article>
+          <article class="viewer-card prediction-card">
+            <div class="viewer-title"><strong id="binaryTitle">3 · Binary</strong><div><button class="text-button apply-model-mask" type="button" id="applyPredictionMaskButton">Dùng làm GT mask</button><button class="text-button zoom-image prediction-zoom" data-target="binaryImage">Phóng to</button></div></div>
+            <div class="image-stage"><img id="binaryImage" alt="Mask dự báo chồng lên ảnh gốc"><div class="image-empty" id="binaryEmpty">Chưa có binary prediction.</div></div>
+          </article>
+          </div>
+        </section>
+        <article class="viewer-card qualitative-card hidden" id="qualitativeCard">
+          <div class="viewer-title"><strong>Ảnh qualitative có sẵn</strong><button class="text-button zoom-image" id="qualitativeZoom" data-target="qualitativeImage">Phóng to</button></div>
+          <div class="image-stage qualitative-stage"><img id="qualitativeImage" alt="Kết quả định tính của model"><div class="empty-note" id="qualitativeEmpty"></div></div>
+        </article>
+      </section>
+
+      <section class="info-grid">
+        <article class="panel">
+          <div class="panel-title"><h3>Thông tin & chẩn đoán</h3><span id="diagnosticStatus"></span></div>
+          <dl class="facts" id="sampleFacts"></dl>
+          <div class="diagnostics" id="diagnostics"></div>
+          <details class="paths"><summary>Đường dẫn nguồn</summary><code id="sourcePaths"></code></details>
+        </article>
+        <article class="panel">
+          <div class="panel-title"><h3>Kết quả model</h3><span id="modelCount"></span></div>
+          <div id="modelMetrics" class="model-metrics empty-note">Không có per_image_metrics.csv được nạp.</div>
+        </article>
+      </section>
+
+      <section class="review-panel">
+        <div class="review-head">
+          <div><div class="eyebrow">Kết luận của người review</div><h3>Phân loại và xử lý mẫu</h3></div>
+          <div class="hotkey-help">1/2/3: xử lý nhanh · M: sửa mask · P: mask model → chỉnh · U: chưa chắc · ←/→: chuyển ảnh</div>
+        </div>
+        <div class="review-grid">
+          <label class="field"><span>Kết luận</span><select id="decisionInput"></select></label>
+          <label class="field"><span>Nhãn sau review</span><select id="correctedLabelInput"><option value="">Giữ nhãn gốc</option><option value="0">Good</option><option value="1">Defect</option></select></label>
+          <label class="field"><span>Nhóm lỗi sau review</span><input id="correctedGroupInput" list="groupList" placeholder="Giữ nhóm hiện tại"><datalist id="groupList"></datalist></label>
+          <label class="field"><span>Người review</span><input id="reviewerInput" placeholder="Tên hoặc mã reviewer"></label>
+        </div>
+        <div class="tag-picker" id="tagPicker"></div>
+        <div class="review-options">
+          <label class="check"><input type="checkbox" id="hardNegativeInput"><span>Đưa vào hard-negative</span></label>
+          <label class="check danger"><input type="checkbox" id="excludedInput"><span>Loại khỏi bản export sạch</span></label>
+        </div>
+        <label class="field wide"><span>Ghi chú</span><textarea id="noteInput" rows="3" placeholder="Lý do đổi nhãn, vùng mask cần sửa, quy chuẩn chấp nhận..."></textarea></label>
+        <div class="review-actions">
+          <button class="button secondary" id="saveButton">Lưu</button>
+          <button class="button primary" id="saveNextButton">Lưu và sang ảnh tiếp <span>Ctrl+Enter</span></button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="mask-dialog" id="maskDialog">
+    <form method="dialog" class="dialog-shell">
+      <div class="dialog-head">
+        <div><div class="eyebrow">Mask editor</div><h2 id="maskEditorTitle">Sửa mask</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Đóng">×</button>
+      </div>
+      <div class="editor-toolbar">
+        <div class="tool-group">
+          <button type="button" class="tool active" id="drawTool">Vẽ <kbd>B</kbd></button>
+          <button type="button" class="tool" id="eraseTool">Xóa <kbd>E</kbd></button>
+          <button type="button" class="tool" id="eraseComponentTool">Xóa 1 vùng (click) <kbd>R</kbd></button>
+        </div>
+        <label class="range-field">Cỡ brush <input type="range" id="brushSize" min="2" max="120" value="24"><output id="brushValue">24 px</output></label>
+        <label class="range-field">Zoom <input type="range" id="editorZoom" min="0.25" max="2" step="0.05" value="0.75"><output id="zoomValue">75%</output></label>
+        <div class="tool-group">
+          <button type="button" class="tool" id="undoMask">Hoàn tác</button>
+          <button type="button" class="tool" id="redoMask">Làm lại</button>
+          <button type="button" class="tool danger" id="clearMask">Xóa sạch mask</button>
+        </div>
+        <div class="tool-group cleanup-tools">
+          <label class="compact-number">Đốm dưới <input type="number" id="smallComponentSize" min="1" max="100000" value="30"><span>px</span></label>
+          <button type="button" class="tool" id="removeSmallComponents">Xóa đốm nhỏ</button>
+          <button type="button" class="tool model-tool" id="loadPredictionMask">Nạp mask model <kbd>P</kbd></button>
+        </div>
+        <label class="tool file-tool">Nạp PNG<input type="file" id="importMask" accept="image/png"></label>
+      </div>
+      <div class="editor-stage" id="editorStage"><canvas id="maskCanvas"></canvas></div>
+      <div class="dialog-foot">
+        <p>Gợi ý: dùng “Xóa cả vùng” rồi click vào một đốm sai. Mask nguồn không bị ghi đè.</p>
+        <div><button class="button secondary" value="cancel">Hủy</button><button type="button" class="button secondary" id="saveMaskButton">Lưu mask</button><button type="button" class="button primary" id="saveMaskNextButton">Lưu + ảnh tiếp <kbd>Ctrl+Enter</kbd></button></div>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="image-dialog" id="imageDialog"><form method="dialog"><button class="image-close" value="cancel">×</button><img id="largeImage" alt="Ảnh phóng to"></form></dialog>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="/static/app.js?v=mask-speckle-fix-20260815" defer></script>
+</body>
+</html>

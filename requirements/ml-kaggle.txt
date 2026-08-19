@@ -1,0 +1,16 @@
+setuptools<82
+transformers>=4.45,<5
+scikit-learn
+pandas
+opencv-python-headless
+tqdm
+matplotlib
+Pillow
+timm
+einops
+fvcore
+yacs
+termcolor
+packaging
+ninja
+chardet

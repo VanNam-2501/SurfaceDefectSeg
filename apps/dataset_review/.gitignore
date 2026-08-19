@@ -1,0 +1,7 @@
+review_state.sqlite3
+review_state.sqlite3-shm
+review_state.sqlite3-wal
+edits/
+exports/
+__pycache__/
+tests/__pycache__/

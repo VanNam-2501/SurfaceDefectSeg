@@ -1,0 +1,4 @@
+fastapi
+uvicorn[standard]
+python-multipart
+-r ../../../requirements/ml-kaggle.txt

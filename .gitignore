@@ -1,0 +1,43 @@
+# Local environments and caches
+.venv/
+archive/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Large datasets and generated experiment artifacts
+data/**
+!data/README.md
+artifacts/**
+!artifacts/README.md
+runtime/wheels/**
+!runtime/README.md
+**/results/
+*.pt
+*.pth
+*.ckpt
+best/
+wheels-*/
+*.zip
+
+# Notebook and editor state
+.ipynb_checkpoints/
+.vscode/
+.idea/
+
+# Web build artifacts
+apps/web_demo/node_modules/
+apps/web_demo/.next/
+apps/web_demo/.vinext/
+apps/web_demo/dist/
+apps/web_demo/.wrangler/
+apps/web_demo/dev-server.out.log
+
+# Local submission binaries are delivered separately from source history
+submission/04_demo_video/*.mp4
+submission/04_demo_video/*.mov
+submission/04_demo_video/*.mkv
+
+# OS noise
+Thumbs.db
+Desktop.ini
