@@ -314,3 +314,42 @@ Python compile, notebook JSON, protocol, 15 test Python, web build + 2 test và
 FastAPI path check đều PASS.
 
 **9. Commit:** `d91f6fd`.
+
+---
+
+## AI-2026-08-21-09 — Loại Colab và phân loại thành phần không dùng
+
+**1. Công cụ/model:** OpenAI Codex desktop, GPT-5.
+
+**2. Ngày, mục tiêu, ngữ cảnh:** 2026-08-21. Làm gọn cây dự án sau khi chốt
+Kaggle là môi trường GPU; loại workflow Colab và tách các thành phần không còn
+tham gia luồng chạy để sinh viên kiểm tra trước khi xóa vĩnh viễn.
+
+**3. Prompt gốc:**
+
+> “làm sạch dự án cái nào cần cái nào k cần, tôi k train trên colab á nên mấy
+> file này xóa đi, với lại file nào k dùng trong dự án thì bỏ vào thư mục riêng
+> tôi xem xét (có tổ chức để tôi tiện quan sát)”
+
+**4. File/thành phần liên quan:** notebook/hướng dẫn/setup Colab; scaffold
+Cloudflare/Drizzle của `apps/web_demo`; mã upstream tùy chọn trong
+`src/threecad_segmentation/third_party/VMamba`; wrapper cũ; tài liệu protocol,
+cleanup manifest và web dependency/test.
+
+**5. Kết quả AI:** Xóa 6 mục Colab; chuyển 1.786 tệp không dùng hoặc ngoài phạm
+vi vào `archive/review_candidates/2026-08-21/` theo 5 nhóm; giữ runtime
+`VMamba/vmamba.py`; rút gọn web demo local và cập nhật tài liệu/kiểm kê.
+
+**6. Chấp nhận/chỉnh sửa/loại bỏ:** Không đụng dữ liệu 3CAD, checkpoint, cache
+kết quả, pipeline Kaggle hoặc mã thí nghiệm đang dùng. Lần test web đầu phát
+hiện test còn gọi `worker.fetch`; đã sửa test dùng Vinext local handler rồi chạy
+lại toàn bộ.
+
+**7. Lý do chỉnh sửa:** Loại phụ thuộc và scaffold không liên quan, giảm nhiễu
+khi giải trình mã, đồng thời giữ bản có thể phục hồi để người dùng tự xem xét.
+
+**8. Kiểm thử/xác minh:** `verify.ps1 -IncludeWeb` PASS: protocol 7.168 ảnh; 10
+test ML; 5 test Dataset Review; frontend build và 2/2 test web; kiểm tra tham
+chiếu gãy và `git diff --check` PASS.
+
+**9. Commit:** `98aa39f`.
