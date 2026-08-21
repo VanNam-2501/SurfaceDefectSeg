@@ -7,10 +7,11 @@ Tài liệu này là inventory kỹ thuật, không phải tư vấn pháp lý.
 - Upstream: `https://github.com/MzeroMiko/VMamba.git`.
 - Commit đang có: `2ed52ead062a51a64521ed3871d52914bf532876`.
 - License có trong vendor tree: MIT, Copyright © 2024 MzeroMiko.
-- File sửa local: `third_party/VMamba/vmamba.py`.
+- File runtime giữ trong dự án: `src/threecad_segmentation/third_party/VMamba/vmamba.py`.
 - Thay đổi: thêm 15 dòng fallback decorator/type khi Triton không khả dụng;
   đường chạy không Triton dùng implementation khác và không thực thi kernel giả.
-- Trạng thái Git vendor: modified, chưa commit trong project repo.
+- Các thư mục nghiên cứu upstream không cần cho runtime đã được chuyển vào
+  `archive/review_candidates/2026-08-21/vmamba_upstream_optional/`.
 
 Khi nộp source phải giữ file LICENSE upstream và ghi rõ patch local.
 

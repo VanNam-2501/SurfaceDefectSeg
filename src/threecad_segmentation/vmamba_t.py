@@ -31,7 +31,7 @@ if _REPO is None:
     searched = "\n".join(str(p / "vmamba.py") for p in _CANDIDATES)
     raise ImportError(
         "Official VMamba repo not found. Searched:\n" + searched +
-        "\nRun setup_vmamba_colab.sh or setup_vmamba_kaggle.sh from the project root."
+        "\nRun scripts/setup/setup_vmamba_kaggle.sh from the project root."
     )
 sys.path.insert(0, str(_REPO))
 

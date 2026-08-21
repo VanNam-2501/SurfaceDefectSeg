@@ -32,7 +32,7 @@ TTTN/
 │   ├── evaluation/            Validation/Test từng model
 │   ├── experiments/           Policy, hybrid và probability cache
 │   ├── reporting/             Tổng hợp bảng/biểu đồ/audit Test
-│   ├── setup/                 Cài VMamba trên Colab/Kaggle
+│   ├── setup/                 Cài runtime VMamba trên Kaggle
 │   ├── training/              Entry point train
 │   └── verification/          Protocol và kiểm tra bàn giao
 ├── tests/ml/                  Unit/smoke tests cho mã lõi
@@ -43,16 +43,19 @@ TTTN/
 │   ├── packages/kaggle/       Gói Kaggle đã đóng băng
 │   ├── reports/final/         Bảng, audit và visualization cuối
 │   └── verification/          Kết quả protocol preflight
-├── experiments/notebooks/     Notebook audit, Colab và Kaggle
+├── experiments/notebooks/     Notebook audit và pipeline Kaggle
 ├── runtime/wheels/vmamba/     Wheel phụ thuộc GPU/Python cụ thể
 ├── docs/                      Protocol và hướng dẫn
 ├── submission/                Hồ sơ nộp bài
-└── archive/                   Bản cũ/quarantine có thể khôi phục
+└── archive/                   Bản cũ/quarantine có thể khôi phục, không chạy mặc định
 ```
+
+`archive/review_candidates/` chứa các tệp không còn thuộc luồng chạy nhưng chưa
+xóa vĩnh viễn. Danh sách, lý do và cách phục hồi nằm trong
+`docs/cleanup/unused_candidates_2026-08-21.md`.
 
 ## Đường dẫn ổn định
 
 Ba launcher ở gốc (`run_review.ps1`, `run_demo.ps1`, `verify.ps1`) là giao diện
 ổn định cho người dùng. Mã Python dùng `src/threecad_segmentation/project_paths.py`
 hoặc tính `repo_root` từ vị trí tệp, không phụ thuộc ổ `E:`.
-

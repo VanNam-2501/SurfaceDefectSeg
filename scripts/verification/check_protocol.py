@@ -1,4 +1,4 @@
-"""Fast pre-flight checks before a final Colab run."""
+"""Fast pre-flight checks before a final evaluation or Kaggle run."""
 from __future__ import annotations
 
 import argparse

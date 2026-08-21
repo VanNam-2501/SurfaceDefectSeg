@@ -10,29 +10,19 @@ import sys
 from pathlib import Path
 import shutil, zipfile
 
-# PROJECT là thư mục chứa train_on_kaggle.py, vmamba_t.py và export_probability_cache.py.
-PROJECT = Path('/kaggle/working/Aluminum_Surface_Defect_Segmentation')
+# PROJECT là gốc package, có các thư mục src/ và scripts/.
+PROJECT = Path('/kaggle/working/threecad_ani_project')
 DATASET = Path('/kaggle/input/<project-dataset>/data/3cad_ani')
 CHECKPOINT = Path('/kaggle/working/results/vmamba_b8_main_seed42/checkpoints/best.pt')
 OUT = Path('/kaggle/working/vmamba_predictions')
 
-# Copy helper vừa upload vào code project đang chạy được. Nếu file .py đã có
-# trong PROJECT thì cell này không làm thay đổi gì.
-if not PROJECT.joinpath('export_probability_cache.py').is_file():
-    helper = next(Path('/kaggle/input').rglob('export_probability_cache.py'), None)
-    helper_zip = next(Path('/kaggle/input').rglob('export_vmamba_kaggle_helper.zip'), None)
-    if helper:
-        shutil.copy2(helper, PROJECT / 'export_probability_cache.py')
-    elif helper_zip:
-        with zipfile.ZipFile(helper_zip) as zf:
-            zf.extract('export_probability_cache.py', PROJECT)
-
-assert PROJECT.joinpath('export_probability_cache.py').is_file(), PROJECT
+EXPORTER = PROJECT / 'scripts/experiments/export_probability_cache.py'
+assert EXPORTER.is_file(), EXPORTER
 assert CHECKPOINT.is_file(), CHECKPOINT
 assert DATASET.is_dir(), DATASET
 
 %cd {PROJECT}
-!{sys.executable} export_probability_cache.py \
+!{sys.executable} {EXPORTER} \
   --model vmamba \
   --checkpoint {CHECKPOINT} \
   --dataset-root {DATASET} \
@@ -60,8 +50,8 @@ Không để thừa một tầng `vmamba_predictions` bên trong thư mục đó
 
 ```powershell
 cd E:\Project\TTTN
-.\run_three_model_experiments.ps1 -Action Check
-.\run_three_model_experiments.ps1
+.\scripts\experiments\run_three_model_experiments.ps1 -Action Check
+.\scripts\experiments\run_three_model_experiments.ps1
 ```
 
 Kết quả sẽ nằm trong

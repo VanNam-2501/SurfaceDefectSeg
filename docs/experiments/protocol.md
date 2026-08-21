@@ -72,7 +72,7 @@ Mỗi lần chạy phải tạo ra:
 - `training_summary.json`;
 - `checkpoints/best.pt`;
 - `checkpoints/last.pt`;
-- `checkpoints/interrupt.pt` nếu quá trình trên Colab bị gián đoạn;
+- `checkpoints/interrupt.pt` nếu quá trình huấn luyện bị gián đoạn;
 - `curves/learning_curve_loss.png`;
 - `curves/learning_curve_dice.png`;
 - `curves/loss_components.png`;
@@ -107,22 +107,11 @@ Chỉ cần kiểm tra lại khi môi trường chạy thay đổi:
 Mini-overfit chỉ là bước kiểm tra kỹ thuật trước khi chạy, không phải thí nghiệm
 hiệu năng để báo cáo.
 
-## E1 — Nghiên cứu phương pháp tiền xử lý — chỉ dùng U-Net
+## E1 — Nghiên cứu phương pháp tiền xử lý — ngoài phạm vi bàn giao cuối
 
-A. Huấn luyện bằng patch trên ảnh độ phân giải gốc + suy luận toàn ảnh bằng
-sliding window.
-
-B. Resize toàn ảnh có giữ tỉ lệ khung hình + center-pad về 512.
-
-Hai nhánh phải dùng cùng model, seed, optimizer, loss, augmentation, quy tắc
-dừng và quy tắc chọn threshold.
-
-Báo cáo:
-
-- Positive Dice / IoU;
-- recall của vùng Tiny và Small;
-- image FNR / FPR;
-- độ trễ suy luận toàn ảnh.
+E1 không được chạy trong bộ kết quả cuối theo phạm vi đã chốt. Cấu hình đang dùng
+là huấn luyện patch trên ảnh độ phân giải gốc và suy luận toàn ảnh bằng sliding
+window; không có nhánh resize đối chứng trong bảng bàn giao.
 
 ## E2 — So sánh kiến trúc chính
 
@@ -238,30 +227,23 @@ Quá trình đánh giá cuối lưu:
 Dùng các ví dụ này để thảo luận về scratches, điểm lỗi rất nhỏ, sai lệch tại
 biên và texture lặp lại.
 
-## E9 — Khả năng tái lập — tùy chọn nhưng được khuyến nghị nếu đủ GPU
+## E9 — Khả năng tái lập — ngoài phạm vi bàn giao cuối
 
-Chạy cấu hình chính đã cố định với các seed `42`, `123`, `2026` và báo cáo
-`mean ± std`. Sau khi hoàn thành tất cả lần Test theo seed, dùng
-`compare_seeds.py`.
+Không chạy thí nghiệm nhiều seed trong phạm vi hiện tại. Script cũ được lưu ở
+`archive/review_candidates/2026-08-21/out_of_scope_experiments/` để có thể phục
+hồi nếu phạm vi báo cáo thay đổi.
 
-## E10 — Ablation hard-negative sampling — có điều kiện
+## E10 — Ablation hard-negative sampling — ngoài phạm vi bàn giao cuối
 
-Sampler chính hiện tại chủ ý giữ quy trình đơn giản đã cố định:
+Không chạy ablation hard-negative trong bộ kết quả cuối. Sampler chính vẫn giữ:
+ảnh Defect dùng positive crop có nhận biết GT, ảnh Good dùng negative crop ngẫu
+nhiên.
 
-- ảnh Defect → positive crop có nhận biết GT;
-- ảnh Good → negative crop ngẫu nhiên.
+## E11 — Hậu xử lý component nhỏ — ngoài phạm vi bàn giao cuối
 
-Chỉ bổ sung background patch từ ảnh Defect nếu **kết quả chính đã cố định** cho
-thấy nhiều false positive. Nếu thực hiện, phải báo cáo thành một ablation riêng;
-không được thay đổi hồi tố E2.
-
-## E11 — Hậu xử lý component nhỏ — có điều kiện
-
-Baseline **không dùng ngưỡng diện tích tối thiểu cho predicted component**. Nếu
-phân tích lỗi trên Validation cho thấy nhiều đảo false positive nhỏ, có thể thêm
-ablation lọc theo diện tích bằng cách chỉ sử dụng Validation, sau đó cố định
-trước khi chạy Test. Phương pháp này không thuộc baseline chính nếu chưa có bằng
-chứng kích hoạt.
+Không báo cáo E11 như một ablation độc lập. Logic quyết định giảm dương tính giả
+được đánh giá trong pipeline policy/hybrid riêng, luôn chọn tham số trên
+Validation rồi khóa trước khi áp dụng lên Test.
 
 # Định nghĩa đánh giá toàn ảnh
 
@@ -282,21 +264,18 @@ chứng kích hoạt.
 2. huấn luyện U-Net chính;
 3. chọn threshold cho U-Net trên Validation;
 4. đánh giá U-Net trên Test;
-5. chạy U-Net E1 resize + Validation + Test;
-6. chạy SegFormer chính + Validation + Test;
-7. thiết lập/kiểm tra runtime VMamba;
-8. chạy VMamba chính + Validation + Test;
-9. chạy `compare_models.py`;
-10. tùy chọn chạy thêm các seed → `compare_seeds.py`;
-11. xem lại lỗi E8; chỉ sau đó mới quyết định có cần E10/E11 hay không.
+5. chạy SegFormer chính + Validation + Test;
+6. thiết lập/kiểm tra runtime VMamba;
+7. chạy VMamba chính + Validation + Test;
+8. chạy `compare_models.py`;
+9. xem lại lỗi E8 và data-audit; không dùng các kết quả audit để chỉnh hồi tố Test.
 
 # Cấu trúc kết quả cuối bắt buộc
 
 ```text
 results/
 ├── unet_r18/
-│   ├── main_seed42/
-│   └── e1_resize_seed42/
+│   └── main_seed42/
 ├── segformer_b0/
 │   └── main_seed42/
 ├── vmamba_t_s2l5/
@@ -309,6 +288,5 @@ results/
     ├── efficiency.csv
     ├── e1_preprocessing.csv
     ├── architecture_comparison.png
-    ├── efficiency_comparison.png
-    └── seed_summary.csv                 # chỉ có nếu chạy E9
+    └── efficiency_comparison.png
 ```

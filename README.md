@@ -29,11 +29,11 @@ scripts/       lệnh train, evaluation, experiment, reporting và verification
 tests/         kiểm thử mã ML
 data/          dữ liệu 3CAD-ANI cục bộ (không đưa vào Git)
 artifacts/     checkpoint, prediction, kết quả và báo cáo sinh ra
-experiments/   notebook Colab/Kaggle
+experiments/   notebook audit dữ liệu và pipeline Kaggle
 docs/          protocol, hướng dẫn và hồ sơ cấu trúc
 runtime/       wheel nhị phân VMamba theo môi trường
 submission/    hồ sơ nộp bài và hồ sơ sử dụng AI
-archive/       dữ liệu cũ có thể khôi phục, không thuộc cây đang chạy
+archive/       dữ liệu cũ và ứng viên cleanup có thể khôi phục
 ```
 
 Chi tiết trách nhiệm từng thư mục nằm tại
@@ -73,4 +73,3 @@ Train lại một model:
 Dataset, checkpoint, artifact sinh ra, môi trường ảo và `archive` được loại khỏi
 Git. Mã nguồn, cấu hình, tài liệu, notebook và lịch sử commit phải được lưu đầy
 đủ để có thể giải thích và tái tạo quy trình.
-

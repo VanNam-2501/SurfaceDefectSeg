@@ -30,14 +30,14 @@ Mở PowerShell tại thư mục này:
 ```powershell
 cd E:\Project\TTTN
 
-.\retrain_models.ps1 -Model unet -RunName cleaned_v1_seed42
-.\retrain_models.ps1 -Model segformer -RunName cleaned_v1_seed42
+.\scripts\training\retrain_models.ps1 -Model unet -RunName cleaned_v1_seed42
+.\scripts\training\retrain_models.ps1 -Model segformer -RunName cleaned_v1_seed42
 ```
 
 Với dataset đã review/export:
 
 ```powershell
-.\retrain_models.ps1 -Model unet `
+.\scripts\training\retrain_models.ps1 -Model unet `
   -DatasetRoot "E:\Project\TTTN\apps\dataset_review\exports\cleaned_final\training_dataset" `
   -RunName cleaned_v1_seed42
 ```
@@ -51,24 +51,24 @@ size vẫn là 4.
 VMamba đã là model thứ ba trong pipeline và trong web demo. Trước khi train,
 script bắt buộc chạy `test_vmamba_runtime.py` để kiểm tra CUDA selective-scan.
 
-Runtime VMamba hiện chưa có trên máy Windows này: thiếu `mamba_ssm` và thiếu
-`third_party/VMamba`. File `setup_vmamba_colab.sh` đi kèm chỉ dành cho Linux
-Colab/T4 (wheel hiện tại là Linux `sm75`), không dùng được trực tiếp trên RTX
-3050 Windows. Vì vậy:
+Mã backbone tối thiểu nằm tại
+`src/threecad_segmentation/third_party/VMamba/vmamba.py`. Wheel đi kèm được đóng
+băng cho runtime Kaggle T4 cụ thể và không dùng trực tiếp trên RTX 3050 Windows.
+Vì vậy:
 
 - train U-Net và SegFormer trên máy này ngay được;
-- train VMamba trên Colab theo `README_COLAB.md`, hoặc tự build bản
-  `mamba-ssm`/VMamba tương thích CUDA, PyTorch và GPU Windows của bạn;
+- train/evaluate VMamba trên Kaggle theo `docs/guides/kaggle_training.md`, hoặc
+  tự build `mamba-ssm` tương thích CUDA, PyTorch và GPU Windows của bạn;
 - khi VMamba runtime đã pass smoke test, chạy:
 
 ```powershell
-.\retrain_models.ps1 -Model vmamba -RunName cleaned_v1_seed42
+.\scripts\training\retrain_models.ps1 -Model vmamba -RunName cleaned_v1_seed42
 ```
 
 Sau khi runtime VMamba hoạt động, có thể chạy tuần tự cả ba model:
 
 ```powershell
-.\retrain_models.ps1 -Model all -RunName cleaned_v1_seed42
+.\scripts\training\retrain_models.ps1 -Model all -RunName cleaned_v1_seed42
 ```
 
 ## Theo dõi hoặc chạy lại
