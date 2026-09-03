@@ -41,6 +41,16 @@ apps/web_demo/dist/
 apps/web_demo/.wrangler/
 apps/web_demo/dev-server.out.log
 
+# Local report builds and private submission records
+submission/01_report/*.docx
+submission/01_report/_report_work/
+submission/05_logs/PROMPT_ARCHIVE/
+submission/06_company_confirmation/
+submission/07_evidence/CLEANUP_REPORT.md
+submission/07_evidence/PROJECT_AUDIT*.md
+docs/MIGRATION_MANIFEST.md
+docs/MIGRATION_REPORT.md
+
 # Local submission binaries are delivered separately from source history
 submission/04_demo_video/*.mp4
 submission/04_demo_video/*.mov
