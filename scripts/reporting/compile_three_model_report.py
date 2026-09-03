@@ -233,73 +233,6 @@ def add_adaptive(report_dir: Path, master: list[dict[str, object]], groups: list
         )
 
 
-def add_learned(
-    directory: Path,
-    experiment_prefix: str,
-    kind: str,
-    master: list[dict[str, object]],
-    groups: list[dict[str, object]],
-) -> None:
-    val_path = directory / "per_validation_oof_predictions.csv"
-    test_path = directory / "per_image_predictions.csv"
-    if not val_path.is_file() or not test_path.is_file():
-        return
-    val, test = read(val_path), read(test_path)
-    automatic_columns = sorted(column for column in test.columns if column.endswith("_automatic"))
-    for column in automatic_columns:
-        branch = column[: -len("_automatic")]
-        if kind == "hybrid_pair" and branch != "hybrid_fusion":
-            continue
-        if column not in val.columns:
-            continue
-        model_set = (
-            experiment_prefix.replace("_", " + ")
-            if branch in {"hybrid_fusion", "fusion"}
-            else branch
-        )
-        experiment_id = f"{kind}__{experiment_prefix}__{branch}"
-        master.append(
-            make_row(
-                experiment_id=experiment_id,
-                family="learned_hybrid" if branch == "hybrid_fusion" else "learned_verifier",
-                model_set=model_set,
-                decision_mode="fully automatic",
-                selection_method="5-fold Validation OOF threshold" if branch != "hybrid_fusion" else "Validation spatial consensus + two-specialist rescue",
-                val=val,
-                test=test,
-                decision_column=column,
-            )
-        )
-        groups.extend(
-            group_recall_rows(
-                experiment_id=experiment_id,
-                family="learned_hybrid" if branch == "hybrid_fusion" else "learned_verifier",
-                model_set=model_set,
-                frame=test,
-                decision_column=column,
-            )
-        )
-    # Triage rows are retained for the three-model independent verifier.  The
-    # binary FPR here is explicitly DEFECT-only; review remains a separate
-    # column rather than being hidden as a successful PASS.
-    if kind == "learned_all3":
-        for column in sorted(column for column in test.columns if column.endswith("_triage")):
-            branch = column[: -len("_triage")]
-            if column not in val.columns:
-                continue
-            master.append(
-                make_row(
-                    experiment_id=f"learned_triage__{branch}",
-                    family="learned_verifier",
-                    model_set=branch,
-                    decision_mode="PASS / REVIEW / DEFECT",
-                    selection_method="5-fold Validation OOF triage thresholds",
-                    val=val,
-                    test=test,
-                    decision_column=column,
-                )
-            )
-
 
 def write_readme(path: Path) -> None:
     path.write_text(
@@ -315,8 +248,6 @@ def write_readme(path: Path) -> None:
         "## Cấu trúc\n\n"
         "- `adaptive_single`: rule-only từng model (area + peak + persistence + contrast).\n"
         "- `spatial`: từng model, từng cặp và cả ba model với connected-component / consensus.\n"
-        "- `learned_all3`: verifier độc lập U-Net, SegFormer, VMamba và learned fusion 3 model.\n"
-        "- `hybrid_pairs`: hybrid fully automatic cho U-Net+SegFormer, U-Net+VMamba, SegFormer+VMamba.\n"
         "- `tables`: bảng gộp dùng trực tiếp cho báo cáo.\n"
         """,
         encoding="utf-8",
@@ -333,11 +264,6 @@ def main() -> None:
     groups: list[dict[str, object]] = []
     add_adaptive(report_dir, master, groups)
     add_spatial(report_dir, master, groups)
-    add_learned(report_dir / "learned_all3", "unet_segformer_vmamba", "learned_all3", master, groups)
-    hybrid_root = report_dir / "hybrid_pairs"
-    if hybrid_root.is_dir():
-        for directory in sorted(path for path in hybrid_root.iterdir() if path.is_dir()):
-            add_learned(directory, directory.name, "hybrid_pair", master, groups)
     master_frame = pd.DataFrame(master)
     if not master_frame.empty:
         master_frame = master_frame.sort_values(["family", "model_set", "decision_mode", "experiment_id"])

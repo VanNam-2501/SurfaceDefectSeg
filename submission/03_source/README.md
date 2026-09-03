@@ -42,7 +42,7 @@ nên nói rõ lịch sử được chuẩn hóa từ thời điểm nào.
 | Full-resolution evaluation | `src/threecad_segmentation/fullres_eval.py`, `scripts/evaluation/evaluate_model.py` |
 | Validation threshold | `src/threecad_segmentation/fullres_eval.py` và kết quả E7 |
 | Adaptive rule | `src/threecad_segmentation/adaptive_component_policy.py` |
-| Learned verifier | `src/threecad_segmentation/learned_decision_verifier.py` |
+| Learned verifier (đã archive) | archive/learned_verifier/src/learned_decision_verifier.py |
 | Chạy toàn bộ decision experiments | `scripts/experiments/run_all_decision_experiments.py` |
 | Audit label/data | `scripts/data/audit_full_dataset_labels.py` |
 | Demo API | `apps/web_demo/backend/app.py` |

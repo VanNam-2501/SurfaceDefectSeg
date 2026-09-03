@@ -1,6 +1,6 @@
 # Báo cáo kiểm thử và xác minh
 
-Ngày chạy: 2026-08-19. Máy local Windows; các phép kiểm tra CUDA VMamba/Kaggle
+Ngày cập nhật phạm vi: 2026-08-24. Máy local Windows; các phép kiểm tra CUDA VMamba/Kaggle
 không chạy lại trong phiên cleanup này.
 
 ## Dataset protocol preflight
@@ -29,14 +29,13 @@ Kết quả:
 | Test | Số test | Kết quả |
 |---|---:|---|
 | `test_decision_policy.py` | 3 | PASS |
+| `test_web_demo_policy.py` | 2 | PASS |
 | `test_training_state.py` | 4 | PASS |
-| `test_learned_decision_verifier.py` | 3 | PASS |
 | Dataset Review Studio | 5 | PASS |
-| Tổng | 15 | PASS |
+| Tổng | 14 | PASS |
 
-Các test kiểm tra ROI biên tối, PASS/REVIEW/DEFECT của spatial policy, đồng
-thuận theo vị trí, phục hồi best epoch, ràng buộc FNR, threshold triage và việc
-hybrid không loại bỏ consensus đáng tin.
+Các test kiểm tra ROI biên tối, PASS/REVIEW/DEFECT của Spatial policy, đồng
+thuận theo vị trí, matching model/policy, phục hồi best epoch và ràng buộc FNR của policy dựa trên luật.
 
 ## Web demo
 
@@ -65,8 +64,14 @@ Health check với các đường dẫn mặc định mới:
 - VMamba checkpoint: available, policy compatible.
 - SegFormer checkpoint: available, không thuộc final U-Net+VMamba policy.
 - Spatial policy: ready.
-- Learned hybrid verifier: ready.
-- Chế độ: `hybrid_fully_automatic`.
+- Chế độ: spatial_triage.
+
+Inference smoke thực tế trên ảnh Test `data/3cad_ani/test/bruise/000000.png`:
+
+- U-Net raw: PASS, HTTP 200.
+- U-Net Adaptive: PASS, HTTP 200, quyết định DEFECT.
+- SegFormer Adaptive: PASS, HTTP 200, quyết định DEFECT.
+- U-Net + VMamba Spatial: BLOCKED trên local vì VMamba runtime thiếu selective-scan CUDA (`ModuleNotFoundError`).
 
 ## Visualizations
 
@@ -78,9 +83,9 @@ Health check với các đường dẫn mặc định mới:
 ## Chưa được xác minh trong phiên này
 
 1. VMamba CUDA selective-scan trên Kaggle GPU.
-2. Full end-to-end inference của API với một ảnh sau khi đổi launcher sang
-   final U-Net+VMamba policy. Health/config đã PASS nhưng chưa chạy forward ảnh
-   trong phiên cleanup.
+2. Full end-to-end inference của VMamba và các Spatial ensemble trên local;
+   U-Net raw/Adaptive và SegFormer Adaptive đã PASS, còn U-Net + VMamba bị chặn
+   bởi selective-scan CUDA runtime chưa cài.
 3. Cài đặt source release trên máy/thư mục sạch.
 4. Tái tạo toàn bộ train từ đầu.
 5. Dataset review export round-trip sau lần cleanup hiện tại.

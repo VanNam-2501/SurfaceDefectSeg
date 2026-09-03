@@ -1,47 +1,55 @@
+"""Optional GPU integration test for the VMamba selective-scan runtime."""
 from __future__ import annotations
 
 import sys
 import time
+import unittest
 from pathlib import Path
 
 import torch
-import selective_scan_cuda
 
-PROJECT = Path(__file__).resolve().parents[2] / "src" / "threecad_segmentation"
-VMAMBA = PROJECT / "third_party" / "VMamba"
-if str(VMAMBA) not in sys.path:
-    sys.path.insert(0, str(VMAMBA))
-import vmamba  # noqa: E402
 
-from vmamba_t import build_vmamba_t_binary  # noqa: E402
+@unittest.skipUnless(torch.cuda.is_available(), "VMamba integration test requires CUDA.")
+class VmambaRuntimeTests(unittest.TestCase):
+    def test_vmamba_cuda_runtime(self) -> None:
+        try:
+            import selective_scan_cuda
+        except ModuleNotFoundError:
+            self.skipTest("selective_scan_cuda is not installed.")
 
-print("selective_scan_cuda:", selective_scan_cuda.__file__)
-print("VMamba:", vmamba.__file__)
-print("WITH_SELECTIVESCAN_MAMBA =", vmamba.WITH_SELECTIVESCAN_MAMBA)
-assert vmamba.WITH_SELECTIVESCAN_MAMBA is True, "CUDA selective scan is NOT active"
+        project = Path(__file__).resolve().parents[2] / "src" / "threecad_segmentation"
+        vmamba_path = project / "third_party" / "VMamba"
+        if str(vmamba_path) not in sys.path:
+            sys.path.insert(0, str(vmamba_path))
+        import vmamba  # noqa: PLC0415
+        from vmamba_t import build_vmamba_t_binary  # noqa: PLC0415
 
-device = torch.device("cuda")
-model = build_vmamba_t_binary(pretrained=False).to(device).eval()
-x = torch.randn(1, 3, 512, 512, device=device)
+        self.assertTrue(vmamba.WITH_SELECTIVESCAN_MAMBA, "CUDA selective scan is NOT active")
+        print("selective_scan_cuda:", selective_scan_cuda.__file__)
+        print("VMamba:", vmamba.__file__)
 
-# This is intentionally inference-only.  It validates that the CUDA selective
-# scan extension and the VMamba graph run on the assigned Kaggle GPU; it does
-# not train, update a weight or download a pretrained backbone.
-with torch.inference_mode(), torch.amp.autocast("cuda", dtype=torch.float16):
-    y = model(x)
-torch.cuda.synchronize()
+        device = torch.device("cuda")
+        model = build_vmamba_t_binary(pretrained=False).to(device).eval()
+        x = torch.randn(1, 3, 512, 512, device=device)
 
-torch.cuda.reset_peak_memory_stats()
-t0 = time.perf_counter()
-with torch.inference_mode(), torch.amp.autocast("cuda", dtype=torch.float16):
-    y = model(x)
-torch.cuda.synchronize()
-elapsed = time.perf_counter() - t0
+        with torch.inference_mode(), torch.amp.autocast("cuda", dtype=torch.float16):
+            model(x)
+        torch.cuda.synchronize()
 
-print("Input:", tuple(x.shape))
-print("Output:", tuple(y.shape))
-print("Forward seconds:", elapsed)
-print("Peak VRAM GB:", torch.cuda.max_memory_allocated() / 1024**3)
-assert y.shape == (1, 1, 512, 512)
-assert torch.isfinite(y).all()
-print("VMAMBA MODEL TEST: PASS")
+        torch.cuda.reset_peak_memory_stats()
+        started = time.perf_counter()
+        with torch.inference_mode(), torch.amp.autocast("cuda", dtype=torch.float16):
+            output = model(x)
+        torch.cuda.synchronize()
+
+        elapsed = time.perf_counter() - started
+        print("Input:", tuple(x.shape))
+        print("Output:", tuple(output.shape))
+        print("Forward seconds:", elapsed)
+        print("Peak VRAM GB:", torch.cuda.max_memory_allocated() / 1024**3)
+        self.assertEqual(tuple(output.shape), (1, 1, 512, 512))
+        self.assertTrue(torch.isfinite(output).all())
+
+
+if __name__ == "__main__":
+    unittest.main()

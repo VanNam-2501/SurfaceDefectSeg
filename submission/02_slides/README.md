@@ -1,4 +1,6 @@
-# Slide bảo vệ — chưa có file chính thức
+# Slide bảo vệ — chờ làm lại
+
+Bộ slide cũ đã được đưa vào archive/review_candidates/2026-08-24/old_presentation để làm lại sau.
 
 Gợi ý 12–14 slide:
 
@@ -11,7 +13,7 @@ Gợi ý 12–14 slide:
 7. E2: bảng/biểu đồ tổng thể.
 8. E3–E5: kích thước, nhóm lỗi, multi-region.
 9. Vì sao threshold pixel gốc báo giả nhiều.
-10. Adaptive, learned và hybrid U-Net + VMamba.
+10. Adaptive Component Policy và spatial rule-based policy.
 11. Trade-off FPR–FNR và kết quả cuối.
 12. Audit dữ liệu và ví dụ định tính.
 13. Demo sản phẩm.

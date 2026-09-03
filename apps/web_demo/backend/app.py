@@ -7,15 +7,14 @@ import importlib.util
 import io
 import json
 import os
-import pickle
 import sys
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
+import cv2
 import numpy as np
 import torch
-import cv2
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image, ImageOps, UnidentifiedImageError
@@ -37,7 +36,11 @@ from decision_policy import (  # noqa: E402
     border_connected_dark_roi,
     load_decision_policy,
 )
-from learned_decision_verifier import image_features, probability_features  # noqa: E402
+from adaptive_component_policy import (  # noqa: E402
+    PolicyConfig,
+    accepted_components,
+    components_for_threshold,
+)
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 CHECKPOINTS = {
@@ -45,31 +48,45 @@ CHECKPOINTS = {
     "segformer": Path(os.environ.get("SEGFORMER_CHECKPOINT", REPO_ROOT / "artifacts" / "checkpoints" / "final" / "segformer_best.pt")),
     "vmamba": Path(os.environ.get("VMAMBA_CHECKPOINT", REPO_ROOT / "artifacts" / "checkpoints" / "final" / "vmamba_best.pt")),
 }
-POLICY_PATH = Path(
+MODEL_ORDER = ("unet", "segformer", "vmamba")
+SUPPORTED_SELECTIONS = (
+    ("unet",),
+    ("segformer",),
+    ("vmamba",),
+    ("unet", "segformer"),
+    ("unet", "vmamba"),
+    ("segformer", "vmamba"),
+)
+DEFAULT_SELECTION = ("unet", "vmamba")
+RAW_THRESHOLDS = {
+    "unet": 0.49,
+    "segformer": 0.66,
+    "vmamba": 0.51,
+}
+ADAPTIVE_POLICY_PATH = Path(
     os.environ.get(
-        "DECISION_POLICY",
-        REPO_ROOT / "artifacts" / "reports" / "final" / "decision_and_test_audit" / "spatial" / "unet_vmamba" / "policy" / "decision_policy.json",
+        "ADAPTIVE_POLICY",
+        REPO_ROOT / "artifacts" / "reports" / "final" / "decision_and_test_audit" / "adaptive_single" / "adaptive_component_policy.json",
     )
 ).resolve()
-LEARNED_POLICY_PATH = Path(
+SPATIAL_POLICY_ROOT = Path(
     os.environ.get(
-        "LEARNED_VERIFIER_POLICY",
-        REPO_ROOT / "artifacts" / "reports" / "final" / "decision_and_test_audit" / "hybrid_pairs" / "unet_vmamba" / "learned_policy.json",
+        "DECISION_POLICY_ROOT",
+        REPO_ROOT / "artifacts" / "reports" / "final" / "decision_and_test_audit" / "spatial",
     )
 ).resolve()
-LEARNED_MODELS_DIR = Path(
-    os.environ.get(
-        "LEARNED_VERIFIER_MODELS",
-        REPO_ROOT / "artifacts" / "reports" / "final" / "decision_and_test_audit" / "hybrid_pairs" / "unet_vmamba" / "models",
-    )
-).resolve()
+POLICY_OVERRIDE_PATH = (
+    Path(os.environ["DECISION_POLICY"]).resolve()
+    if os.environ.get("DECISION_POLICY")
+    else None
+)
 LOADED: dict[str, tuple[torch.nn.Module, dict[str, Any]]] = {}
-POLICY_CACHE: tuple[int, dict[str, Any]] | None = None
-LEARNED_POLICY_CACHE: tuple[int, dict[str, Any]] | None = None
-VERIFIER_CACHE: dict[str, dict[str, Any]] = {}
+POLICY_CACHE: dict[Path, tuple[int, dict[str, Any]]] = {}
+RUNTIME_ISSUE_CACHE: dict[str, str] = {}
 INFERENCE_LOCK = asyncio.Lock()
 MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 MAX_IMAGE_PIXELS = 25_000_000
+ADAPTIVE_POLICY_TYPE = "adaptive_component_evidence"
 
 app = FastAPI(title="Aluminum Surface Lab Inference API")
 app.add_middleware(
@@ -80,193 +97,54 @@ app.add_middleware(
 )
 
 
-def current_policy() -> dict[str, Any] | None:
-    global POLICY_CACHE
-    if not POLICY_PATH.is_file():
-        POLICY_CACHE = None
+def selection_id(selected: tuple[str, ...]) -> str:
+    return "_".join(selected)
+
+
+def policy_path_for(selected: tuple[str, ...]) -> Path:
+    if len(selected) == 1:
+        return ADAPTIVE_POLICY_PATH
+    generated = SPATIAL_POLICY_ROOT / selection_id(selected) / "policy" / "decision_policy.json"
+    if POLICY_OVERRIDE_PATH and POLICY_OVERRIDE_PATH.is_file():
+        override = load_decision_policy(POLICY_OVERRIDE_PATH)
+        if set(override["models"]) == set(selected):
+            return POLICY_OVERRIDE_PATH
+    return generated
+
+
+def is_adaptive_policy(policy: Mapping[str, Any]) -> bool:
+    return policy.get("type") == ADAPTIVE_POLICY_TYPE
+
+
+def policy_matches_selection(policy: Mapping[str, Any], selected: tuple[str, ...]) -> bool:
+    policy_models = set(policy.get("models", {}))
+    selected_models = set(selected)
+    return (
+        selected_models.issubset(policy_models)
+        if is_adaptive_policy(policy)
+        else selected_models == policy_models
+    )
+
+
+def current_policy(selected: tuple[str, ...]) -> dict[str, Any] | None:
+    path = policy_path_for(selected)
+    if not path.is_file():
+        POLICY_CACHE.pop(path, None)
         return None
-    modified = POLICY_PATH.stat().st_mtime_ns
-    if POLICY_CACHE is None or POLICY_CACHE[0] != modified:
-        POLICY_CACHE = (modified, load_decision_policy(POLICY_PATH))
-    return POLICY_CACHE[1]
+    modified = path.stat().st_mtime_ns
+    cached = POLICY_CACHE.get(path)
+    if cached is None or cached[0] != modified:
+        if len(selected) == 1:
+            policy = json.loads(path.read_text(encoding="utf-8"))
+            if not is_adaptive_policy(policy):
+                raise ValueError(f"Unsupported adaptive policy: {path}")
+        else:
+            policy = load_decision_policy(path)
+        cached = (modified, policy)
+        POLICY_CACHE[path] = cached
+    return cached[1]
 
 
-def current_learned_policy() -> dict[str, Any] | None:
-    global LEARNED_POLICY_CACHE
-    if not LEARNED_POLICY_PATH.is_file():
-        LEARNED_POLICY_CACHE = None
-        return None
-    modified = LEARNED_POLICY_PATH.stat().st_mtime_ns
-    if LEARNED_POLICY_CACHE is None or LEARNED_POLICY_CACHE[0] != modified:
-        policy = json.loads(LEARNED_POLICY_PATH.read_text(encoding="utf-8"))
-        if policy.get("type") != "cross_validated_learned_verifier":
-            raise ValueError(f"Unsupported learned verifier: {LEARNED_POLICY_PATH}")
-        if "hybrid_fusion" not in policy.get("branches", {}):
-            raise ValueError("Learned verifier has no hybrid_fusion branch")
-        LEARNED_POLICY_CACHE = (modified, policy)
-    return LEARNED_POLICY_CACHE[1]
-
-
-def load_verifier_bundle(name: str) -> dict[str, Any]:
-    if name not in VERIFIER_CACHE:
-        path = LEARNED_MODELS_DIR / f"{name}_folds.pkl"
-        if not path.is_file():
-            raise FileNotFoundError(f"Verifier bundle missing: {path}")
-        with path.open("rb") as handle:
-            bundle = pickle.load(handle)
-        if bundle.get("branch") != name or not bundle.get("estimators"):
-            raise ValueError(f"Invalid verifier bundle: {path}")
-        VERIFIER_CACHE[name] = bundle
-    return VERIFIER_CACHE[name]
-
-
-def learned_verifier_status() -> dict[str, Any]:
-    try:
-        policy = current_learned_policy()
-        if policy is None:
-            return {"available": False, "ready": False, "reason": "Policy missing."}
-        hybrid = policy["branches"]["hybrid_fusion"]
-        missing = []
-        for name, settings in hybrid["rescue"].items():
-            if settings["score_strategy"] == "learned_hgb":
-                path = LEARNED_MODELS_DIR / f"{name}_folds.pkl"
-                if not path.is_file():
-                    missing.append(str(path))
-        return {
-            "available": True,
-            "ready": not missing,
-            "reason": "" if not missing else "Missing verifier bundle(s): " + ", ".join(missing),
-            "path": str(LEARNED_POLICY_PATH),
-            "models_dir": str(LEARNED_MODELS_DIR),
-            "type": "hybrid_fully_automatic",
-        }
-    except (OSError, ValueError, KeyError, TypeError) as exc:
-        return {"available": True, "ready": False, "reason": str(exc)}
-
-
-def verifier_features(
-    source: np.ndarray,
-    probability: np.ndarray,
-    model: str,
-    feature_size: int,
-    roi_threshold: int,
-) -> dict[str, float]:
-    original_height, original_width = source.shape[:2]
-    scale = min(1.0, float(feature_size) / max(original_height, original_width))
-    target_width = max(1, int(round(original_width * scale)))
-    target_height = max(1, int(round(original_height * scale)))
-    resized = source
-    if (target_height, target_width) != (original_height, original_width):
-        resized = cv2.resize(
-            source, (target_width, target_height), interpolation=cv2.INTER_AREA
-        )
-    resized_probability = probability
-    if probability.shape != (target_height, target_width):
-        resized_probability = cv2.resize(
-            probability,
-            (target_width, target_height),
-            interpolation=cv2.INTER_AREA,
-        )
-    roi = border_connected_dark_roi(resized, threshold=roi_threshold)
-    gray, gradient, features = image_features(resized, roi)
-    features.update(
-        probability_features(
-            model, resized_probability, gray, gradient, roi
-        )
-    )
-    return features
-
-
-def verifier_score(
-    source: np.ndarray,
-    probability: np.ndarray,
-    model: str,
-    strategy: str,
-    learned_policy: dict[str, Any],
-    roi_threshold: int,
-) -> float:
-    features = verifier_features(
-        source,
-        probability,
-        model,
-        int(learned_policy["calibration"].get("feature_size", 256)),
-        roi_threshold,
-    )
-    if strategy != "learned_hgb":
-        if strategy not in features:
-            raise ValueError(f"Verifier feature is unavailable: {strategy}")
-        return float(features[strategy])
-    bundle = load_verifier_bundle(model)
-    columns = bundle["feature_columns"]
-    try:
-        vector = np.asarray([[features[column] for column in columns]], dtype=np.float32)
-    except KeyError as exc:
-        raise ValueError(f"Verifier feature is unavailable: {exc.args[0]}") from exc
-    return float(
-        np.mean(
-            [
-                estimator.predict_proba(vector)[0, 1]
-                for estimator in bundle["estimators"]
-            ]
-        )
-    )
-
-
-def apply_learned_hybrid(
-    source: np.ndarray,
-    probabilities: dict[str, np.ndarray],
-    spatial: dict[str, Any],
-    spatial_policy: dict[str, Any],
-    learned_policy: dict[str, Any],
-) -> dict[str, Any]:
-    hybrid = learned_policy["branches"]["hybrid_fusion"]
-    scores: dict[str, float] = {}
-    rescued: list[str] = []
-    if spatial["decision"] != "defect":
-        for name, settings in hybrid["rescue"].items():
-            threshold = float(settings["threshold"])
-            if threshold > 1.0:
-                scores[name] = 0.0
-                continue
-            score = verifier_score(
-                source,
-                probabilities[name],
-                name,
-                str(settings["score_strategy"]),
-                learned_policy,
-                int(spatial_policy.get("roi", {}).get("border_dark_threshold", 5)),
-            )
-            scores[name] = score
-            if score >= threshold:
-                rescued.append(name)
-
-    if spatial["decision"] == "defect":
-        mask = np.asarray(spatial["mask"], dtype=bool)
-        level = "defect"
-        reason = "U-Net and SegFormer agree spatially"
-    elif rescued:
-        masks = [
-            np.asarray(spatial["analyses"][name]["candidate_mask"], dtype=bool)
-            for name in rescued
-        ]
-        mask = np.logical_or.reduce(masks)
-        if not mask.any():
-            mask = np.logical_or.reduce(
-                [probabilities[name] >= 0.5 for name in rescued]
-            )
-        level = "defect"
-        reason = "specialist verifier confirmed: " + ", ".join(rescued)
-    else:
-        mask = np.zeros(source.shape[:2], dtype=bool)
-        level = "pass"
-        reason = "no spatial consensus and no specialist verifier confirmation"
-    return {
-        "level": level,
-        "reason": reason,
-        "mask": mask,
-        "scores": scores,
-        "rescued_models": rescued,
-    }
 
 def to_data_url(array: np.ndarray) -> str:
     image = Image.fromarray(array)
@@ -274,24 +152,93 @@ def to_data_url(array: np.ndarray) -> str:
     image.save(buffer, format="PNG")
     return "data:image/png;base64," + base64.b64encode(buffer.getvalue()).decode("ascii")
 
+
+def apply_adaptive_policy(
+    image: np.ndarray,
+    probability: np.ndarray,
+    policy: dict[str, Any],
+    model: str,
+) -> dict[str, Any]:
+    """Apply the frozen component rules used by the Adaptive single-model report."""
+    settings = policy["models"][model]["config"]
+    config = PolicyConfig(
+        low_threshold=float(settings["low_threshold"]),
+        min_area=int(settings["min_area_px"]),
+        peak_threshold=float(settings["peak_threshold"]),
+        min_persistent_area=int(settings["min_persistent_area_px"]),
+        min_local_contrast=float(settings["min_local_contrast"]),
+    )
+    roi = border_connected_dark_roi(
+        image, threshold=int(policy.get("roi_border_dark_threshold", 5))
+    )
+    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
+    frame = components_for_threshold(
+        np.asarray(probability, dtype=np.float32), gray, roi, config.low_threshold
+    )
+    accepted = accepted_components(frame, config)
+    binary = ((probability >= config.low_threshold) & roi).astype(np.uint8)
+    _, labels, _, _ = cv2.connectedComponentsWithStats(binary, connectivity=8)
+    mask = np.isin(labels, np.flatnonzero(accepted) + 1)
+    analysis = {
+        "threshold": config.low_threshold,
+        "min_component_area_px": config.min_area,
+        "tiny_high_threshold": config.peak_threshold,
+        "strong_mask": mask,
+        "review_mask": np.zeros(mask.shape, dtype=bool),
+        "candidate_mask": mask,
+        "has_strong": bool(mask.any()),
+        "has_candidate": bool(mask.any()),
+        "strong_component_count": int(accepted.sum()),
+        "review_component_count": 0,
+        "candidate_pixels": int(mask.sum()),
+        "components": [],
+    }
+    return {
+        "decision": "defect" if mask.any() else "pass",
+        "reason": "Adaptive component rules accepted one or more components" if mask.any() else "no component passed the Adaptive component rules",
+        "mask": mask,
+        "consensus_mask": mask,
+        "models_used": [model],
+        "required_votes": 1,
+        "max_spatial_votes": int(mask.any()),
+        "strong_models": [model] if mask.any() else [],
+        "candidate_models": [model] if mask.any() else [],
+        "mask_pixels": int(mask.sum()),
+        "analyses": {model: analysis},
+        "roi": roi,
+    }
+
 def runtime_issue(name: str) -> str:
+    if name in RUNTIME_ISSUE_CACHE:
+        return RUNTIME_ISSUE_CACHE[name]
+    issue = ""
     if name == "segformer" and importlib.util.find_spec("transformers") is None:
-        return "SegFormer runtime is not installed."
-    if name == "vmamba":
+        issue = "SegFormer runtime is not installed."
+    elif name == "vmamba":
         candidates = []
         if os.environ.get("VMAMBA_REPO"):
             candidates.append(Path(os.environ["VMAMBA_REPO"]).expanduser())
         candidates.extend([ROOT / "third_party" / "VMamba", Path("/content/TTTN/third_party/VMamba")])
-        if not any((candidate / "vmamba.py").is_file() for candidate in candidates):
-            return "VMamba runtime is not installed."
-        if not torch.cuda.is_available():
-            return "VMamba requires the configured CUDA runtime."
-    return ""
+        repository = next((candidate for candidate in candidates if (candidate / "vmamba.py").is_file()), None)
+        if repository is None:
+            issue = "VMamba runtime is not installed."
+        elif not torch.cuda.is_available():
+            issue = "VMamba requires the configured CUDA runtime."
+        else:
+            try:
+                importlib.import_module("selective_scan_cuda")
+                if str(repository) not in sys.path:
+                    sys.path.insert(0, str(repository))
+                vmamba_module = importlib.import_module("vmamba")
+                if not getattr(vmamba_module, "WITH_SELECTIVESCAN_MAMBA", False):
+                    issue = "VMamba selective-scan CUDA extension is not active."
+            except Exception as exc:  # pragma: no cover - depends on optional GPU runtime
+                issue = f"VMamba runtime check failed: {exc.__class__.__name__}."
+    RUNTIME_ISSUE_CACHE[name] = issue
+    return issue
 
 
 def status() -> dict[str, dict[str, Any]]:
-    policy = current_policy()
-    policy_models = set(policy["models"]) if policy else set(CHECKPOINTS)
     result = {}
     for name, path in CHECKPOINTS.items():
         issue = "" if path.is_file() else "Checkpoint missing."
@@ -301,7 +248,7 @@ def status() -> dict[str, dict[str, Any]]:
             "available": not issue,
             "checkpoint": str(path),
             "reason": issue,
-            "policy_compatible": name in policy_models,
+            "policy_compatible": any(name in selection for selection in SUPPORTED_SELECTIONS),
         }
     return result
 
@@ -326,26 +273,65 @@ def load_model(name: str) -> tuple[torch.nn.Module, dict[str, Any]]:
 
 @app.get("/health")
 def health() -> dict[str, Any]:
-    policy = current_policy()
-    learned = learned_verifier_status()
     model_status = status()
-    policy_ready = bool(
-        policy
-        and all(model_status.get(name, {}).get("available", False) for name in policy["models"])
+    modes = []
+    for name, cutoff in RAW_THRESHOLDS.items():
+        ready = model_status[name]["available"]
+        modes.append({
+            "id": f"raw_{name}",
+            "models": [name],
+            "available": True,
+            "models_available": ready,
+            "ready": ready,
+            "reason": "" if ready else model_status[name]["reason"],
+            "path": "",
+            "targets": {"threshold": cutoff},
+            "threshold": cutoff,
+            "mode": "raw_segmentation",
+        })
+    for selected in SUPPORTED_SELECTIONS:
+        policy = current_policy(selected)
+        models_available = all(model_status[name]["available"] for name in selected)
+        compatible = bool(policy and policy_matches_selection(policy, selected))
+        ready = compatible and models_available
+        if not policy:
+            reason = "Frozen validation policy is missing."
+        elif not compatible:
+            reason = "Policy model list does not match this mode."
+        elif not models_available:
+            unavailable = [name for name in selected if not model_status[name]["available"]]
+            reason = "Unavailable model(s): " + ", ".join(unavailable)
+        else:
+            reason = ""
+        targets = policy.get("targets", {}) if policy else {}
+        if policy and is_adaptive_policy(policy):
+            targets = {"max_alert_fnr": policy.get("validation_target_max_fnr")}
+        modes.append({
+            "id": selection_id(selected),
+            "models": list(selected),
+            "available": policy is not None,
+            "models_available": models_available,
+            "ready": ready,
+            "reason": reason,
+            "path": str(policy_path_for(selected)),
+            "targets": targets,
+            "mode": "adaptive_single_model" if len(selected) == 1 else "spatial_pair_ensemble",
+        })
+    default_mode = next(
+        (
+            mode
+            for mode in modes
+            if mode["id"] == selection_id(DEFAULT_SELECTION) and mode["ready"]
+        ),
+        next((mode for mode in modes if mode["ready"]), modes[0]),
     )
     return {
         "device": str(DEVICE),
         "project_root": str(ROOT),
         "models": model_status,
-        "policy": {
-            "available": policy is not None,
-            "ready": policy_ready,
-            "path": str(POLICY_PATH),
-            "models": list(policy["models"]) if policy else [],
-            "targets": policy.get("targets", {}) if policy else {},
-            "mode": "hybrid_fully_automatic" if learned.get("ready") else "spatial_triage",
-            "learned_verifier": learned,
-        },
+        "default_mode": default_mode["id"],
+        "modes": modes,
+        "policy": default_mode,
     }
 
 
@@ -353,8 +339,12 @@ def health() -> dict[str, Any]:
 async def infer(
     image: UploadFile = File(...),
     models: str = Form("unet,segformer,vmamba"),
+    decision_mode: str = Form("calibrated"),
     threshold: float | None = Form(None),
 ) -> dict[str, Any]:
+    decision_mode = decision_mode.strip().lower()
+    if decision_mode not in {"calibrated", "raw"}:
+        raise HTTPException(422, "decision_mode must be calibrated or raw.")
     if threshold is not None and not 0.0 < threshold < 1.0:
         raise HTTPException(422, "Threshold must be between 0 and 1.")
     selected = [item.strip().lower() for item in models.split(",") if item.strip()]
@@ -363,6 +353,14 @@ async def infer(
         raise HTTPException(422, f"Unsupported model(s): {', '.join(invalid)}")
     if not selected:
         raise HTTPException(422, "Select at least one model.")
+    if len(selected) != len(set(selected)):
+        raise HTTPException(422, "Each model may be selected only once.")
+    normalized = tuple(name for name in MODEL_ORDER if name in selected)
+    if normalized not in SUPPORTED_SELECTIONS:
+        raise HTTPException(422, "Select one model or one supported two-model ensemble.")
+    selected = list(normalized)
+    if decision_mode == "raw" and len(selected) != 1:
+        raise HTTPException(422, "Raw baseline supports one model at a time.")
     payload = await image.read(MAX_UPLOAD_BYTES + 1)
     if len(payload) > MAX_UPLOAD_BYTES:
         raise HTTPException(413, "Image is larger than the 20 MB upload limit.")
@@ -375,14 +373,17 @@ async def infer(
     except (UnidentifiedImageError, OSError, ValueError) as exc:
         raise HTTPException(422, "Upload a valid PNG or JPEG image.") from exc
 
-    policy = current_policy()
-    if policy:
-        expected_models = set(policy["models"])
-        if set(selected) != expected_models:
+    policy = None if decision_mode == "raw" else current_policy(normalized)
+    if decision_mode == "calibrated":
+        if not policy:
             raise HTTPException(
                 422,
-                "Frozen policy requires exactly these models: "
-                + ", ".join(policy["models"]),
+                f"Frozen policy is missing for mode: {selection_id(normalized)}",
+            )
+        if not policy_matches_selection(policy, normalized):
+            raise HTTPException(
+                422,
+                "Frozen policy does not match the selected inference mode.",
             )
 
     results = []
@@ -408,14 +409,10 @@ async def infer(
             elapsed_by_model[name] = time.perf_counter() - started
 
     if policy:
-        combined = apply_decision_policy(source, probabilities, policy)
-        learned_policy = current_learned_policy()
-        learned_status = learned_verifier_status()
-        hybrid = (
-            apply_learned_hybrid(source, probabilities, combined, policy, learned_policy)
-            if learned_policy is not None and learned_status.get("ready")
-            else None
-        )
+        if is_adaptive_policy(policy):
+            combined = apply_adaptive_policy(source, probabilities[selected[0]], policy, selected[0])
+        else:
+            combined = apply_decision_policy(source, probabilities, policy)
         for name in selected:
             analysis = combined["analyses"][name]
             mask = np.asarray(analysis["candidate_mask"], dtype=bool)
@@ -436,9 +433,9 @@ async def infer(
                 "mask_png": to_data_url((mask.astype(np.uint8) * 255)),
                 "overlay_png": to_data_url(overlay),
             })
-        decision_level = hybrid["level"] if hybrid else combined["decision"]
-        decision_reason = hybrid["reason"] if hybrid else combined["reason"]
-        decision_mask = np.asarray(hybrid["mask"] if hybrid else combined["mask"], dtype=bool)
+        decision_level = combined["decision"]
+        decision_reason = combined["reason"]
+        decision_mask = np.asarray(combined["mask"], dtype=bool)
         color = {
             "pass": np.asarray([67, 145, 104]),
             "review": np.asarray([232, 168, 55]),
@@ -458,52 +455,64 @@ async def infer(
             "mask_pixels": int(combined["mask_pixels"]),
             "mask_png": to_data_url(decision_mask.astype(np.uint8) * 255),
             "overlay_png": to_data_url(decision_overlay),
-            "verifier_scores": hybrid["scores"] if hybrid else {},
-            "rescued_models": hybrid["rescued_models"] if hybrid else [],
         }
-        mode = "learned_hybrid_policy" if hybrid else "calibrated_policy"
+        mode = (
+            "adaptive_single_model"
+            if is_adaptive_policy(policy)
+            else "spatial_pair_ensemble"
+        )
     else:
-        cutoff = 0.5 if threshold is None else float(threshold)
-        legacy_masks = []
-        for name in selected:
-            mask = probabilities[name] >= cutoff
-            legacy_masks.append(mask)
-            overlay = source.copy()
-            overlay[mask] = (
-                0.45 * overlay[mask] + 0.55 * np.asarray([229, 109, 57])
-            ).astype(np.uint8)
-            results.append({
-                "model": name,
-                "threshold": cutoff,
-                "min_component_area_px": 1,
-                "state": "strong" if mask.any() else "pass",
-                "strong_component_count": int(mask.any()),
-                "review_component_count": 0,
-                "elapsed_seconds": elapsed_by_model[name],
-                "mask_png": to_data_url(mask.astype(np.uint8) * 255),
-                "overlay_png": to_data_url(overlay),
-            })
-        decision_mask = np.logical_or.reduce(legacy_masks)
-        decision_level = "defect" if decision_mask.any() else "pass"
+        name = selected[0]
+        cutoff = RAW_THRESHOLDS[name] if threshold is None else float(threshold)
+        mask = probabilities[name] >= cutoff
+        overlay = source.copy()
+        overlay[mask] = (
+            0.45 * overlay[mask] + 0.55 * np.asarray([229, 109, 57])
+        ).astype(np.uint8)
+        results.append({
+            "model": name,
+            "threshold": cutoff,
+            "min_component_area_px": 1,
+            "state": "strong" if mask.any() else "pass",
+            "strong_component_count": int(mask.any()),
+            "review_component_count": 0,
+            "elapsed_seconds": elapsed_by_model[name],
+            "mask_png": to_data_url(mask.astype(np.uint8) * 255),
+            "overlay_png": to_data_url(overlay),
+        })
+        decision_level = "defect" if mask.any() else "pass"
+        decision_color = (
+            np.asarray([213, 68, 62])
+            if decision_level == "defect"
+            else np.asarray([67, 145, 104])
+        )
+        decision_overlay = source.copy()
+        decision_overlay[mask] = (
+            0.35 * decision_overlay[mask] + 0.65 * decision_color
+        ).astype(np.uint8)
         decision = {
             "level": decision_level,
-            "reason": "legacy threshold fallback; calibrate decision_policy.json",
+            "reason": (
+                f"Raw {name} probability map at threshold {cutoff:.2f}; "
+                "no component filtering or spatial policy."
+            ),
             "required_votes": 1,
-            "max_spatial_votes": int(decision_mask.any()),
-            "strong_models": [
-                name for name in selected if bool((probabilities[name] >= cutoff).any())
-            ],
-            "candidate_models": [
-                name for name in selected if bool((probabilities[name] >= cutoff).any())
-            ],
-            "mask_pixels": int(decision_mask.sum()),
-            "mask_png": to_data_url(decision_mask.astype(np.uint8) * 255),
-            "overlay_png": to_data_url(source),
+            "max_spatial_votes": int(mask.any()),
+            "strong_models": [name] if mask.any() else [],
+            "candidate_models": [name] if mask.any() else [],
+            "mask_pixels": int(mask.sum()),
+            "mask_png": to_data_url(mask.astype(np.uint8) * 255),
+            "overlay_png": to_data_url(decision_overlay),
         }
-        mode = "legacy_threshold"
+        mode = "raw_segmentation"
     return {
         "mode": mode,
-        "policy_path": str(POLICY_PATH) if policy else "",
+        "selection": (
+            f"raw_{selection_id(normalized)}"
+            if decision_mode == "raw"
+            else selection_id(normalized)
+        ),
+        "policy_path": str(policy_path_for(normalized)) if policy else "",
         "decision": decision,
         "results": results,
     }

@@ -106,24 +106,3 @@ Ví dụ yêu cầu alert FNR tối đa 1%, Defect recall tối thiểu 85%:
 Nếu constraint không đạt, `selection_status` trong policy sẽ ghi rõ constraint
 nào phải được nới hoặc fallback nào đã được dùng; pipeline không âm thầm tuyên
 bố rằng mục tiêu đã đạt.
-
-## Bộ xác minh tự động U-Net + SegFormer
-
-Pipeline học mới giữ spatial consensus làm tín hiệu chắc chắn, sau đó dùng hai
-specialist verifier để tự động phân xử các ca hai model bất đồng. Validation
-được chấm bằng 5-fold out-of-fold; Test không tham gia chọn score hay threshold.
-
-```powershell
-cd E:\Project\TTTN
-.\run_learned_verifier.ps1
-```
-
-Các kết quả chính:
-
-- `artifacts/experiments/learned_verifier/model_comparison.csv`: từng model và fusion.
-- `artifacts/experiments/learned_verifier/per_image_predictions.csv`: từng ảnh Test.
-- `artifacts/experiments/learned_verifier/defect_group_comparison.csv`: theo nhóm lỗi.
-- `artifacts/experiments/learned_verifier/learned_policy.json`: score và threshold đã khóa.
-
-`hybrid_fusion / fully_automatic` là cấu hình tự động đề xuất và không dùng
-REVIEW. Các dòng `safety_triage` chỉ được giữ để thấy rõ trade-off.

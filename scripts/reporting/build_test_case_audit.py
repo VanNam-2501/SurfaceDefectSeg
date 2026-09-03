@@ -9,7 +9,7 @@ all final PASS/DEFECT branches into a traceable Test ledger:
 * the corresponding original image, GT-mask and probability-map paths are
   included in CSV files;
 * review-ready preview boards are generated for all images of U-Net,
-  SegFormer, VMamba and the learned three-model fusion; and
+  SegFormer, VMamba and Adaptive VMamba; and
 * all FNs/FPs of every automatic experiment receive a visual preview.
 
 This script never changes a threshold.  It only reads already-frozen Test
@@ -105,12 +105,6 @@ def outcome(label: int, decision: str) -> str:
 def model_set_for(experiment_id: str) -> list[str]:
     if experiment_id.startswith("base__") or experiment_id.startswith("adaptive__"):
         return [experiment_id.rsplit("__", 1)[-1]]
-    if experiment_id.startswith("learned_all3__"):
-        branch = experiment_id.split("__")[1]
-        return [branch] if branch in {"unet", "segformer", "vmamba"} else ["unet", "segformer", "vmamba"]
-    if experiment_id.startswith("hybrid_"):
-        pair = experiment_id.split("__", 1)[0].removeprefix("hybrid_")
-        return pair.split("_")
     return ["unet", "segformer", "vmamba"]
 
 
@@ -187,23 +181,6 @@ def gather_experiments(
             adaptive[adaptive["model"].str.lower() == model], "decision",
         ))
 
-    learned_path = report / "learned_all3" / "per_image_predictions.csv"
-    learned = pd.read_csv(learned_path).fillna("")
-    for branch in ("unet", "segformer", "vmamba", "fusion"):
-        column = f"{branch}_automatic"
-        rows.append(source_rows(
-            index, f"learned_all3__{branch}__fully_automatic", "learned_verifier",
-            learned, column,
-        ))
-
-    pairs = ("unet_segformer", "unet_vmamba", "segformer_vmamba")
-    for pair in pairs:
-        path = report / "hybrid_pairs" / pair / "per_image_predictions.csv"
-        hybrid = pd.read_csv(path).fillna("")
-        rows.append(source_rows(
-            index, f"hybrid_{pair}__hybrid_fusion__fully_automatic", "automatic_pair_hybrid",
-            hybrid, "hybrid_fusion_automatic",
-        ))
     return rows
 
 
@@ -323,7 +300,7 @@ def make_previews(all_cases: pd.DataFrame, audit: Path, preview_size: int) -> No
     gallery = audit / "visual_gallery"
     full = {
         "base__unet", "base__segformer", "base__vmamba",
-        "learned_all3__fusion__fully_automatic",
+        "adaptive__vmamba",
     }
     for experiment_id, subset in all_cases.groupby("experiment_id", sort=True):
         is_full = experiment_id in full
@@ -337,7 +314,7 @@ def make_previews(all_cases: pd.DataFrame, audit: Path, preview_size: int) -> No
                 print(f"[preview:{experiment_id}] {position}/{len(selected)}", flush=True)
 
     (gallery / "README.txt").write_text(
-        "all_cases contains every Test image for U-Net, SegFormer, VMamba and the final learned 3-model fusion.\n"
+        "all_cases contains every Test image for U-Net, SegFormer, VMamba and Adaptive VMamba.\n"
         "errors_only contains every false negative and false positive for each other automatic experiment.\n"
         "Each JPG shows Input | GT overlay | probability evidence | final PASS/DEFECT conclusion.\n",
         encoding="utf-8",
@@ -353,7 +330,7 @@ Mọi policy đã được chốt bằng Validation trước khi Test được �
 - PASS/DEFECT experiments: {experiment_count}
 - `01_all_experiments_all_test_images.csv`: toàn bộ ảnh Test của toàn bộ experiment.
 - `per_experiment/<experiment>/`: mỗi experiment có file `all_test_images.csv`, `correct_pass.csv`, `correct_defect.csv`, `missed_defect.csv`, `false_alarm.csv`.
-- `visual_gallery/all_cases/`: tất cả ảnh của ba model gốc và fusion ba model.
+- visual_gallery/all_cases/: tất cả ảnh của ba model gốc và Adaptive VMamba.
 - `visual_gallery/errors_only/`: toàn bộ ảnh bỏ sót/báo động giả của mọi logic tự động khác.
 
 Ý nghĩa: `missed_defect` = Defect thật nhưng kết luận PASS (FN); `false_alarm` = Good thật nhưng kết luận DEFECT (FP).

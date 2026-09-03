@@ -1,11 +1,11 @@
 # Aluminum Surface Lab Demo
 
-This local web demo loads the three trained segmentation architectures. Its
-default production decision is the fully automatic U-Net + VMamba hybrid that
-was selected on Validation and reported once on Test. SegFormer remains
-available as an individually reported experiment, while the frozen hybrid
-decision uses exactly U-Net and VMamba. Each active model provides its overlay
-and mask.
+This local web demo loads the three trained segmentation architectures. It
+offers three original raw baselines, three Adaptive single-model policies,
+and three Spatial two-model ensembles. Raw modes use each model's
+frozen Validation threshold without component filtering; Adaptive single modes load the component policy and Spatial pair modes load
+their matching spatial policy. Each active model provides its overlay and
+mask.
 
 ## Before the first run
 
@@ -17,7 +17,7 @@ and mask.
    directory.
 4. Start the web interface with `npm run dev`, then open the local URL shown.
 
-The frontend never fabricates predictions: a model is marked unavailable until
-its checkpoint is present. With a frozen policy, only policy-compatible models
-are selectable. VMamba also needs its compatible runtime and CUDA setup from
-the main experiment package.
+The frontend never fabricates predictions: a mode is marked unavailable until
+all required checkpoints and, for Adaptive/Spatial modes, the matching frozen policy
+are present. VMamba also needs its compatible runtime and CUDA setup from the
+main experiment package.

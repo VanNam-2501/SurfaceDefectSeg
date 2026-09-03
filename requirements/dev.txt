@@ -1,0 +1,3 @@
+# Local verification and unit tests
+-r ml-kaggle.txt
+pytest>=8.0

@@ -1,6 +1,6 @@
-# Báo cáo thực tập tốt nghiệp — chưa có file chính thức
+# Báo cáo thực tập tốt nghiệp — bản kỹ thuật hiện có
 
-Đặt template gốc, bản DOCX đang viết và PDF cuối tại đây. Không tự dựng biểu
+Bản DOCX kỹ thuật đã có; vẫn cần đặt vào template chính thức của khoa và xuất PDF cuối. Không tự dựng biểu
 mẫu nếu khoa đã phát hành mẫu bắt buộc.
 
 ## Nội dung tối thiểu nên có
@@ -12,7 +12,7 @@ mẫu nếu khoa đã phát hành mẫu bắt buộc.
 4. Patch training và full-resolution sliding-window inference.
 5. Quy tắc chọn checkpoint và threshold chỉ trên Validation.
 6. E0, E2, E3, E4, E5, E7, E8 theo scope đã chốt.
-7. Adaptive rule, learned verifier và hybrid U-Net + VMamba là phần bổ sung.
+7. Adaptive Component Policy và spatial rule-based policy là phần bổ sung.
 8. Kết quả định lượng, định tính và audit label noise.
 9. Giới hạn: batch khác nhau, nhóm knife mark ít mẫu, E6/E9 chưa thực hiện.
 10. Đóng góp cá nhân, sử dụng AI và cách kiểm chứng.

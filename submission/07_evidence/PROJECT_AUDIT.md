@@ -51,8 +51,7 @@ ký thực tập và xác nhận đơn vị. AI log mới ở mức hồi cứu 
    workspace; config vẫn còn bên trong checkpoint, nhưng E6 chưa đủ.
 3. `third_party/VMamba/vmamba.py` có 15 dòng sửa local chưa có commit/patch
    chính thức trong repository dự án.
-4. “Learned SegFormer/VMamba” là nhãn pipeline; score cuối là top-4 probability,
-   không phải learned HGB.
+4. Learned Verifier và Learned Hybrid đã được chuyển vào archive/learned_verifier và không còn thuộc pipeline mặc định.
 
 ### P2 — vệ sinh và dung lượng
 

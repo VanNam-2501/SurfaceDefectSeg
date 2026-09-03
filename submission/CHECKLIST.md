@@ -1,14 +1,14 @@
 # Checklist tuân thủ và sản phẩm phải nộp
 
-Ngày audit: **2026-08-19**. Trạng thái phản ánh file thực tế trong
+Ngày audit: **2026-08-24**. Trạng thái phản ánh file thực tế trong
 `E:\Project\TTTN`, không dựa trên lời kể.
 
 ## Sản phẩm phải nộp
 
 | Sản phẩm | Trạng thái | Bằng chứng hiện có | Việc còn làm |
 |---|---|---|---|
-| Báo cáo thực tập tốt nghiệp đúng biểu mẫu | **THIẾU** | Chưa có DOCX/PDF báo cáo | Xin đúng template của khoa, viết và xuất PDF |
-| Slide bảo vệ | **THIẾU** | Chưa có PPTX/PDF slide | Tạo slide vấn đề → giải pháp → sản phẩm → kết quả → đóng góp |
+| Báo cáo thực tập tốt nghiệp đúng biểu mẫu | **CÓ BẢN KỸ THUẬT** | DOCX kỹ thuật tại `submission/01_report/` | Chuyển vào template chính thức, điền thông tin và xuất PDF |
+| Slide bảo vệ | **CHỜ LÀM LẠI** | Bộ cũ đã chuyển vào `archive/review_candidates/2026-08-24/old_presentation/` | Tạo bộ slide mới sau |
 | Toàn bộ mã nguồn | **CÓ NHƯNG CHƯA ĐÓNG GÓI** | Pipeline ML, demo web, review tool đều có | Tạo source release không chứa dataset/cache/secret |
 | Lịch sử quản lý phiên bản | **MỘT PHẦN** | Repo gốc nhánh `main`, baseline `d91f6fd` từ 2026-08-19 | Duy trì commit thật từ baseline; lịch sử trước baseline không được giả mạo |
 | Video demo dự phòng | **THIẾU** | Chưa có MP4/MOV/MKV | Quay video theo kịch bản trong `04_demo_video/README.md` |
@@ -35,7 +35,7 @@ Ngày audit: **2026-08-19**. Trạng thái phản ánh file thực tế trong
 
 - **Chưa thể đánh dấu hoàn tất bằng file.** Sinh viên phải tự giải thích được
   dataset split, loss, sliding-window inference, threshold Validation, các metric,
-  adaptive component rule, learned verifier và hybrid U-Net + VMamba.
+  Adaptive Component Policy và spatial rule-based policy.
 - Dùng `03_source/README.md` làm bản đồ học mã.
 - Thực hành ít nhất một thay đổi trực tiếp trước buổi bảo vệ: đổi ràng buộc FNR,
   chạy lại Validation selection, chạy test và giải thích ảnh hưởng lên FPR.
@@ -51,8 +51,7 @@ Ngày audit: **2026-08-19**. Trạng thái phản ánh file thực tế trong
    Tuy nhiên, repository chính thức chưa nêu license dữ liệu rõ ràng; phải lưu
    thêm điều khoản tải dữ liệu hoặc xác nhận quyền dùng/công bố trước khi phát
    hành dataset ra ngoài.
-4. Tên “Learned SegFormer/VMamba” dễ gây hiểu nhầm: score cuối được selector
-   chọn là `top_4_mean`, không phải HGB. Chỉ U-Net và fusion ba model dùng HGB.
+4. Pipeline hiện hành chỉ gồm Adaptive Component Policy và Spatial rule-based ensemble; phần Learner cũ được lưu riêng trong archive lịch sử.
 
 ## Điều kiện “sẵn sàng nộp”
 

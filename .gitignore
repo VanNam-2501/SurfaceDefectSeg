@@ -1,6 +1,14 @@
 # Local environments and caches
 .venv/
-archive/
+archive/**
+!archive/learned_verifier/
+!archive/learned_verifier/README.md
+!archive/learned_verifier/src/
+!archive/learned_verifier/src/learned_decision_verifier.py
+!archive/learned_verifier/tests/
+!archive/learned_verifier/tests/test_learned_decision_verifier.py
+!archive/learned_verifier/scripts/
+!archive/learned_verifier/scripts/run_learned_verifier.ps1
 **/__pycache__/
 *.py[cod]
 .pytest_cache/

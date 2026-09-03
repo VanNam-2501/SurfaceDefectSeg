@@ -1,0 +1,38 @@
+name: threecad-ani-demo
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    environment:
+      PYTHONUNBUFFERED: "1"
+      SEGMENTATION_PROJECT_ROOT: /app/src/threecad_segmentation
+      UNET_CHECKPOINT: /app/artifacts/checkpoints/final/unet_best.pt
+      SEGFORMER_CHECKPOINT: /app/artifacts/checkpoints/final/segformer_best.pt
+      VMAMBA_CHECKPOINT: /app/artifacts/checkpoints/final/vmamba_best.pt
+      ADAPTIVE_POLICY: /app/artifacts/reports/final/decision_and_test_audit/adaptive_single/adaptive_component_policy.json
+      DECISION_POLICY_ROOT: /app/artifacts/reports/final/decision_and_test_audit/spatial
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5)"]
+      interval: 10s
+      timeout: 6s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    environment:
+      NEXT_PUBLIC_INFERENCE_API: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+

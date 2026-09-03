@@ -1,6 +1,6 @@
 # Current project audit
 
-Date: 2026-08-21. This document supersedes the path layout in
+Date: 2026-08-24. This document supersedes the path layout in
 `PROJECT_AUDIT.md`, which is retained as the pre-migration snapshot.
 
 ## Current inventory
@@ -38,8 +38,8 @@ instructions.
 The code workspace is organized and verified, but the following products still
 require the student's real content or external confirmation:
 
-1. Report in the faculty's official DOCX/PDF template.
-2. Defense slide deck and PDF export.
+1. Chuyển DOCX kỹ thuật hiện có vào template DOCX/PDF chính thức của khoa.
+2. Làm lại slide bảo vệ sau; bộ slide cũ đã được đưa vào archive.
 3. Backup demo video.
 4. Complete internship and development logs with real durations.
 5. Exact Codex model/build and raw task exports for the AI archive.

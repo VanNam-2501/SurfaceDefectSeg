@@ -18,8 +18,8 @@ Khi nộp source phải giữ file LICENSE upstream và ghi rõ patch local.
 ## Model/dependency chính cần đưa vào dependency notice cuối
 
 - PyTorch/Torchvision và pretrained ResNet18.
+- Scikit-learn metrics cho đánh giá (không dùng learned verifier).
 - Hugging Face Transformers và `nvidia/mit-b0`.
-- Scikit-learn HistGradientBoostingClassifier.
 - OpenCV, NumPy, pandas, Pillow, Matplotlib.
 - FastAPI/Uvicorn.
 - React/Vinext/Vite và các package trong `web_demo/package-lock.json`.

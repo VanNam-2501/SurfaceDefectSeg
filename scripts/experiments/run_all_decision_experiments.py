@@ -6,8 +6,6 @@ after a policy is frozen, and is used solely for the final report.
 Outputs include:
 * single-model adaptive component policies;
 * spatial PASS/REVIEW/DEFECT policies for each model, each pair, and all 3;
-* learned standalone branches and learned 3-model fusion;
-* fully automatic spatial-consensus + specialist-rescue hybrid for each pair;
 * report-ready consolidated CSV tables.
 """
 from __future__ import annotations
@@ -44,15 +42,11 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--prediction", action="append", default=[])
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--max-fnr", type=float, default=0.02)
-    parser.add_argument("--max-defect-fpr", type=float, default=0.10)
-    parser.add_argument("--fnr-safety-margin", type=float, default=0.005)
-    parser.add_argument("--folds", type=int, default=5)
-    parser.add_argument("--feature-size", type=int, default=256)
     parser.add_argument("--rebuild-caches", action="store_true")
     parser.add_argument(
         "--automatic-only",
         action="store_true",
-        help="Report only final PASS/DEFECT branches; spatial REVIEW is internal evidence for hybrid calibration and is not a final output.",
+        help="Report only final PASS/DEFECT branches; spatial REVIEW is internal evidence for rule-based calibration and is not a final output.",
     )
     return parser.parse_args()
 
@@ -165,44 +159,11 @@ def build_report(output: Path, automatic_only: bool = False) -> None:
             }
             rows.append(percent_columns(row))
 
-    learned_sources = [("learned_all3", output / "learned_all3")]
-    hybrid_root = output / "hybrid_pairs"
-    if hybrid_root.is_dir():
-        learned_sources.extend((f"hybrid_{path.name}", path) for path in sorted(hybrid_root.iterdir()) if path.is_dir())
-    for source, directory in learned_sources:
-        path = directory / "model_comparison.csv"
-        if not path.is_file():
-            continue
-        for item in pd.read_csv(path).fillna("").to_dict("records"):
-            if source.startswith("hybrid_") and item.get("branch") != "hybrid_fusion":
-                continue
-            if automatic_only and item.get("mode") != "fully_automatic":
-                continue
-            model_set = source.removeprefix("hybrid_").replace("_", " + ") if item.get("branch") == "hybrid_fusion" else item.get("branch", "")
-            rows.append(percent_columns({
-                "experiment_id": f"{source}__{item.get('branch')}__{item.get('mode')}",
-                "family": "learned_hybrid" if item.get("branch") == "hybrid_fusion" else "learned_verifier",
-                "model_set": model_set,
-                "decision_mode": item.get("mode", ""),
-                "selection_split": "Validation OOF only",
-                "test_alert_fnr": item.get("test_fnr"),
-                "test_auto_defect_fnr": item.get("test_fnr"),
-                "test_auto_defect_fpr": item.get("test_fpr"),
-                "test_good_attention_rate": item.get("test_good_attention_rate"),
-                "test_review_rate": item.get("test_review_rate"),
-                "test_accuracy": item.get("test_accuracy"),
-                "score_strategy": item.get("score_strategy", ""),
-                "threshold_low": item.get("threshold_low", ""),
-                "threshold_high": item.get("threshold_high", ""),
-            }))
-
     master = pd.DataFrame(rows)
     if not master.empty:
         master = master.sort_values(["family", "model_set", "decision_mode", "experiment_id"])
     master.to_csv(tables / "01_master_test_comparison.csv", index=False)
     automatic = master[master["decision_mode"] == "fully_automatic"].copy() if "decision_mode" in master else master.copy()
-    # The learned verifier calls its binary rows fully_automatic; rules call
-    # them fully automatic. Keep both in the convenient automatic table.
     if not master.empty:
         automatic = master[master["decision_mode"].isin(["fully automatic", "fully_automatic"])].copy()
     automatic.to_csv(tables / "02_fully_automatic_comparison.csv", index=False)
@@ -271,41 +232,6 @@ def main() -> None:
             ]
             add_prediction_args(evaluate_args, predictions, names)
             run(repo_root, f"SPATIAL {split.upper()} · {key}", evaluate_args)
-
-    # 3) Learned verifier branches for U-Net, SegFormer, VMamba and 3-model fusion.
-    learned_all_args = [
-        str(source_root / "learned_decision_verifier.py"), "--dataset-root", str(dataset),
-        "--output-dir", str(output / "learned_all3"), "--max-fnr", str(args.max_fnr),
-        "--max-defect-fpr", str(args.max_defect_fpr), "--folds", str(args.folds),
-        "--feature-size", str(args.feature_size),
-    ]
-    add_prediction_args(learned_all_args, predictions, ["unet", "segformer", "vmamba"])
-    if args.rebuild_caches:
-        learned_all_args.append("--rebuild-features")
-    run(repo_root, "LEARNED VERIFIER · ALL 3", learned_all_args)
-
-    # 4) Automatic pair hybrid: spatial consensus is trusted; two models rescue
-    # its misses at thresholds selected entirely from Validation OOF scores.
-    pairs = {
-        "unet_segformer": ["unet", "segformer"],
-        "unet_vmamba": ["unet", "vmamba"],
-        "segformer_vmamba": ["segformer", "vmamba"],
-    }
-    for key, names in pairs.items():
-        spatial = output / "spatial" / key
-        hybrid_args = [
-            str(source_root / "learned_decision_verifier.py"), "--dataset-root", str(dataset),
-            "--output-dir", str(output / "hybrid_pairs" / key),
-            "--base-val-decisions", str(spatial / "val" / "per_image_decisions.csv"),
-            "--base-test-decisions", str(spatial / "test" / "per_image_decisions.csv"),
-            "--max-fnr", str(args.max_fnr), "--max-defect-fpr", str(args.max_defect_fpr),
-            "--fnr-safety-margin", str(args.fnr_safety_margin), "--folds", str(args.folds),
-            "--feature-size", str(args.feature_size),
-        ]
-        add_prediction_args(hybrid_args, predictions, names)
-        if args.rebuild_caches:
-            hybrid_args.append("--rebuild-features")
-        run(repo_root, f"AUTOMATIC HYBRID · {key}", hybrid_args)
 
     build_report(output, automatic_only=args.automatic_only)
     print(f"\nALL DECISION EXPERIMENTS COMPLETE: {output}", flush=True)

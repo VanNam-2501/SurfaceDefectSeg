@@ -242,7 +242,7 @@ nhiên.
 ## E11 — Hậu xử lý component nhỏ — ngoài phạm vi bàn giao cuối
 
 Không báo cáo E11 như một ablation độc lập. Logic quyết định giảm dương tính giả
-được đánh giá trong pipeline policy/hybrid riêng, luôn chọn tham số trên
+được đánh giá trong pipeline policy riêng, luôn chọn tham số trên
 Validation rồi khóa trước khi áp dụng lên Test.
 
 # Định nghĩa đánh giá toàn ảnh

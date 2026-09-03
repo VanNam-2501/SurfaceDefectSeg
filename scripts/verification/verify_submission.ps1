@@ -14,8 +14,8 @@ $Required = @(
     $Python,
     (Join-Path $Root "scripts\verification\check_protocol.py"),
     (Join-Path $Root "tests\ml\test_decision_policy.py"),
+    (Join-Path $Root "tests\ml\test_web_demo_policy.py"),
     (Join-Path $Root "tests\ml\test_training_state.py"),
-    (Join-Path $Root "tests\ml\test_learned_decision_verifier.py"),
     (Join-Path $Root "apps\dataset_review\tests\test_review_tool.py"),
     (Join-Path $Root "artifacts\reports\final\visualizations\index.html"),
     (Join-Path $Root "artifacts\checkpoints\final\unet_best.pt"),
@@ -43,10 +43,10 @@ try {
     Assert-LastExitCode "Dataset protocol check"
     & $Python ".\tests\ml\test_decision_policy.py"
     Assert-LastExitCode "Decision policy tests"
+    & $Python ".\tests\ml\test_web_demo_policy.py"
+    Assert-LastExitCode "Web policy tests"
     & $Python ".\tests\ml\test_training_state.py"
     Assert-LastExitCode "Training state tests"
-    & $Python ".\tests\ml\test_learned_decision_verifier.py"
-    Assert-LastExitCode "Learned verifier tests"
     & $Python -m unittest discover -s ".\apps\dataset_review\tests" -v
     Assert-LastExitCode "Dataset Review Studio tests"
 }

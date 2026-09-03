@@ -13,6 +13,7 @@ and then frozen before Test is read.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import pickle
@@ -53,6 +54,7 @@ PEAK_THRESHOLDS = (
 MIN_AREAS = (1, 2, 4, 8, 16, 32, 64, 128)
 MIN_PERSISTENT_AREAS = (1, 2, 4, 8, 16)
 MIN_CONTRASTS = (0.00, 0.01, 0.02, 0.04)
+CACHE_SCHEMA_VERSION = 3
 
 
 @dataclass(frozen=True)
@@ -274,6 +276,47 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def _stat_signature(path: Path) -> tuple[int, int] | None:
+    try:
+        stat = path.stat()
+    except FileNotFoundError:
+        return None
+    return stat.st_size, stat.st_mtime_ns
+
+
+def cache_fingerprint(
+    records: pd.DataFrame,
+    split: str,
+    dataset_root: Path,
+    prediction_root: Path,
+    roi_threshold: int,
+) -> str:
+    """Identify every input that can change the component cache result."""
+    payload: list[Any] = [
+        CACHE_SCHEMA_VERSION,
+        split,
+        str(dataset_root.resolve()),
+        str(prediction_root.resolve()),
+        int(roi_threshold),
+        LOW_THRESHOLDS,
+        PEAK_THRESHOLDS,
+        [(row_id(row), str(row["image_path"]), int(row["label"])) for _, row in records.iterrows()],
+    ]
+    for _, row in records.iterrows():
+        image_id = row_id(row)
+        image_path = resolve_path(dataset_root, row["image_path"])
+        probability_path_value = probability_path(prediction_root, split, image_id)
+        payload.append(
+            (
+                image_id,
+                _stat_signature(image_path),
+                _stat_signature(probability_path_value),
+            )
+        )
+    encoded = json.dumps(payload, sort_keys=True, default=str).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
 def load_or_build_cache(
     cache_path: Path,
     records: pd.DataFrame,
@@ -283,18 +326,42 @@ def load_or_build_cache(
     roi_threshold: int,
     rebuild: bool,
 ) -> list[dict[str, Any]]:
-    if cache_path.is_file() and not rebuild:
-        with cache_path.open("rb") as handle:
-            cache = pickle.load(handle)
-        if len(cache) == len(records):
-            print(f"[components:{split}] using cache {cache_path}")
-            return cache
-    cache = component_cache_for_split(
+    fingerprint = cache_fingerprint(
         records, split, dataset_root, prediction_root, roi_threshold
     )
-    with cache_path.open("wb") as handle:
-        pickle.dump(cache, handle)
-    return cache
+    if cache_path.is_file() and not rebuild:
+        try:
+            with cache_path.open("rb") as handle:
+                cache = pickle.load(handle)
+        except (OSError, EOFError, pickle.PickleError):
+            cache = None
+        if (
+            isinstance(cache, dict)
+            and cache.get("schema_version") == CACHE_SCHEMA_VERSION
+            and cache.get("fingerprint") == fingerprint
+            and isinstance(cache.get("records"), list)
+            and len(cache["records"]) == len(records)
+        ):
+            print(f"[components:{split}] using cache {cache_path}")
+            return cache["records"]
+        print(f"[components:{split}] cache is stale; rebuilding {cache_path}")
+    component_records = component_cache_for_split(
+        records, split, dataset_root, prediction_root, roi_threshold
+    )
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = cache_path.with_suffix(cache_path.suffix + ".tmp")
+    with temporary.open("wb") as handle:
+        pickle.dump(
+            {
+                "schema_version": CACHE_SCHEMA_VERSION,
+                "fingerprint": fingerprint,
+                "records": component_records,
+            },
+            handle,
+            protocol=pickle.HIGHEST_PROTOCOL,
+        )
+    temporary.replace(cache_path)
+    return component_records
 
 
 def main() -> None:

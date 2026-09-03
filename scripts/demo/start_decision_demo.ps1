@@ -4,8 +4,6 @@ param(
     [string]$SegformerCheckpoint = "",
     [string]$VmambaCheckpoint = "",
     [string]$DecisionPolicy = "",
-    [string]$LearnedVerifierPolicy = "",
-    [string]$LearnedVerifierModels = "",
     [int]$ApiPort = 8000
 )
 
@@ -29,13 +27,7 @@ if (-not $VmambaCheckpoint) {
 if (-not $DecisionPolicy) {
     $DecisionPolicy = Join-Path $RepoRoot "artifacts\reports\final\decision_and_test_audit\spatial\unet_vmamba\policy\decision_policy.json"
 }
-if (-not $LearnedVerifierPolicy) {
-    $LearnedVerifierPolicy = Join-Path $RepoRoot "artifacts\reports\final\decision_and_test_audit\hybrid_pairs\unet_vmamba\learned_policy.json"
-}
-if (-not $LearnedVerifierModels) {
-    $LearnedVerifierModels = Join-Path $RepoRoot "artifacts\reports\final\decision_and_test_audit\hybrid_pairs\unet_vmamba\models"
-}
-foreach ($Path in @($Python, $ProjectRoot, $WebRoot, $UnetCheckpoint, $SegformerCheckpoint, $DecisionPolicy, $LearnedVerifierPolicy, $LearnedVerifierModels)) {
+foreach ($Path in @($Python, $ProjectRoot, $WebRoot, $UnetCheckpoint, $SegformerCheckpoint, $DecisionPolicy)) {
     if (-not (Test-Path -LiteralPath $Path)) {
         throw "Required path not found: $Path"
     }
@@ -48,8 +40,7 @@ $env:SEGMENTATION_PROJECT_ROOT = $ProjectRoot
 $env:UNET_CHECKPOINT = $UnetCheckpoint
 $env:SEGFORMER_CHECKPOINT = $SegformerCheckpoint
 $env:DECISION_POLICY = $DecisionPolicy
-$env:LEARNED_VERIFIER_POLICY = $LearnedVerifierPolicy
-$env:LEARNED_VERIFIER_MODELS = $LearnedVerifierModels
+$env:DECISION_POLICY_ROOT = Join-Path $RepoRoot "artifacts\reports\final\decision_and_test_audit\spatial"
 $env:VMAMBA_CHECKPOINT = $VmambaCheckpoint
 $env:NEXT_PUBLIC_INFERENCE_API = "http://127.0.0.1:$ApiPort"
 
@@ -70,6 +61,6 @@ $Frontend = Start-Process -FilePath $Npm -ArgumentList @("run", "dev") `
 Write-Host "Decision demo started." -ForegroundColor Green
 Write-Host "API PID: $($Api.Id) · http://127.0.0.1:$ApiPort/health"
 Write-Host "Web PID: $($Frontend.Id) · check $LogRoot\web.stdout.log for its URL"
-Write-Host "Policy: $DecisionPolicy"
-Write-Host "Learned verifier: $LearnedVerifierPolicy"
+Write-Host "Default policy: $DecisionPolicy"
+Write-Host "Policy root: $env:DECISION_POLICY_ROOT"
 Write-Host "Stop later with: Stop-Process -Id $($Api.Id),$($Frontend.Id)"

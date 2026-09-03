@@ -1,17 +1,18 @@
 # Local inference setup
 
-The recommended setup uses the final frozen U-Net + VMamba policy. From the
-workspace root, run:
+The demo exposes nine modes: three original raw model baselines, three
+Adaptive single-model policies, and three Spatial two-model ensembles.
+Raw baselines use the frozen Validation thresholds 0.49 (U-Net), 0.66
+(SegFormer), and 0.51 (VMamba). From the workspace root, run:
 
 ```powershell
 .\run_demo.ps1
 ```
 
-The launcher uses the local final checkpoints in
-`artifacts/checkpoints/final` and the final U-Net + VMamba policy
-under `artifacts/reports/final/decision_and_test_audit`. No path under
-`E:\Dowload` is required. `DECISION_POLICY`, `LEARNED_VERIFIER_POLICY` and
-`LEARNED_VERIFIER_MODELS` can override those defaults.
+The launcher uses the local final checkpoints and discovers the Adaptive
+single-model policy plus the six Spatial policies under artifacts/reports/final/decision_and_test_audit/spatial. No external download path is required. ADAPTIVE_POLICY may override the
+Adaptive policy, DECISION_POLICY may override one matching Spatial policy, and
+DECISION_POLICY_ROOT may override the Spatial policy directory.
 
 The default trained checkpoints are in:
 

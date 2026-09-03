@@ -24,13 +24,12 @@ TTTN/
 │   ├── fullres_eval.py        Suy luận ảnh đầy đủ và metric
 │   ├── decision_policy.py     Logic không gian/connected components
 │   ├── adaptive_component_policy.py
-│   ├── learned_decision_verifier.py
 │   └── third_party/VMamba/    Mã vendor; không chứa `.git` lồng
 ├── scripts/
 │   ├── data/                  Data audit
 │   ├── demo/                  Khởi động demo
 │   ├── evaluation/            Validation/Test từng model
-│   ├── experiments/           Policy, hybrid và probability cache
+│   ├── experiments/           Policy, spatial ensemble và probability cache
 │   ├── reporting/             Tổng hợp bảng/biểu đồ/audit Test
 │   ├── setup/                 Cài runtime VMamba trên Kaggle
 │   ├── training/              Entry point train

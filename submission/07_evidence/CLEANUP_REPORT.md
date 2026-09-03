@@ -78,8 +78,8 @@ vĩnh viễn.
 
 - `.venv/` và `web_demo/node_modules/`: lớn nhưng giúp demo/review chạy ngay;
   không đóng gói khi nộp.
-- `decision_workspace/`, `adaptive_component_workspace/` và
-  `learned_verifier_workspace/`: nhỏ, là output trung gian phục vụ tái kiểm tra.
+- decision_workspace/ và adaptive_component_workspace/: output trung gian phục vụ tái kiểm tra.
+- Learned Verifier/Hybrid cùng artifact cũ được bảo toàn trong archive/learned_verifier/.
 - U-Net Val/Test prediction cache đã được gom từ kết quả ngoài workspace vào
   `decision_workspace/predictions/unet/`; các script thí nghiệm không còn mặc
   định phụ thuộc `E:\Dowload`.

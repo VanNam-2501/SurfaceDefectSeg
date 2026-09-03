@@ -24,7 +24,7 @@ kế hoạch ban đầu trước khi điều chỉnh theo VRAM Kaggle.
 |---|---:|---:|---:|---:|---:|---:|---:|
 | U-Net/ResNet18 | 38 | 1 | 38 | 50 | 48 | 0,702160 | 0,49 |
 | SegFormer-B0 | 16 | 2 | 32 | 50 | 50 | 0,691986 | 0,66 |
-| VMamba-T | 16 | 1 | 16 | 25 | 23 | 0,768361 | 0,51 |
+| VMamba-T | 16 | 1 | 16 | 25 | 2có3 | 0,768361 | 0,51 |
 
 Nguồn cấu hình: trường `config`, `best_epoch` và `best_metric` bên trong:
 

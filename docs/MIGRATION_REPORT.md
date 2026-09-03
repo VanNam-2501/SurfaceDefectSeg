@@ -33,8 +33,8 @@ launchers use repository-relative paths; no active default depends on drive `E:`
 - ML unit tests: 10/10 PASS.
 - Dataset Review Studio tests: 5/5 PASS.
 - Web production build and rendered/client tests: 2/2 PASS.
-- FastAPI configuration: all three checkpoints, spatial policy, learned policy
-  and learned model directory resolved successfully.
+- FastAPI configuration: all three checkpoints and the frozen spatial rule-based policy resolve successfully.
+- Learned Verifier and Learned Hybrid are preserved under archive/learned_verifier and are no longer active.
 - Git baseline: `d91f6fd` on branch `main`.
 
 Run the same maintained check with:

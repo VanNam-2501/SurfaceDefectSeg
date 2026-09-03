@@ -17,7 +17,7 @@ artifacts; generated paths inside those historical files are not rewritten.
 | `kaggle_upload/*.zip` | `artifacts/packages/kaggle` |
 | `decision_workspace` | `artifacts/experiments/decision` |
 | `adaptive_component_workspace` | `artifacts/experiments/adaptive_component` |
-| `learned_verifier_workspace` | `artifacts/experiments/learned_verifier` |
+| learned_verifier_workspace | archive/learned_verifier/artifacts/experiments/learned_verifier |
 | `final_thesis_deliverables` | `artifacts/reports/final` |
 | `cleanup_quarantine` | `archive/cleanup_quarantine` |
 | root experiment scripts | `scripts/experiments` |

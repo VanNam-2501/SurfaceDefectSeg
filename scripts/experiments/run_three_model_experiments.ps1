@@ -8,10 +8,6 @@ param(
     [string]$VmambaPredictionRoot = "",
     [string]$ReportDir = "",
     [double]$MaxFnr = 0.02,
-    [double]$MaxDefectFpr = 0.10,
-    [double]$FnrSafetyMargin = 0.005,
-    [int]$Folds = 5,
-    [int]$FeatureSize = 256,
     [switch]$RebuildCaches
 )
 
@@ -24,8 +20,6 @@ Every threshold/rule is fitted on Validation only.  The Test split is never
 used to choose a policy.  The final package contains:
   * single-model adaptive component rules (U-Net, SegFormer, VMamba);
   * spatial PASS/REVIEW/DEFECT policies for each model, all pairs, and all 3;
-  * a learned verifier for each model and learned three-model fusion;
-  * fully automatic hybrid policies for every pair of models;
   * consolidated CSV tables for the thesis/report.
 
 .EXAMPLE
@@ -50,7 +44,6 @@ $Python = Join-Path $RepoRoot ".venv\Scripts\python.exe"
 $Calibrator = Join-Path $ProjectRoot "calibrate_decision_policy.py"
 $Evaluator = Join-Path $RepoRoot "scripts\experiments\evaluate_decision_policy.py"
 $Adaptive = Join-Path $ProjectRoot "adaptive_component_policy.py"
-$Learned = Join-Path $ProjectRoot "learned_decision_verifier.py"
 $Compiler = Join-Path $RepoRoot "scripts\reporting\compile_three_model_report.py"
 $Invariant = [Globalization.CultureInfo]::InvariantCulture
 
@@ -60,7 +53,7 @@ $ModelRoots = [ordered]@{
     vmamba = $VmambaPredictionRoot
 }
 
-foreach ($RequiredPath in @($Python, $DatasetRoot, $Calibrator, $Evaluator, $Adaptive, $Learned, $Compiler)) {
+foreach ($RequiredPath in @($Python, $DatasetRoot, $Calibrator, $Evaluator, $Adaptive, $Compiler)) {
     if (-not (Test-Path -LiteralPath $RequiredPath)) {
         throw "Required path not found: $RequiredPath"
     }
@@ -123,8 +116,6 @@ if ($Action -eq "Check") {
 
 New-Item -ItemType Directory -Force -Path $ReportDir | Out-Null
 $fnrText = $MaxFnr.ToString("0.####", $Invariant)
-$defectFprText = $MaxDefectFpr.ToString("0.####", $Invariant)
-$marginText = $FnrSafetyMargin.ToString("0.####", $Invariant)
 
 function Invoke-SpatialExperiment {
     param([string]$Id, [string[]]$Models)
@@ -175,42 +166,6 @@ foreach ($Item in @($Adaptive, "--dataset-root", $DatasetRoot, "--output-dir", $
 Add-Predictions -Arguments $AdaptiveArguments -Models @("unet", "segformer", "vmamba")
 if ($RebuildCaches) { $AdaptiveArguments.Add("--rebuild-cache") }
 Invoke-Python -Arguments $AdaptiveArguments
-
-Write-Host "`n=== LEARNED VERIFIER · ALL THREE MODELS ===" -ForegroundColor Yellow
-$LearnedAllOutput = Join-Path $ReportDir "learned_all3"
-$LearnedAllArguments = [System.Collections.Generic.List[string]]::new()
-foreach ($Item in @(
-    $Learned, "--dataset-root", $DatasetRoot, "--output-dir", $LearnedAllOutput,
-    "--max-fnr", $fnrText, "--max-defect-fpr", $defectFprText,
-    "--folds", "$Folds", "--feature-size", "$FeatureSize"
-)) { $LearnedAllArguments.Add([string]$Item) }
-Add-Predictions -Arguments $LearnedAllArguments -Models @("unet", "segformer", "vmamba")
-if ($RebuildCaches) { $LearnedAllArguments.Add("--rebuild-features") }
-Invoke-Python -Arguments $LearnedAllArguments
-
-$Pairs = [ordered]@{
-    unet_segformer = @("unet", "segformer")
-    unet_vmamba = @("unet", "vmamba")
-    segformer_vmamba = @("segformer", "vmamba")
-}
-foreach ($Entry in $Pairs.GetEnumerator()) {
-    $Id = [string]$Entry.Key
-    $Models = [string[]]$Entry.Value
-    Write-Host "`n=== FULLY AUTOMATIC HYBRID: $Id ===" -ForegroundColor Magenta
-    $HybridOutput = Join-Path $ReportDir "hybrid_pairs\$Id"
-    $SpatialRoot = Join-Path $ReportDir "spatial\$Id"
-    $HybridArguments = [System.Collections.Generic.List[string]]::new()
-    foreach ($Item in @(
-        $Learned, "--dataset-root", $DatasetRoot, "--output-dir", $HybridOutput,
-        "--base-val-decisions", (Join-Path $SpatialRoot "val\per_image_decisions.csv"),
-        "--base-test-decisions", (Join-Path $SpatialRoot "test\per_image_decisions.csv"),
-        "--max-fnr", $fnrText, "--max-defect-fpr", $defectFprText,
-        "--fnr-safety-margin", $marginText, "--folds", "$Folds", "--feature-size", "$FeatureSize"
-    )) { $HybridArguments.Add([string]$Item) }
-    Add-Predictions -Arguments $HybridArguments -Models $Models
-    if ($RebuildCaches) { $HybridArguments.Add("--rebuild-features") }
-    Invoke-Python -Arguments $HybridArguments
-}
 
 Write-Host "`n=== COMPILE REPORT TABLES ===" -ForegroundColor Green
 $CompileArguments = [System.Collections.Generic.List[string]]::new()

@@ -30,8 +30,6 @@ MODEL_COLORS = {
 FAMILY_COLORS = {
     "Ngưỡng pixel gốc": "#8795A1",
     "Adaptive": "#3B6FB6",
-    "Learned": "#9C6ADE",
-    "Hybrid": "#2D8B73",
 }
 OUTCOME_COLORS = {
     "TN": "#86BFA6",
@@ -235,8 +233,6 @@ def load_inputs(root: Path) -> dict[str, pd.DataFrame]:
         "automatic": decision_root / "tables" / "02_fully_automatic_comparison.csv",
         "outcomes": decision_root / "tables" / "03_test_case_outcome_summary.csv",
         "adaptive_group": decision_root / "adaptive_single" / "adaptive_defect_group_test.csv",
-        "learned_group": decision_root / "learned_all3" / "defect_group_comparison.csv",
-        "hybrid_um_group": decision_root / "hybrid_pairs" / "unet_vmamba" / "defect_group_comparison.csv",
         "all_images": data_root / "01_all_images_frozen_policy.csv",
         "audit_reasons": data_root / "03_summary_by_split_and_reason.csv",
         "integrity": data_root / "04_mask_integrity_issues.csv",
@@ -591,12 +587,6 @@ def experiment_label(row: pd.Series) -> str:
     combo = "+".join(model_tokens)
     if "adaptive" in joined:
         return f"Adaptive {combo}".strip()
-    if "hybrid" in joined:
-        return f"Hybrid {combo}".strip()
-    if "learned_all3__fusion" in joined or ("fusion" in joined and len(model_tokens) >= 3):
-        return "Learned fusion U+S+M"
-    if "learned" in joined or "fully_automatic" in joined:
-        return f"Learned {combo}".strip()
     return raw.replace("__", " · ").replace("_", " ")
 
 
@@ -607,10 +597,6 @@ def experiment_family(row: pd.Series) -> str:
         return "Ngưỡng pixel gốc"
     if "adaptive" in joined:
         return "Adaptive"
-    if "hybrid" in joined:
-        return "Hybrid"
-    if "learned" in joined or "fusion" in joined:
-        return "Learned"
     return "Ngưỡng pixel gốc"
 
 
@@ -620,7 +606,8 @@ def automatic_with_base(data: dict[str, pd.DataFrame]) -> pd.DataFrame:
     automatic["family"] = automatic.apply(experiment_family, axis=1)
     automatic["fnr_pct"] = pct_or_identity(automatic["test_auto_defect_fnr_pct"])
     automatic["fpr_pct"] = pct_or_identity(automatic["test_auto_defect_fpr_pct"])
-    automatic["accuracy_pct"] = pct_or_identity(automatic["test_accuracy_pct"])
+    accuracy_column = "test_accuracy_pct" if "test_accuracy_pct" in automatic else "test_automatic_accuracy_pct"
+    automatic["accuracy_pct"] = pct_or_identity(automatic[accuracy_column])
 
     base = data["base"].copy()
     base["model"] = base["model"].map(clean_model)
@@ -639,15 +626,8 @@ def automatic_with_base(data: dict[str, pd.DataFrame]) -> pd.DataFrame:
 def plot_decision_tradeoff(data: dict[str, pd.DataFrame], exporter: Exporter) -> None:
     frame = automatic_with_base(data)
     fig, ax = plt.subplots(figsize=(13.5, 8.2))
-    markers = {"Ngưỡng pixel gốc": "o", "Adaptive": "s", "Learned": "D", "Hybrid": "^"}
-    label_offsets = {
-        "Learned M": (7, -16),
-        "Hybrid S+M": (7, 12),
-        "Learned fusion U+S+M": (7, -18),
-        "Hybrid U+M": (7, 10),
-        "Learned U": (7, 8),
-        "Adaptive U": (7, -15),
-    }
+    markers = {"Ngưỡng pixel gốc": "o", "Adaptive": "s"}
+    label_offsets = {"Adaptive U": (7, -15)}
     for family, group in frame.groupby("family", sort=False):
         ax.scatter(
             group["fpr_pct"],
@@ -691,8 +671,8 @@ def plot_decision_tradeoff(data: dict[str, pd.DataFrame], exporter: Exporter) ->
         fig,
         section="Logic quyết định tự động",
         slug="12_decision_fpr_fnr_tradeoff",
-        title="Trade-off FPR–FNR của toàn bộ logic tự động",
-        description="Biểu đồ trung tâm để chọn cấu hình: điểm càng gần góc trái dưới càng cân bằng.",
+        title="Trade-off FPR–FNR của logic quyết định cấp ảnh",
+        description="So sánh FPR/FNR của quyết định PASS/DEFECT; không phản ánh Dice/IoU hay chất lượng biên mask.",
         sources="00_base_model_segmentation_test.csv; 02_fully_automatic_comparison.csv",
     )
 
@@ -704,7 +684,6 @@ def plot_strategy_by_model(data: dict[str, pd.DataFrame], exporter: Exporter) ->
         selectors = {
             "Gốc": full["label"] == f"Gốc {model}",
             "Adaptive": full["label"] == f"Adaptive {short}",
-            "Learned": full["label"] == f"Learned {short}",
         }
         for strategy, mask in selectors.items():
             subset = full[mask]
@@ -719,7 +698,7 @@ def plot_strategy_by_model(data: dict[str, pd.DataFrame], exporter: Exporter) ->
                     }
                 )
     frame = pd.DataFrame(rows)
-    strategy_colors = {"Gốc": "#8795A1", "Adaptive": "#3B6FB6", "Learned": "#9C6ADE"}
+    strategy_colors = {"Gốc": "#8795A1", "Adaptive": "#3B6FB6"}
     fig, axes = plt.subplots(1, 3, figsize=(16.5, 5.6), sharey=True)
     for ax, model in zip(axes, MODEL_ORDER):
         subset = frame[frame["model"] == model]
@@ -736,13 +715,13 @@ def plot_strategy_by_model(data: dict[str, pd.DataFrame], exporter: Exporter) ->
         for label in ax.get_xticklabels():
             label.set_color(strategy_colors.get(label.get_text(), TEXT_COLOR))
     axes[0].legend(ncol=2, loc="upper left")
-    fig.suptitle("Model riêng · Logic hậu xử lý giảm FPR như thế nào?", y=1.02)
+    fig.suptitle("Model riêng · Adaptive thay đổi quyết định cấp ảnh như thế nào?", y=1.02)
     exporter.save(
         fig,
         section="Logic quyết định tự động",
         slug="13_single_model_strategy_comparison",
-        title="So sánh ngưỡng gốc, adaptive và learned cho từng model riêng",
-        description="Thể hiện trực tiếp mức giảm báo động giả và phần đánh đổi bằng bỏ sót.",
+        title="So sánh ngưỡng gốc và Adaptive cho từng model",
+        description="So sánh quyết định PASS/DEFECT trước và sau Adaptive; probability map và chất lượng biên mask không thay đổi.",
         sources="00_base_model_segmentation_test.csv; 02_fully_automatic_comparison.csv",
     )
 
@@ -777,7 +756,7 @@ def plot_outcomes(data: dict[str, pd.DataFrame], exporter: Exporter) -> None:
         section="Logic quyết định tự động",
         slug="14_test_case_outcomes",
         title="Phân rã TP, TN, FP, FN của từng thí nghiệm",
-        description="Cho biết thay đổi FPR/FNR tương ứng chính xác bao nhiêu ảnh trong 717 ảnh Test.",
+        description="Phân rã kết quả quyết định cấp ảnh, cho biết thay đổi FPR/FNR tương ứng bao nhiêu ảnh trong 717 ảnh Test.",
         sources="03_test_case_outcome_summary.csv",
     )
 
@@ -820,7 +799,7 @@ def plot_validation_pareto(data: dict[str, pd.DataFrame], root: Path, exporter: 
         section="Logic quyết định tự động",
         slug="15_validation_adaptive_pareto",
         title="Không gian FPR–FNR và cấu hình được chọn trên Validation",
-        description="Ngôi sao là cấu hình được khóa trước khi đánh giá Test; đường đen là biên Pareto.",
+        description="Ngôi sao là policy quyết định cấp ảnh được khóa trên Validation trước khi đánh giá Test; đường đen là biên Pareto.",
         sources="*_adaptive_scan.csv; adaptive_component_policy.json",
     )
 
@@ -828,46 +807,31 @@ def plot_validation_pareto(data: dict[str, pd.DataFrame], root: Path, exporter: 
 def plot_automatic_group_recall(data: dict[str, pd.DataFrame], exporter: Exporter) -> None:
     adaptive = data["adaptive_group"].copy()
     adaptive["model"] = adaptive["model"].map(clean_model)
-    adaptive_vmamba = adaptive[adaptive["model"] == "VMamba"].copy()
-    adaptive_vmamba["method"] = "Adaptive VMamba"
-    adaptive_vmamba = adaptive_vmamba.rename(columns={"defect_group": "group", "recall": "automatic_recall"})
-
-    learned = data["learned_group"]
-    learned = learned[learned["branch"].astype(str).str.lower() == "fusion"].copy()
-    learned["method"] = "Learned fusion U+S+M"
-    learned = learned.rename(columns={"defect_group": "group"})
-
-    hybrid = data["hybrid_um_group"]
-    hybrid = hybrid[hybrid["branch"].astype(str).str.lower() == "hybrid_fusion"].copy()
-    hybrid["method"] = "Hybrid U+M"
-    hybrid = hybrid.rename(columns={"defect_group": "group"})
-
-    frame = pd.concat(
-        [
-            adaptive_vmamba[["method", "group", "automatic_recall", "positive_images"]],
-            learned[["method", "group", "automatic_recall", "positive_images"]],
-            hybrid[["method", "group", "automatic_recall", "positive_images"]],
-        ],
-        ignore_index=True,
+    adaptive = adaptive.rename(
+        columns={"defect_group": "group", "recall": "automatic_recall"}
     )
-    groups = frame["group"].drop_duplicates().tolist()
-    methods = ["Adaptive VMamba", "Learned fusion U+S+M", "Hybrid U+M"]
-    colors = ["#3B6FB6", "#9C6ADE", "#2D8B73"]
+    groups = adaptive["group"].drop_duplicates().tolist()
     series = []
-    for method, color in zip(methods, colors):
-        subset = frame[frame["method"] == method].set_index("group").reindex(groups)
-        series.append((method, pct(subset["automatic_recall"]), color))
+    for model in MODEL_ORDER:
+        subset = adaptive[adaptive["model"] == model].set_index("group").reindex(groups)
+        series.append(
+            (
+                f"Adaptive {model}",
+                pct(subset["automatic_recall"]),
+                MODEL_COLORS[model],
+            )
+        )
     fig, ax = plt.subplots(figsize=(14, 6.2))
-    grouped_bars(ax, groups, series, ylim=(0, 104), rotate=22, annotate=True)
-    ax.legend(ncol=3, loc="lower left")
-    ax.set_title("Logic tự động · Recall theo từng nhóm khuyết tật")
+    grouped_bars(ax, groups, series, ylim=(0, 118), rotate=22, annotate=True)
+    ax.legend(ncol=3, loc="upper center")
+    ax.set_title("Adaptive · Recall cấp ảnh theo từng nhóm khuyết tật")
     exporter.save(
         fig,
         section="Logic quyết định tự động",
         slug="16_automatic_defect_group_recall",
-        title="Độ nhạy theo loại lỗi của các logic nổi bật",
-        description="Giúp kiểm tra việc giảm FPR có làm yếu riêng một nhóm khuyết tật hay không.",
-        sources="adaptive_defect_group_test.csv; learned_all3/defect_group_comparison.csv; unet_vmamba/defect_group_comparison.csv",
+        title="Độ nhạy cấp ảnh theo loại lỗi của Adaptive trên ba model",
+        description="Recall ở cấp ảnh của Adaptive theo nhóm lỗi; đây không phải Dice/IoU hay chất lượng biên mask.",
+        sources="adaptive_defect_group_test.csv",
     )
 
 
@@ -982,56 +946,191 @@ def plot_vote_patterns(data: dict[str, pd.DataFrame], exporter: Exporter) -> Non
     )
 
 
-def make_error_contact_sheet(root: Path, exporter: Exporter) -> None:
-    base = root / "decision_and_test_audit" / "test_case_audit" / "visual_gallery" / "errors_only" / "hybrid_unet_vmamba__hybrid_fusion__fully_automatic"
-    categories = [("false_alarm", "Báo động giả"), ("missed_defect", "Bỏ sót bất thường")]
+def contact_sheet_font(size: int, *, bold: bool = False) -> ImageFont.ImageFont:
+    candidates = (
+        ("arialbd.ttf", "DejaVuSans-Bold.ttf")
+        if bold
+        else ("arial.ttf", "DejaVuSans.ttf")
+    )
+    for candidate in candidates:
+        try:
+            return ImageFont.truetype(candidate, size)
+        except OSError:
+            continue
+    return ImageFont.load_default()
+
+
+def gallery_case_score(path: Path, category: str) -> float:
+    """Return a reproducible visual score used only for representative sampling."""
+    with Image.open(path) as image:
+        array = np.asarray(image.convert("RGB"), dtype=np.int16)
+    panel_width = array.shape[1] // 4
+    content = array[24:]
+    if category == "false_alarm":
+        probability = content[:, 2 * panel_width : 3 * panel_width]
+        luminance = (
+            0.2126 * probability[:, :, 0]
+            + 0.7152 * probability[:, :, 1]
+            + 0.0722 * probability[:, :, 2]
+        )
+        return float(np.mean(np.clip((luminance - 16.0) / 239.0, 0.0, 1.0)))
+
+    ground_truth = content[:, panel_width : 2 * panel_width]
+    redness = ground_truth[:, :, 0] - np.maximum(ground_truth[:, :, 1], ground_truth[:, :, 2])
+    return float(np.mean(redness > 28))
+
+
+def select_representative_cases(paths: list[Path], category: str) -> list[tuple[Path, str]]:
+    """Select P25/P75 cases instead of depending on arbitrary filename order."""
+    if not paths:
+        return []
+    scored = sorted(
+        ((gallery_case_score(path, category), path) for path in paths),
+        key=lambda item: (item[0], item[1].name),
+    )
+    quantiles = (0.25, 0.75) if len(scored) > 1 else (0.5,)
+    scores = np.asarray([score for score, _ in scored], dtype=float)
     selected: list[tuple[Path, str]] = []
-    for folder, label in categories:
-        paths = sorted((base / folder).glob("*.jpg"))[:4]
-        selected.extend((path, label) for path in paths)
+    used: set[Path] = set()
+    for quantile in quantiles:
+        target = float(np.quantile(scores, quantile))
+        _, path = min(
+            (item for item in scored if item[1] not in used),
+            key=lambda item: (abs(item[0] - target), item[1].name),
+        )
+        used.add(path)
+        selected.append((path, f"P{round(quantile * 100)}"))
+    return selected
+
+
+def gallery_visual_panels(path: Path) -> tuple[Image.Image, Image.Image, Image.Image]:
+    """Crop the three visual panels and discard the small English title/verdict bands."""
+    with Image.open(path) as image:
+        board = image.convert("RGB")
+    panel_width = board.width // 4
+    top = 24
+    return tuple(
+        board.crop((index * panel_width, top, (index + 1) * panel_width, board.height))
+        for index in range(3)
+    )
+
+
+def fit_panel(image: Image.Image, width: int, height: int) -> Image.Image:
+    scale = min(width / image.width, height / image.height)
+    resized = image.resize(
+        (max(1, round(image.width * scale)), max(1, round(image.height * scale))),
+        Image.Resampling.LANCZOS,
+    )
+    tile = Image.new("RGB", (width, height), "white")
+    tile.paste(resized, ((width - resized.width) // 2, (height - resized.height) // 2))
+    return tile
+
+
+def make_error_contact_sheet(root: Path, exporter: Exporter) -> None:
+    base = root / "decision_and_test_audit" / "test_case_audit" / "visual_gallery" / "errors_only" / "adaptive__vmamba"
+    category_specs = (
+        ("false_alarm", "FP · BÁO ĐỘNG GIẢ", "Good", "DEFECT", "mức bằng chứng", "#E7A54A"),
+        ("missed_defect", "FN · BỎ SÓT BẤT THƯỜNG", "Defect", "PASS", "diện tích GT", "#C95A5A"),
+    )
+    selected: list[tuple[Path, str, str, str, str, str, str]] = []
+    category_counts: dict[str, int] = {}
+    for folder, label, truth, decision, criterion, color in category_specs:
+        paths = sorted((base / folder).glob("*.jpg"))
+        category_counts[folder] = len(paths)
+        selected.extend(
+            (path, quantile, label, truth, decision, criterion, color)
+            for path, quantile in select_representative_cases(paths, folder)
+        )
     if not selected:
         return
 
-    thumb_w, thumb_h = 640, 270
-    header_h = 72
-    margin = 18
-    columns = 2
-    rows = math.ceil(len(selected) / columns)
-    canvas = Image.new("RGB", (columns * thumb_w + (columns + 1) * margin, rows * (thumb_h + header_h) + (rows + 1) * margin), "#F7F9FB")
+    margin = 28
+    gap = 18
+    metadata_width = 330
+    panel_width = 340
+    panel_height = 238
+    row_height = 286
+    header_height = 188
+    footer_height = 56
+    canvas_width = margin * 2 + metadata_width + 3 * panel_width + 3 * gap
+    canvas_height = header_height + len(selected) * row_height + (len(selected) - 1) * gap + footer_height
+    canvas = Image.new("RGB", (canvas_width, canvas_height), BACKGROUND)
     draw = ImageDraw.Draw(canvas)
-    try:
-        font = ImageFont.truetype("arial.ttf", 22)
-        small_font = ImageFont.truetype("arial.ttf", 16)
-    except OSError:
-        font = ImageFont.load_default()
-        small_font = font
-    for idx, (path, category_label) in enumerate(selected):
-        row, col = divmod(idx, columns)
-        x = margin + col * (thumb_w + margin)
-        y = margin + row * (thumb_h + header_h + margin)
-        with Image.open(path) as image:
-            rgb = image.convert("RGB")
-            rgb.thumbnail((thumb_w, thumb_h), Image.Resampling.LANCZOS)
-            tile = Image.new("RGB", (thumb_w, thumb_h), "white")
-            paste_x = (thumb_w - rgb.width) // 2
-            paste_y = (thumb_h - rgb.height) // 2
-            tile.paste(rgb, (paste_x, paste_y))
-            canvas.paste(tile, (x, y + header_h))
-        draw.rounded_rectangle((x, y, x + thumb_w, y + header_h - 4), radius=8, fill="#E9EFF4")
-        draw.text((x + 12, y + 5), category_label, fill="#20303C", font=font)
-        display_name = path.stem.replace("good_good_", "good_").replace("defect_", "")
-        draw.text((x + 12, y + 40), display_name[:64], fill="#60717D", font=small_font)
-    png_path = exporter.png_dir / "20_qualitative_hybrid_um_errors.png"
-    canvas.save(png_path, quality=96)
-    exporter.register_raster(
-        section="E8 · Định tính",
-        slug="20_qualitative_hybrid_um_errors",
-        title="Ví dụ lỗi còn lại của Hybrid U-Net + VMamba",
-        description="Mẫu định tính lấy từ gallery đã xuất: bốn báo động giả và bốn bất thường bị bỏ sót đầu tiên theo thứ tự file.",
-        sources="test_case_audit/visual_gallery/errors_only/hybrid_unet_vmamba__hybrid_fusion__fully_automatic",
-        png_path=png_path,
+    title_font = contact_sheet_font(32, bold=True)
+    subtitle_font = contact_sheet_font(18)
+    heading_font = contact_sheet_font(18, bold=True)
+    badge_font = contact_sheet_font(20, bold=True)
+    body_font = contact_sheet_font(17)
+    small_font = contact_sheet_font(14)
+
+    draw.text((margin, 24), "Các trường hợp Adaptive VMamba còn phân loại sai", fill=TEXT_COLOR, font=title_font)
+    summary = (
+        f"Bốn mẫu đại diện trên Test: 2/{category_counts.get('false_alarm', 0)} báo động giả và "
+        f"2/{category_counts.get('missed_defect', 0)} ca bỏ sót."
+    )
+    draw.text((margin, 70), summary, fill=MUTED_COLOR, font=subtitle_font)
+    draw.text(
+        (margin, 100),
+        "Adaptive chỉ quyết định ở cấp ảnh; bản đồ xác suất vẫn là đầu ra segmentation của VMamba.",
+        fill="#694F20",
+        font=subtitle_font,
     )
 
+    headings = ("Thông tin", "Ảnh đầu vào", "GT (phủ đỏ)", "Xác suất VMamba")
+    first_panel_x = margin + metadata_width + gap
+    column_x = [margin] + [
+        first_panel_x + (panel_width + gap) * index for index in range(3)
+    ]
+    for x, width, heading in zip(column_x, (metadata_width, panel_width, panel_width, panel_width), headings):
+        draw.rounded_rectangle((x, 137, x + width, 176), radius=7, fill="#E9EFF4")
+        draw.text((x + 12, 146), heading, fill=TEXT_COLOR, font=heading_font)
+
+    for index, (path, quantile, label, truth, decision, criterion, color) in enumerate(selected):
+        y = header_height + index * (row_height + gap)
+        draw.rounded_rectangle(
+            (margin, y, canvas_width - margin, y + row_height),
+            radius=10,
+            fill="white",
+            outline=GRID_COLOR,
+            width=1,
+        )
+        draw.rounded_rectangle(
+            (margin + 12, y + 14, margin + metadata_width - 12, y + 51),
+            radius=7,
+            fill=color,
+        )
+        draw.text((margin + 24, y + 21), label, fill="white", font=badge_font)
+        draw.text((margin + 22, y + 70), f"Nhãn thật: {truth}", fill=TEXT_COLOR, font=body_font)
+        draw.text((margin + 22, y + 99), f"Quyết định: {decision}", fill=TEXT_COLOR, font=body_font)
+        draw.text((margin + 22, y + 137), f"Mẫu {quantile} theo {criterion}", fill=MUTED_COLOR, font=small_font)
+        display_name = path.stem.replace("good_good_", "good_").replace("defect_", "")
+        draw.text((margin + 22, y + 168), display_name[:38], fill=MUTED_COLOR, font=small_font)
+
+        for panel_index, panel in enumerate(gallery_visual_panels(path)):
+            x = column_x[panel_index + 1]
+            tile = fit_panel(panel, panel_width, panel_height)
+            canvas.paste(tile, (x, y + 24))
+            draw.rectangle((x, y + 24, x + panel_width, y + 24 + panel_height), outline="#CBD6DC", width=1)
+
+    draw.text(
+        (margin, canvas_height - 38),
+        "Tiêu chí chọn mẫu: phân vị P25/P75; không chọn theo thứ tự tên file và không tối ưu lại trên Test.",
+        fill=MUTED_COLOR,
+        font=small_font,
+    )
+    png_path = exporter.png_dir / "20_qualitative_adaptive_vmamba_errors.png"
+    canvas.save(png_path, optimize=True)
+    exporter.register_raster(
+        section="E8 · Định tính",
+        slug="20_qualitative_adaptive_vmamba_errors",
+        title="Ví dụ lỗi còn lại của Adaptive VMamba",
+        description=(
+            "Bốn mẫu đại diện tại P25/P75: báo động giả được phân tầng theo mức bằng chứng xác suất; "
+            "ca bỏ sót được phân tầng theo diện tích GT. Adaptive chỉ đưa ra quyết định cấp ảnh."
+        ),
+        sources="test_case_audit/visual_gallery/errors_only/adaptive__vmamba",
+        png_path=png_path,
+    )
 
 def write_tables(data: dict[str, pd.DataFrame], exporter: Exporter) -> dict[str, pd.DataFrame]:
     e2 = prepare_models(data["e2"])[
@@ -1180,12 +1279,12 @@ def write_dashboard(root: Path, exporter: Exporter, tables: dict[str, pd.DataFra
 <body>
   <header>
     <h1>Trực quan hóa kết quả đồ án TTTN</h1>
-    <p>U-Net/ResNet18 · SegFormer-B0 · VMamba-T · E2–E5 · E7–E8 · logic quyết định tự động · hybrid từng cặp · audit toàn bộ dữ liệu.</p>
+    <p>U-Net/ResNet18 · SegFormer-B0 · VMamba-T · E2–E5 · E7–E8 · ngưỡng model gốc · Adaptive cấp ảnh · audit toàn bộ dữ liệu.</p>
   </header>
   <nav>{nav_html}<a href="#tables">Bảng tóm tắt</a></nav>
   <main>
     <div class="stats">{card_html}</div>
-    <p class="note">Ngưỡng và policy được chọn trên Validation; các chỉ số cuối cùng được báo cáo trên Test. Các biểu đồ audit toàn bộ dữ liệu chỉ dùng để tìm case nghi vấn/label noise, không dùng để chọn lại hyperparameter theo Test.</p>
+    <p class="note">Ngưỡng và policy được chọn trên Validation; các chỉ số cuối cùng được báo cáo trên Test. Các biểu đồ audit toàn bộ dữ liệu chỉ dùng để tìm case nghi vấn/label noise, không dùng để chọn lại hyperparameter theo Test. <strong>Lưu ý:</strong> Adaptive chỉ hậu xử lý để quyết định PASS/DEFECT ở cấp ảnh; không làm thay đổi probability map, Dice/IoU hay chất lượng biên mask.</p>
     {''.join(section_html_parts)}
     <section id="tables">
       <h2>Bảng tóm tắt dùng trong báo cáo</h2>
