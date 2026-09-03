@@ -1,75 +1,145 @@
-# 3CAD-ANI Aluminum Surface Defect Segmentation
+# SurfaceDefectSeg
 
-Dự án thực tập tốt nghiệp về phân đoạn khuyết tật bề mặt nhôm trên tập con
-**ANI (Aluminum New iPad) của 3CAD**. Hệ thống gồm U-Net ResNet-18,
-SegFormer-B0, VMamba-T, lựa chọn ngưỡng chỉ trên Validation, đánh giá Test cố
-định, logic giảm dương tính giả và hai ứng dụng review/demo.
+Hệ thống phân đoạn khuyết tật bề mặt nhôm trên tập dữ liệu 3CAD-ANI, phục vụ huấn luyện, đánh giá mô hình, hậu xử lý theo thành phần liên thông và trực quan hóa kết quả.
 
-## Bắt đầu nhanh
+## Tổng quan
+
+Dự án triển khai ba kiến trúc phân đoạn:
+
+| Mô hình | Kiến trúc | Trạng thái demo |
+| --- | --- | --- |
+| U-Net | ResNet-18 encoder | Hỗ trợ mặc định |
+| SegFormer | MiT-B0 | Hỗ trợ mặc định |
+| VMamba | VMamba-T | Yêu cầu CUDA và selective-scan tương thích |
+
+Kết quả từ mô hình được xử lý theo ba nhóm chế độ:
+
+- **Original:** sử dụng ngưỡng đã khóa trên tập Validation.
+- **Adaptive:** lọc và hiệu chỉnh từng mô hình bằng chính sách thành phần.
+- **Spatial:** kết hợp không gian giữa hai mô hình bằng policy đã cố định.
+
+Mọi threshold và policy được lựa chọn trên Validation. Tập Test chỉ được dùng để đánh giá cuối cùng.
+
+## Luồng xử lý
+
+```text
+Ảnh đầu vào
+    -> mô hình phân đoạn
+    -> probability mask
+    -> threshold đã khóa
+    -> adaptive/spatial policy
+    -> mask dự đoán, overlay và thông tin thành phần
+```
+
+## Chạy demo bằng Docker
+
+### Yêu cầu
+
+- Docker Desktop và Docker Compose.
+- Các checkpoint và decision policy trong `artifacts/`.
+- Khoảng 8 GB RAM và 8 GB dung lượng trống cho quá trình build.
+
+Khởi động:
 
 ```powershell
-# Kiểm tra mã, protocol, model tests và các artifact bắt buộc
-.\verify.ps1
+.\start_docker_demo.ps1
+```
 
-# Review và sửa nhãn/mask
-.\run_review.ps1
+Hoặc:
 
-# Demo dự báo U-Net + SegFormer + VMamba
+```powershell
+docker compose up -d --build
+```
+
+Truy cập:
+
+- Giao diện: [http://localhost:3000](http://localhost:3000)
+- API health check: [http://localhost:8000/health](http://localhost:8000/health)
+
+Dừng hệ thống:
+
+```powershell
+.\stop_docker_demo.ps1
+```
+
+Docker mặc định chạy inference U-Net và SegFormer. VMamba không nằm trong runtime Docker mặc định vì phụ thuộc CUDA selective-scan theo môi trường. Xem [DOCKER_DEMO.md](DOCKER_DEMO.md) để biết cấu hình chi tiết.
+
+## Cài đặt cục bộ
+
+Yêu cầu Python 3.10 trở lên và Node.js.
+
+```powershell
+python -m venv .venv
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements/dev.txt
+
+Set-Location apps/web_demo
+npm install
+Set-Location ../..
+```
+
+Khởi động demo:
+
+```powershell
 .\run_demo.ps1
 ```
 
-Thêm `-IncludeWeb` vào `verify.ps1` để chạy cả test frontend.
+Demo cục bộ chỉ kích hoạt mô hình khi checkpoint, policy và runtime tương ứng đều khả dụng. Chi tiết biến môi trường và đường dẫn checkpoint nằm trong [apps/web_demo/INFERENCE_SETUP.md](apps/web_demo/INFERENCE_SETUP.md).
 
-## Cấu trúc chính
+## Thí nghiệm
 
-```text
-apps/          ứng dụng Dataset Review và web demo
-src/           model, dataset, loss và logic quyết định dùng lại được
-scripts/       lệnh train, evaluation, experiment, reporting và verification
-tests/         kiểm thử mã ML
-data/          dữ liệu 3CAD-ANI cục bộ (không đưa vào Git)
-artifacts/     checkpoint, prediction, kết quả và báo cáo sinh ra
-experiments/   notebook audit dữ liệu và pipeline Kaggle
-docs/          protocol, hướng dẫn và hồ sơ cấu trúc
-runtime/       wheel nhị phân VMamba theo môi trường
-submission/    hồ sơ nộp bài và hồ sơ sử dụng AI
-archive/       dữ liệu cũ và ứng viên cleanup có thể khôi phục
-```
-
-Chi tiết trách nhiệm từng thư mục nằm tại
-[`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md). Lịch sử đổi đường dẫn
-nằm tại [`docs/MIGRATION_MANIFEST.md`](docs/MIGRATION_MANIFEST.md).
-
-## Quy trình thí nghiệm đúng
-
-1. Kiểm tra split và rò rỉ dữ liệu bằng `scripts/verification/check_protocol.py`.
-2. Train từng kiến trúc độc lập nếu cần; checkpoint tốt nhất chọn theo
-   Validation, không theo Test.
-3. Chọn threshold/policy trên Validation.
-4. Khóa threshold/policy và đánh giá đúng một lần trên Test.
-5. Dùng toàn bộ Train/Validation/Test chỉ cho data audit riêng, không dùng các
-   kết quả đó để điều chỉnh lại bảng Test.
-
-Chạy lại toàn bộ logic ba model từ probability cache:
+Chạy lại pipeline quyết định từ probability cache:
 
 ```powershell
 .\scripts\experiments\run_three_model_experiments.ps1
 ```
 
-Train lại một model:
+Train lại một mô hình:
 
 ```powershell
 .\scripts\training\retrain_models.ps1 -Model unet -RunName unet_seed42_v2
 ```
 
-## Kết quả và hồ sơ nộp
+Tài liệu phương pháp:
 
-- Dashboard kết quả: `artifacts/reports/final/visualizations/index.html`.
-- Checkpoint cuối: `artifacts/checkpoints/final/`.
-- Checklist nộp bài: `submission/CHECKLIST.md`.
-- AI Development Log: `submission/05_logs/AI_DEVELOPMENT_LOG.md`.
-- Nguồn gốc dataset: `submission/07_evidence/DATASET_PROVENANCE.md`.
+- [Experiment protocol](docs/experiments/protocol.md)
+- [Final configuration](docs/experiments/final_config.md)
+- [Decision pipeline](docs/decision_pipeline.md)
 
-Dataset, checkpoint, artifact sinh ra, môi trường ảo và `archive` được loại khỏi
-Git. Mã nguồn, cấu hình, tài liệu, notebook và lịch sử commit phải được lưu đầy
-đủ để có thể giải thích và tái tạo quy trình.
+## Kiểm thử
+
+Trên workspace đầy đủ dataset, checkpoint và artifact:
+
+```powershell
+.\verify.ps1 -IncludeWeb
+```
+
+Quy trình kiểm tra bao gồm tính hợp lệ của data split, decision policy, trạng thái huấn luyện, công cụ review dữ liệu và frontend.
+
+## Cấu trúc dự án
+
+```text
+apps/                       Dataset Review và web demo
+src/threecad_segmentation/  Model, evaluation và decision policy
+scripts/                    Data, training, experiment, reporting, verification
+tests/                      Kiểm thử mã ML và ứng dụng
+experiments/                Notebook audit và pipeline Kaggle
+docs/                       Protocol và tài liệu kỹ thuật
+submission/                 Báo cáo và bằng chứng kiểm chứng
+docker/                     Dockerfile cho backend và frontend
+archive/                    Mã không còn thuộc luồng chạy chính
+```
+
+Mô tả đầy đủ nằm trong [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md).
+
+## Dữ liệu và kết quả
+
+Dataset, checkpoint, probability cache, báo cáo sinh tự động và các gói bàn giao có dung lượng lớn không được lưu trong Git.
+
+- Hướng dẫn dữ liệu: [data/README.md](data/README.md)
+- Nguồn gốc dataset: [submission/07_evidence/DATASET_PROVENANCE.md](submission/07_evidence/DATASET_PROVENANCE.md)
+- Thông báo thành phần bên thứ ba: [submission/07_evidence/THIRD_PARTY_NOTICES.md](submission/07_evidence/THIRD_PARTY_NOTICES.md)
+
+Để chạy đầy đủ trên máy khác, sử dụng source code cùng gói artifact/checkpoint được cung cấp riêng.
