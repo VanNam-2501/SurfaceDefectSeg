@@ -46,12 +46,8 @@ TTTN/
 ├── runtime/wheels/vmamba/     Wheel phụ thuộc GPU/Python cụ thể
 ├── docs/                      Protocol và hướng dẫn
 ├── submission/                Hồ sơ nộp bài
-└── archive/                   Bản cũ/quarantine có thể khôi phục, không chạy mặc định
+└── archive/                   Mã không thuộc luồng chạy chính
 ```
-
-`archive/review_candidates/` chứa các tệp không còn thuộc luồng chạy nhưng chưa
-xóa vĩnh viễn. Danh sách, lý do và cách phục hồi nằm trong
-`docs/cleanup/unused_candidates_2026-08-21.md`.
 
 ## Đường dẫn ổn định
 
