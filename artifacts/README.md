@@ -1,6 +1,5 @@
-# Generated artifacts
+# Artifacts
 
-Thư mục này chứa checkpoint, probability cache, bảng kết quả, báo cáo và gói
-Kaggle. Đây là đầu ra có thể sinh lại và không được commit mặc định. Các số liệu
-đóng băng dùng trong báo cáo nằm trong `reports/final/`.
+Thư mục này chứa đầu ra sinh từ quá trình huấn luyện, đánh giá và lập báo cáo, bao gồm checkpoint, probability cache, bảng số liệu, trực quan hóa và gói Kaggle.
 
+Nội dung trong thư mục không được commit mặc định. Kết quả đã khóa để sử dụng trong báo cáo nằm tại `reports/final/`.
