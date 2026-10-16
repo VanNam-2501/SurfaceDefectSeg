@@ -1531,7 +1531,7 @@ class SS2Dv2:
         # ==============================
         **kwargs,
     ):
-        assert selective_scan_backend in [None, "oflex", "mamba", "torch"]
+        assert selective_scan_backend in [None, "oflex", "mamba", "torch", "core"]
         _scan_mode = dict(cross2d=0, unidi=1, bidi=2, cascade2d=-1).get(scan_mode, None) if isinstance(scan_mode, str) else scan_mode # for debug
         assert isinstance(_scan_mode, int)
         delta_softplus = True

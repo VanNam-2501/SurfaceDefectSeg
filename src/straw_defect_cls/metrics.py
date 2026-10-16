@@ -106,3 +106,76 @@ def plot_roc_curves(
     plt.tight_layout()
     plt.savefig(save_path, dpi=150)
     plt.close()
+
+
+def compute_hierarchical_metrics(
+    y_true_5class: list | np.ndarray,
+    s1_preds: list | np.ndarray,
+    s2_preds: list | np.ndarray,
+    confidence_good_th: float = 0.80,
+    confidence_defect_th: float = 0.65,
+) -> dict:
+    """Compute performance metrics for the Two-Stage Hierarchical pipeline.
+
+    Args:
+        y_true_5class: ground truth 0..4 (0: good, 1: bent, 2: loose, 3: missing, 4: pierced)
+        s1_preds: binary predictions from Stage 1 (0: good, 1: defect)
+        s2_preds: 4-class defect predictions from Stage 2 (0: bent, 1: loose, 2: missing, 3: pierced)
+    """
+    y_true = np.array(y_true_5class)
+    s1_pred = np.array(s1_preds)
+    s2_pred = np.array(s2_preds)
+
+    # Ground truth binary: 0 = good, 1 = defect
+    y_true_s1 = (y_true > 0).astype(int)
+
+    # 1. Stage 1 Triage Metrics
+    tp = int(np.sum((y_true_s1 == 1) & (s1_pred == 1)))
+    fn = int(np.sum((y_true_s1 == 1) & (s1_pred == 0)))
+    tn = int(np.sum((y_true_s1 == 0) & (s1_pred == 0)))
+    fp = int(np.sum((y_true_s1 == 0) & (s1_pred == 1)))
+
+    stage1_acc = float((tp + tn) / max(1, len(y_true_s1)))
+    defect_recall = float(tp / max(1, tp + fn))  # True positive rate (defects caught)
+    fnr = float(fn / max(1, tp + fn))  # Critical: defective products leaked to market
+    fpr = float(fp / max(1, tn + fp))  # False alarms (good products flagged as defective)
+
+    # 2. Stage 2 Defect Diagnosis Metrics (on defective samples)
+    defect_mask = y_true > 0
+    if np.sum(defect_mask) > 0:
+        y_true_s2 = y_true[defect_mask] - 1  # 0: bent, 1: loose, 2: missing, 3: pierced
+        s2_pred_defects = s2_pred[defect_mask]
+        stage2_acc = float(accuracy_score(y_true_s2, s2_pred_defects))
+        stage2_macro_f1 = float(f1_score(y_true_s2, s2_pred_defects, average="macro", zero_division=0))
+    else:
+        stage2_acc, stage2_macro_f1 = 0.0, 0.0
+
+    # 3. End-to-End Hierarchical Prediction (5-class space)
+    # If Stage 1 says good -> predict good (0)
+    # If Stage 1 says defect -> predict (s2_pred + 1)
+    end_to_end_preds = np.where(s1_pred == 0, 0, s2_pred + 1)
+    end_to_end_acc = float(accuracy_score(y_true, end_to_end_preds))
+    end_to_end_macro_f1 = float(f1_score(y_true, end_to_end_preds, average="macro", zero_division=0))
+
+    hierarchical_cm = sk_confusion_matrix(y_true, end_to_end_preds, labels=range(5))
+
+    return {
+        "stage1_triage": {
+            "accuracy": stage1_acc,
+            "defect_recall": defect_recall,
+            "false_negative_rate_fnr": fnr,
+            "false_positive_rate_fpr": fpr,
+            "tp": tp, "fn": fn, "tn": tn, "fp": fp,
+        },
+        "stage2_diagnosis": {
+            "accuracy": stage2_acc,
+            "macro_f1": stage2_macro_f1,
+            "evaluated_samples": int(np.sum(defect_mask)),
+        },
+        "end_to_end": {
+            "overall_accuracy": end_to_end_acc,
+            "overall_macro_f1": end_to_end_macro_f1,
+            "confusion_matrix": hierarchical_cm.tolist(),
+        },
+    }
+

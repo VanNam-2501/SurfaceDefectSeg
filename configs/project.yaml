@@ -1,0 +1,62 @@
+project:
+  name: "juice_box_straw_defect_classification"
+  title: "Hệ thống phân loại và chẩn đoán khuyết tật ống hút trên bao bì hộp đồ uống"
+  seed: 42
+
+dataset:
+  raw_zip: "archive.zip"
+  raw_dir: "data/straw_defects_raw"
+  splits_dir: "data/straw_defects_splits"
+  masks_dir: "data/masks"
+  degraded_val_dir: "data/val_degraded"
+  image_size_default: 224
+  image_size_highres: 384
+  brands:
+    - "Choco"
+    - "Chocolait"
+    - "Chuckie"
+    - "Dutchmill Purple"
+    - "Dutchmill Yellow"
+    - "Moo"
+    - "Nutriboost"
+    - "Selecta"
+  classes:
+    stage1:
+      - "Good"
+      - "Defect"
+    stage2:
+      - "Bent"
+      - "Loose"
+      - "Missing"
+      - "Pierced"
+    full5:
+      - "Good"
+      - "Bent"
+      - "Loose"
+      - "Missing"
+      - "Pierced"
+  splits:
+    train_ratio: 0.70
+    val_ratio: 0.15
+    test_ratio: 0.15
+  phash_hamming_threshold: 6
+
+industrial_requirements:
+  target_max_fnr: 0.01
+  wilson_confidence: 0.95
+  pi_deploy_defect: 0.05
+  pi_train_defect: 0.80
+  cost_matrix:
+    c_fn: 100.0
+    c_review: 10.0
+    c_fp: 1.0
+
+models:
+  backbones:
+    - "resnet18"
+    - "swin_t"
+    - "vmamba_t"
+  stages:
+    - 1
+    - 2
+    - "full5"

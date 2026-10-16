@@ -33,6 +33,9 @@ from tqdm.auto import tqdm
 from .dataset import (
     CLASS_NAMES,
     NUM_CLASSES,
+    STAGE1_CLASS_NAMES,
+    STAGE2_CLASS_NAMES,
+    FULL_CLASS_NAMES,
     StrawDefectDataset,
     build_dataloaders,
     get_train_transform,
@@ -49,6 +52,8 @@ from .models import build_model
 @dataclass
 class TrainConfig:
     """All hyper-parameters and paths for a training run."""
+    # Task: 'stage1' (Good vs Defect), 'stage2' (4 Defect classes), or 'full' (5-class baseline)
+    task: str = "full"
     # Data
     data_dir: str = ""
     train_csv: str = ""
@@ -153,7 +158,7 @@ def train_one_epoch(
         all_labels.extend(labels.cpu().numpy())
         pbar.set_postfix(loss=f"{running_loss / step:.4f}")
 
-    metrics = compute_metrics(all_labels, all_preds, None, CLASS_NAMES)
+    metrics = compute_metrics(all_labels, all_preds, None, getattr(cfg, "_class_names", CLASS_NAMES))
     metrics["loss"] = running_loss / len(loader)
     return metrics
 
@@ -187,7 +192,7 @@ def validate(
         all_labels.extend(labels.cpu().numpy())
         all_probs.extend(probs.cpu().numpy())
 
-    metrics = compute_metrics(all_labels, all_preds, np.array(all_probs), CLASS_NAMES)
+    metrics = compute_metrics(all_labels, all_preds, np.array(all_probs), getattr(cfg, "_class_names", CLASS_NAMES))
     metrics["loss"] = running_loss / max(len(loader), 1)
     # Keep raw arrays for ROC plotting (not serialised to JSON)
     metrics["_y_true"] = all_labels
@@ -260,11 +265,25 @@ def run_training(cfg: TrainConfig) -> Path:
         json.dumps(environment_info(device), indent=2), encoding="utf-8"
     )
 
+    # Setup task specifics
+    task = cfg.task.lower()
+    if task == "stage1":
+        class_names = STAGE1_CLASS_NAMES
+        cfg.num_classes = 2
+    elif task == "stage2":
+        class_names = STAGE2_CLASS_NAMES
+        cfg.num_classes = 4
+    else:
+        class_names = FULL_CLASS_NAMES
+        cfg.num_classes = 5
+    cfg._class_names = class_names
+
     # Data
     loaders = build_dataloaders(
         data_dir=cfg.data_dir or None,
         train_csv=cfg.train_csv or None,
         val_csv=cfg.val_csv or None,
+        task=task,
         image_size=cfg.image_size,
         batch_size=cfg.batch_size,
         num_workers=cfg.num_workers,
@@ -368,13 +387,13 @@ def run_training(cfg: TrainConfig) -> Path:
 
             # Save best-epoch plots
             plot_confusion_matrix(
-                val_metrics["confusion_matrix"], CLASS_NAMES,
+                val_metrics["confusion_matrix"], class_names,
                 run_dir / "best_confusion_matrix.png"
             )
             if val_metrics.get("_y_prob") is not None:
                 plot_roc_curves(
                     val_metrics["_y_true"], val_metrics["_y_prob"],
-                    CLASS_NAMES, run_dir / "best_roc_curves.png"
+                    class_names, run_dir / "best_roc_curves.png"
                 )
         else:
             bad_epochs += 1
