@@ -1,16 +1,23 @@
 {
-  "tau_pass": 0.80,
-  "tau_defect": 0.65,
-  "tau2": 0.50,
-  "margin2": 0.15,
-  "e_thr": -10.0,
-  "temperature_stage1": 1.0,
-  "temperature_stage2": 1.0,
+  "tau_pass": 0.995,
+  "tau_defect": 0.4,
+  "tau2": 0.5579,
+  "margin2": 0.1979,
+  "e_thr": -1.3553,
+  "temperature_stage1": 3.2544,
+  "temperature_stage2": 0.6362,
   "pi_deploy_defect": 0.05,
+  "pi_train_defect": 0.8,
   "cost_matrix": {
     "c_fn": 100.0,
     "c_review": 10.0,
     "c_fp": 1.0
   },
-  "status": "initial_uncalibrated"
+  "fnr_worst_case": 0.0,
+  "fnr_clean": 0.0,
+  "fnr_degraded": 0.0,
+  "fnr_ci_low_95": 0.0,
+  "fnr_ci_high_95": 0.0158,
+  "calibration_timestamp": "2026-10-16T15:15:01Z",
+  "status": "calibrated_industrial"
 }
