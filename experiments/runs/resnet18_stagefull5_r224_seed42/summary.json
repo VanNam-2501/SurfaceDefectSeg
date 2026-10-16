@@ -1,0 +1,12 @@
+{
+  "tag": "resnet18_stagefull5_r224_seed42",
+  "backbone": "resnet18",
+  "stage": "full5",
+  "resolution": 224,
+  "seed": 42,
+  "best_epoch": 1,
+  "metric_name": "macro_recall",
+  "best_metric": 0.7533333333333333,
+  "epochs_completed": 1,
+  "total_seconds": 216.6
+}

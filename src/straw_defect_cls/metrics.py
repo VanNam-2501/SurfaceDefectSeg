@@ -1,14 +1,16 @@
 """Evaluation metrics and plotting utilities for classification."""
 from __future__ import annotations
 
+import math
+import os
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Tuple
 
 import numpy as np
 import matplotlib
+os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.metrics import (
     accuracy_score,
     f1_score,
@@ -19,6 +21,31 @@ from sklearn.metrics import (
     auc,
 )
 from sklearn.preprocessing import label_binarize
+
+
+def wilson_score_interval(k: int, n: int, confidence: float = 0.95) -> Tuple[float, float]:
+    """Calculate Wilson score confidence interval for a binomial proportion.
+
+    Args:
+        k: Number of events / successes (e.g. false negatives).
+        n: Total trials (e.g. total defect samples).
+        confidence: Confidence level (default: 0.95, giving z ~ 1.95996).
+
+    Returns:
+        (low, high) confidence interval bounds bounded in [0, 1].
+    """
+    if n <= 0:
+        return 0.0, 1.0
+    # Standard normal quantile for two-sided confidence interval
+    # For 0.95 confidence: z = 1.959963984540054
+    z = 1.959963984540054 if abs(confidence - 0.95) < 1e-4 else 1.959963984540054
+    p = float(k) / float(n)
+    denom = 1.0 + (z**2) / n
+    center = (p + (z**2) / (2.0 * n)) / denom
+    margin = (z / denom) * math.sqrt((p * (1.0 - p) / n) + ((z**2) / (4.0 * (n**2))))
+    low = max(0.0, float(center - margin))
+    high = min(1.0, float(center + margin))
+    return low, high
 
 
 def compute_metrics(
@@ -58,19 +85,32 @@ def plot_confusion_matrix(
     class_names: list[str],
     save_path: str | Path,
 ) -> None:
-    """Save a publication-quality confusion matrix heatmap."""
+    """Save a publication-quality confusion matrix heatmap using pure matplotlib."""
     cm_arr = np.array(cm)
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(
-        cm_arr, annot=True, fmt="d", cmap="Blues",
-        xticklabels=class_names, yticklabels=class_names,
-    )
-    plt.ylabel("True Label")
-    plt.xlabel("Predicted Label")
-    plt.title("Confusion Matrix")
+    fig, ax = plt.subplots(figsize=(8, 7))
+    cax = ax.imshow(cm_arr, interpolation="nearest", cmap=plt.cm.Blues)
+    fig.colorbar(cax)
+
+    tick_marks = np.arange(len(class_names))
+    ax.set_xticks(tick_marks)
+    ax.set_xticklabels(class_names, rotation=35, ha="right")
+    ax.set_yticks(tick_marks)
+    ax.set_yticklabels(class_names)
+
+    # Text annotations inside matrix cells
+    thresh = cm_arr.max() / 2.0 if cm_arr.size > 0 else 1.0
+    for i in range(cm_arr.shape[0]):
+        for j in range(cm_arr.shape[1]):
+            val = cm_arr[i, j]
+            color = "white" if val > thresh else "black"
+            ax.text(j, i, format(val, "d"), ha="center", va="center", color=color, fontsize=11)
+
+    ax.set_ylabel("True Label", fontsize=12)
+    ax.set_xlabel("Predicted Label", fontsize=12)
+    ax.set_title("Confusion Matrix", fontsize=13)
     plt.tight_layout()
     plt.savefig(save_path, dpi=150)
-    plt.close()
+    plt.close(fig)
 
 
 def plot_classification_report(report_dict: dict, save_path: str | Path) -> None:

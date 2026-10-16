@@ -7,6 +7,9 @@ Three lightweight CNN backbones adapted for 5-class classification:
 
 All models expose ``encoder_parameters()`` and ``classifier_parameters()``
 for differential learning-rate optimisation.
+"""
+from __future__ import annotations
+
 import sys
 from pathlib import Path
 

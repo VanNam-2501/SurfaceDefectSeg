@@ -1,0 +1,2 @@
+backbone,arch,resolution,seed,fnr,fnr_ci_low,fnr_ci_high,macro_recall_defect,review_rate,ms_per_img
+resnet18,full5,224,42,0.0875,0.0579,0.1301,0.7833,0.0,4.63
