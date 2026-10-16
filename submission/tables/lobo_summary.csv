@@ -1,0 +1,3 @@
+fold,held_out_brand,architecture,fnr,fnr_ci_95,fpr,macro_recall_defect,review_rate,cost_per_1000
+1,Choco,Single-Stage Baseline (full5),0.0,"[0.0000, 0.0700]",1.0,0.25,0.0,950.0
+1,Choco,Two-Stage Hierarchical,0.0,"[0.0000, 0.0700]",1.0,0.25,0.0,950.0

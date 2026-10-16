@@ -219,3 +219,126 @@ def compute_hierarchical_metrics(
         },
     }
 
+
+def compute_audit_metrics(
+    y_true: list[int] | np.ndarray,
+    decisions: list[str] | np.ndarray,
+    predicted_classes: list[int] | np.ndarray,
+    cost_matrix: Optional[dict[str, float]] = None,
+    pi_deploy: float = 0.05,
+    pi_train: float = 0.80,
+    latency_ms: float = 0.0,
+    class_names: Optional[list[str]] = None,
+) -> dict[str, Any]:
+    """Audit-grade performance metrics conforming to industrial KLTN thesis specs.
+
+    Calculates:
+    - FNR / FPR with Wilson 95% Confidence Interval.
+    - Recall for every class (good, bent, loose, missing, pierced).
+    - Deployment-reweighted metrics (prior shift adjustment to factory reality pi_deploy in 2-5%).
+    - Review rate (% cartons routed to human operator inspection).
+    - Expected cost per 1,000 cartons based on cost matrix (c_FN:c_REVIEW:c_FP = 100:10:1).
+    - Latency in ms/carton.
+
+    Args:
+        y_true: Ground truth 5-class labels (0: Good, 1: Bent, 2: Loose, 3: Missing, 4: Pierced).
+        decisions: Array of string decisions ('PASS', 'REVIEW', 'DEFECT').
+        predicted_classes: Array of predicted 5-class labels (0..4, or -1 for review).
+        cost_matrix: Dict with 'c_fn', 'c_review', 'c_fp' (default: 100:10:1).
+        pi_deploy: Defect base rate in factory deployment (default: 0.05).
+        pi_train: Defect base rate in dataset (default: 0.80).
+        latency_ms: Inference latency per image in milliseconds.
+        class_names: List of class names (default: Good, Bent, Loose, Missing, Pierced).
+
+    Returns:
+        Dict of comprehensive audit metrics.
+    """
+    if cost_matrix is None:
+        cost_matrix = {"c_fn": 100.0, "c_review": 10.0, "c_fp": 1.0}
+    c_fn = float(cost_matrix.get("c_fn", 100.0))
+    c_rev = float(cost_matrix.get("c_review", 10.0))
+    c_fp = float(cost_matrix.get("c_fp", 1.0))
+
+    if class_names is None:
+        class_names = ["Good", "Bent", "Loose", "Missing", "Pierced"]
+
+    y_arr = np.asarray(y_true, dtype=int)
+    dec_arr = np.asarray(decisions, dtype=str)
+    pred_arr = np.asarray(predicted_classes, dtype=int)
+    total_n = len(y_arr)
+
+    is_defect = y_arr > 0
+    is_good = y_arr == 0
+    n_defects = int(np.sum(is_defect))
+    n_good = int(np.sum(is_good))
+
+    # 1. False Negative Rate (FNR): True defect marked PASS
+    # (leaked defect into supply chain)
+    fn_count = int(np.sum(is_defect & (dec_arr == "PASS")))
+    fnr = float(fn_count / max(1, n_defects))
+    fnr_ci_low, fnr_ci_high = wilson_score_interval(fn_count, n_defects, confidence=0.95)
+
+    # 2. False Positive Rate (FPR): True good marked DEFECT
+    # (false rejection of good carton)
+    fp_count = int(np.sum(is_good & (dec_arr == "DEFECT")))
+    fpr = float(fp_count / max(1, n_good))
+    fpr_ci_low, fpr_ci_high = wilson_score_interval(fp_count, n_good, confidence=0.95)
+
+    # 3. Review Rates
+    rev_total = int(np.sum(dec_arr == "REVIEW"))
+    rev_rate = float(rev_total / max(1, total_n))
+    rev_good_rate = float(np.sum(is_good & (dec_arr == "REVIEW")) / max(1, n_good))
+    rev_defect_rate = float(np.sum(is_defect & (dec_arr == "REVIEW")) / max(1, n_defects))
+
+    # 4. Per-Class Empirical Recall
+    recalls = {}
+    for c_idx, c_name in enumerate(class_names):
+        c_mask = y_arr == c_idx
+        n_c = int(np.sum(c_mask))
+        if n_c > 0:
+            tp_c = int(np.sum(c_mask & (pred_arr == c_idx)))
+            recalls[c_name.lower()] = round(float(tp_c / n_c), 4)
+        else:
+            recalls[c_name.lower()] = 0.0
+
+    # Macro recall across defect classes (Bent, Loose, Missing, Pierced)
+    defect_class_recalls = [recalls[name.lower()] for name in class_names[1:] if name.lower() in recalls]
+    macro_recall_defect = float(np.mean(defect_class_recalls)) if defect_class_recalls else 0.0
+
+    # 5. Reweighted Metrics Under Deployment Prior (pi_deploy in 2-5%)
+    # In factory deployment: P(Good) = 1 - pi_deploy, P(Defect) = pi_deploy
+    p_good_deploy = 1.0 - pi_deploy
+    p_defect_deploy = pi_deploy
+
+    p_fn_deploy = p_defect_deploy * fnr
+    p_fp_deploy = p_good_deploy * fpr
+    p_rev_deploy = (p_good_deploy * rev_good_rate) + (p_defect_deploy * rev_defect_rate)
+
+    # Expected Cost per 1,000 cartons:
+    expected_cost_1000 = 1000.0 * (c_fn * p_fn_deploy + c_rev * p_rev_deploy + c_fp * p_fp_deploy)
+
+    # Reweighted deployment accuracy
+    reweighted_acc = (p_good_deploy * recalls.get("good", 0.0)) + (p_defect_deploy * macro_recall_defect)
+
+    return {
+        "fnr": round(fnr, 4),
+        "fnr_ci_low": round(fnr_ci_low, 4),
+        "fnr_ci_high": round(fnr_ci_high, 4),
+        "fn_count": fn_count,
+        "n_defects": n_defects,
+        "fpr": round(fpr, 4),
+        "fpr_ci_low": round(fpr_ci_low, 4),
+        "fpr_ci_high": round(fpr_ci_high, 4),
+        "fp_count": fp_count,
+        "n_good": n_good,
+        "review_rate": round(rev_rate, 4),
+        "review_rate_good": round(rev_good_rate, 4),
+        "review_rate_defect": round(rev_defect_rate, 4),
+        "recalls": recalls,
+        "macro_recall_defect": round(macro_recall_defect, 4),
+        "pi_deploy": pi_deploy,
+        "reweighted_accuracy": round(reweighted_acc, 4),
+        "expected_cost_per_1000": round(expected_cost_1000, 2),
+        "latency_ms": round(latency_ms, 2),
+    }
+
