@@ -37,7 +37,7 @@ if ($Action -eq 'start') {
         if ($container.Image -ne $expectedImage) { throw 'Existing container uses another image. Stop/remove that container first; keep its data volume.' }
         & docker start $Name
     } else {
-        & docker run -d --init --gpus all --restart unless-stopped --name $Name --label io.straw.demo=container-v3.5 --shm-size=1g -p "127.0.0.1:${Port}:8033" --mount "type=volume,source=$Volume,target=/workspace/artifacts" $image
+        & docker run -d --init --gpus 1 --restart unless-stopped --name $Name --label io.straw.demo=container-v3.5 --shm-size=1g -p "127.0.0.1:${Port}:8033" --mount "type=volume,source=$Volume,target=/workspace/artifacts" $image
     }
     if ($LASTEXITCODE -ne 0) { throw 'Cannot start the GPU container. Check NVIDIA GPU support and whether the port is already in use.' }
     Write-Host "Demo: http://127.0.0.1:$Port/ (the first start builds an engine for this GPU)."

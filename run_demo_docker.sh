@@ -30,7 +30,7 @@ case "$action" in
           mounts+=(--mount "type=bind,source=/usr/lib/wsl/lib/$lib,target=/usr/lib/x86_64-linux-gnu/$lib,readonly")
         fi
       done
-      docker run -d --init --gpus all --restart unless-stopped --name "$name" \
+      docker run -d --init --gpus 1 --restart unless-stopped --name "$name" \
         --label io.straw.demo=container-v3.5 --shm-size=1g \
         -p "127.0.0.1:$port:8033" --mount "type=volume,source=$volume,target=/workspace/artifacts" \
         "${mounts[@]}" "$image"

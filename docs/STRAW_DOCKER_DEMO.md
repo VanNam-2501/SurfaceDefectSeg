@@ -22,6 +22,8 @@ API nghiên cứu trả 404; nghiên cứu và báo cáo vẫn có trong hồ s�
   dữ liệu. Không hỗ trợ macOS, GPU AMD hoặc máy chỉ có CPU cho đường TensorRT này.
 
 Docker chứa môi trường phần mềm; GPU và driver vẫn do máy nhận cung cấp.
+Launcher cấp một GPU cho một worker; máy có nhiều GPU vẫn dùng một thiết bị
+cho cả decode và suy luận, để số liệu GPU thống nhất với thiết bị đang xử lý.
 Engine không được dùng chung một cách mặc định giữa các GPU/phiên bản runtime.
 [NVIDIA giải thích tính tương thích engine](https://docs.nvidia.com/deeplearning/tensorrt/latest/inference-library/engine-compatibility.html).
 
