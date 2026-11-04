@@ -1,0 +1,2130 @@
+{
+  "schema": 1,
+  "role": "val",
+  "source": "static photos, not motion/camera data",
+  "classes": [
+    "good",
+    "bent",
+    "loose",
+    "missing",
+    "pierced"
+  ],
+  "size": 512,
+  "stream_width": 640,
+  "stream_height": 640,
+  "checkpoint_sha256": "8bed6f0944af36a616f663da534c0007514bb16f1e0442dc61bc550d3a4484e6",
+  "onnx_sha256": "6ed97ca68ea1e85e541da6572ebafc53f134f68e644ebc1214d2ad68e6203680",
+  "decision_threshold": null,
+  "validation_manifest_sha256": "51f87c5342948fd66f779db88f304f0701409d3e12bf3abdd01c437c50308797",
+  "cases": [
+    {
+      "sample_id": "0060346ff82646c17e9b",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/0060346ff82646c17e9b",
+      "sha256": "3fcbd5d0381429976c8164fbf82b06bb19d7c5cfd59de3c6426ab995d4994d84"
+    },
+    {
+      "sample_id": "01175451541d78dae165",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/01175451541d78dae165",
+      "sha256": "3a4b0ba9485b9cb037ca47844b3794d983a5b6688f8a9072dd7b9b29c4f2a877"
+    },
+    {
+      "sample_id": "0226b2d9d4f8966aced5",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/0226b2d9d4f8966aced5",
+      "sha256": "ae78c590377ea6afedc1230fc8ff93606d687af1f5708ca6193e3cff1a235bd2"
+    },
+    {
+      "sample_id": "02f9927ec2e452d670bb",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/02f9927ec2e452d670bb",
+      "sha256": "b37c78f134b698feda37e790dc8cf98b2ce311a5581c4e760a1f8b98a01a1aff"
+    },
+    {
+      "sample_id": "034507d05b889579eb46",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/034507d05b889579eb46",
+      "sha256": "6ebdbc97efac43e08c9e22710d65d2cf5944295cbcdc4521353a593ec0e6e862"
+    },
+    {
+      "sample_id": "036da45c4bfa54762236",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/036da45c4bfa54762236",
+      "sha256": "dc93676f96910cfb5f344358a24bbc9a545998b9ab5bc26cfa6a5058003c8436"
+    },
+    {
+      "sample_id": "041a7857ce04320ee3d6",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/041a7857ce04320ee3d6",
+      "sha256": "1f54115f728c1f2e79e7f412ff1c675e256e410222fd5a731bdd64cba56138cc"
+    },
+    {
+      "sample_id": "04c4f0af883d749acc41",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/04c4f0af883d749acc41",
+      "sha256": "ae5735ff01f4a76cc5396285971308c153e717af7a92e5c9b309b78a901317ea"
+    },
+    {
+      "sample_id": "068f86d74556c1be63ce",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/068f86d74556c1be63ce",
+      "sha256": "d1df6589240d62ed407547defcfbe1e3a4eecbd2b7cb677f3801a8df07c79d60"
+    },
+    {
+      "sample_id": "06b49aa258892cfe9611",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/06b49aa258892cfe9611",
+      "sha256": "aeaf49492e4b3a253626f8639342aa46ab4755bfd16b2b30f33ae981e6fafa34"
+    },
+    {
+      "sample_id": "087d49a3fa0a48889f45",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/087d49a3fa0a48889f45",
+      "sha256": "9b248cb7cf8341246323f9843632f08d8e2d6acbbe0cc39017712e21ae01861b"
+    },
+    {
+      "sample_id": "0b8a041891f580b14e26",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/0b8a041891f580b14e26",
+      "sha256": "d6d088d3fccd7b07d5218f86558af4c05931ec8185aaae12edfb0eda142cf1f9"
+    },
+    {
+      "sample_id": "0bb82cc0df8f398d610f",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/0bb82cc0df8f398d610f",
+      "sha256": "96091b1d171bed82cfa0bfbc11c511f0f9c6f4075231be11a6d766b61f8bdad3"
+    },
+    {
+      "sample_id": "0bf8d7b36666a3afc0a3",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/0bf8d7b36666a3afc0a3",
+      "sha256": "cf4d35e52a216a54798aed226c7127a1a8429ec18967c37bcb2413e1c0c89702"
+    },
+    {
+      "sample_id": "0d3b63bd406416f22b54",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/0d3b63bd406416f22b54",
+      "sha256": "2da2aa5dd4e53ab36bb562d37c9a6778102a50ae05a8e1a18388f42d0d41b4d6"
+    },
+    {
+      "sample_id": "0d8b3557e87c86478c4b",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/0d8b3557e87c86478c4b",
+      "sha256": "02175929c2c71620843d7828832da0cf5df5decd3c2003e435e00c7ce194689a"
+    },
+    {
+      "sample_id": "0e69e75c59944b37de7b",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/0e69e75c59944b37de7b",
+      "sha256": "bd4445f29606c667bd0ea961afe9e0e7f27a83f52dcfd74f00b03bdda2bb6f41"
+    },
+    {
+      "sample_id": "0f7c0fc683d6dd9abb35",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/0f7c0fc683d6dd9abb35",
+      "sha256": "88c18570a68d92ff37244b2715e1306716abcadc272784d4b34f3d4f4dbbbde6"
+    },
+    {
+      "sample_id": "0fb4c5bbad48c601e6ad",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/0fb4c5bbad48c601e6ad",
+      "sha256": "222ed64a2a0ec43233f0e4e5f4caaafdcdfa035351a50458200e5c92d7e348f5"
+    },
+    {
+      "sample_id": "111fb35129e13f2d3e22",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/111fb35129e13f2d3e22",
+      "sha256": "55c7004183853d933bf295433f061314d0512443049e0a6647581db9bf416e8f"
+    },
+    {
+      "sample_id": "11794862eee18b1430ec",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/11794862eee18b1430ec",
+      "sha256": "8a4ac95a7ff0fe9b80aa25b1871c6dfc95f3a2322c1379cb8f4cab1279960bdc"
+    },
+    {
+      "sample_id": "11be36382c411e16069f",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/11be36382c411e16069f",
+      "sha256": "40a87142b83ac86884e2d29a742ffc5ae7f8bca20e4aee0c24a648bdb773489f"
+    },
+    {
+      "sample_id": "1241128d5aa8319e75da",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/1241128d5aa8319e75da",
+      "sha256": "4450b73f56ad34841466a0d90edb0c59635a5465827f5ff32b66f33776da3b7e"
+    },
+    {
+      "sample_id": "14fce7eb3f775a916502",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/14fce7eb3f775a916502",
+      "sha256": "766ed9984a84aee3d7eedadf4a7beffe0c5a0488a1b99ff35c383f4ba1f8dcb7"
+    },
+    {
+      "sample_id": "1563ccb5b7db9279bf50",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/1563ccb5b7db9279bf50",
+      "sha256": "56a1521dc7f003b891e38097af4b6df409ffb7343d80c5d8ac32fe575fc19396"
+    },
+    {
+      "sample_id": "162d51fb1976c622286b",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/162d51fb1976c622286b",
+      "sha256": "ef8a88694a60f7a3d69ddf797b19cf2f477cdd92d3fa1987d31906e46f947df3"
+    },
+    {
+      "sample_id": "1675c1d6580f35554384",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/1675c1d6580f35554384",
+      "sha256": "a061f2864100ff23e1517f2e77243d23ad3c8e5512a01875cb4fc0b8d7bac339"
+    },
+    {
+      "sample_id": "1aef511b11cd8636de41",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/1aef511b11cd8636de41",
+      "sha256": "f2ce3f6f784a0e47be1daca89b4364314ce1a3b1db7edcb550f66dfd4068eaae"
+    },
+    {
+      "sample_id": "1c59f97a5528902d55f1",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/1c59f97a5528902d55f1",
+      "sha256": "afd96a290b88b7f64825f31f1be404f28affb0080ce361e04f2e5a4f04518124"
+    },
+    {
+      "sample_id": "1cee427f7fac174a2b68",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/1cee427f7fac174a2b68",
+      "sha256": "2648717fe80c44b1fd0b84248c5357461f91e1c3f662796537b633600e727ab7"
+    },
+    {
+      "sample_id": "1e9e474d467f0bb57df9",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/1e9e474d467f0bb57df9",
+      "sha256": "2c77a74de87ed4977812e58292c70d077731aa16aa3c7dada210b62d5dc34b07"
+    },
+    {
+      "sample_id": "204063080494c71dfbb1",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/204063080494c71dfbb1",
+      "sha256": "9301fd93ca737be650b6b4764eb36880aad3aad29b927b62b6204fa8e24b592d"
+    },
+    {
+      "sample_id": "2040ddf51fb53764f4b9",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/2040ddf51fb53764f4b9",
+      "sha256": "be65913bc1232ccbe36ffe510725866488dfcb115bf1c5151ce1c3570645daf0"
+    },
+    {
+      "sample_id": "20fafe154288db99978f",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/20fafe154288db99978f",
+      "sha256": "3ec35e1ad6bafee29f5db4d3339fdc520e8c019b29040771764bbab28c3464c9"
+    },
+    {
+      "sample_id": "219b0fcabb2696c5b921",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/219b0fcabb2696c5b921",
+      "sha256": "b2655dbc09cf138366e778e85c75384460c174f73beb7d72d11ca33a4899ef48"
+    },
+    {
+      "sample_id": "21c6c3507959de3c960d",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/21c6c3507959de3c960d",
+      "sha256": "7d50f75eea70ba2477c17462658dead3b5077748558009752d48140b41d824d7"
+    },
+    {
+      "sample_id": "23a384c0656225176ece",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/23a384c0656225176ece",
+      "sha256": "3ffb95be141c0fd9d13dcf67f3e07c94941cb565635e4cb467f22ba0d3e3a60e"
+    },
+    {
+      "sample_id": "2481ceb65935af936bb4",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/2481ceb65935af936bb4",
+      "sha256": "2624b5fd56c82e0dac2b1b89aa9ea1167712240a367ce2f8688a35a73356eac8"
+    },
+    {
+      "sample_id": "24b52dde062c9059ca93",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/24b52dde062c9059ca93",
+      "sha256": "88da87d9062cb4351c7f2081e35a61419b7b5db6af0dea39bdc20ade37e6fa59"
+    },
+    {
+      "sample_id": "25a409bbff3360a38497",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/25a409bbff3360a38497",
+      "sha256": "0a409034a1c62f849daaec55f2e9c2250a8ba4b926c689399aa6ca816d582c3c"
+    },
+    {
+      "sample_id": "266841530848c32a47c8",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/266841530848c32a47c8",
+      "sha256": "1d79c47207d7a1ff1d19199fb08bf075a7297f95dd054db19601505550a474f6"
+    },
+    {
+      "sample_id": "27b90c7572f2ff1e1128",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/27b90c7572f2ff1e1128",
+      "sha256": "6ff4ebb2e9ef2f60fb04c9fd2246389f8f8104e0d9d704be8c8a1fd02cc53775"
+    },
+    {
+      "sample_id": "28969063e6675ddb1995",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/28969063e6675ddb1995",
+      "sha256": "91b5e68dd7336b14cc26e4db2f37ad3087aed2ae71598e07cd2f384931229d30"
+    },
+    {
+      "sample_id": "28c1b5df1c553224f25f",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/28c1b5df1c553224f25f",
+      "sha256": "c519d61988296c85b775bf4a98cfc1c3370543f793b7de516d19def3a643f3c9"
+    },
+    {
+      "sample_id": "28d025b99a8f30f0e255",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/28d025b99a8f30f0e255",
+      "sha256": "984c45450351d0500ee6b3a44beb87560007fa89fa21ae8376cac4732df81715"
+    },
+    {
+      "sample_id": "29816be36feeb5634b06",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/29816be36feeb5634b06",
+      "sha256": "cb579c62d2403636ce09fc6e17590cf93e4cefd2300256336ae89cc8f000b010"
+    },
+    {
+      "sample_id": "2a16bd6b6d123d94f93c",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/2a16bd6b6d123d94f93c",
+      "sha256": "7fe39e4e481446cf5e1e42db979140029f4ad32c09a81735c47a6a1b6502ce58"
+    },
+    {
+      "sample_id": "2a1c360057fda6ee952c",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/2a1c360057fda6ee952c",
+      "sha256": "f39ef49beadaeb8f1809a90ef25bdcf5ac578abcb4accd2c56269cf7f352b926"
+    },
+    {
+      "sample_id": "2a5892ef5749a71f5e3e",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/2a5892ef5749a71f5e3e",
+      "sha256": "f425d2eb6028af5284237650d510c0161c1c890da10ad3ccfeb7fe97e6ce6b2c"
+    },
+    {
+      "sample_id": "2a649855174e50b5b349",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/2a649855174e50b5b349",
+      "sha256": "9e240ed9d7f4bef90c4fb562519cc7dab3652f6c3de4481235d5e3796bd768c0"
+    },
+    {
+      "sample_id": "2aa70ef09c9f42f8e39f",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/2aa70ef09c9f42f8e39f",
+      "sha256": "d9280d6b69b5fa8f0792576f24a8c9a72f8011b436966f6f4e33d84361042f10"
+    },
+    {
+      "sample_id": "2af8863321e3d5ef0ef8",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/2af8863321e3d5ef0ef8",
+      "sha256": "50192c298c061eb26580ad4db87a8766d8d3d43df63f73beb0af1d427d325e66"
+    },
+    {
+      "sample_id": "2b0ee308b61cf640ca78",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/2b0ee308b61cf640ca78",
+      "sha256": "9dbe29963ca4ebdbf3e45638439d9440728cc61580ea6c52cc38fde909ab2738"
+    },
+    {
+      "sample_id": "2c622dd670fb1b436330",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/2c622dd670fb1b436330",
+      "sha256": "4af262603a534d0b7b9728158f858957a537b8f219481f98d7615f01ce5cbf8e"
+    },
+    {
+      "sample_id": "2dd234528f945f17e3a9",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/2dd234528f945f17e3a9",
+      "sha256": "0c8fd8075dbb4debdde19dbdb9fc3bb96781753025e27a31d2277b318729ccdf"
+    },
+    {
+      "sample_id": "2e21d1f19e90b223c6fe",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/2e21d1f19e90b223c6fe",
+      "sha256": "c0b1fa07ceb85985cd4cd72e88e414185e32cc0b6b6b951e4039f0df3df7bd2d"
+    },
+    {
+      "sample_id": "2e981b6c796253097363",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/2e981b6c796253097363",
+      "sha256": "da9b5ca91c366cbeccc34ef9f597ce144c052c7881a6b906735143a2f4487778"
+    },
+    {
+      "sample_id": "3059ff819c10c98afa4c",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/3059ff819c10c98afa4c",
+      "sha256": "c5707eaad0d27ec879597f1df3987c355521d74085af89bcd25a789f5768f3c9"
+    },
+    {
+      "sample_id": "3156bca43096331725a7",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/3156bca43096331725a7",
+      "sha256": "e588d98d4fba0ab0c3f46498ccee631b7043baa0cc4e3fdbd814fda3408920e1"
+    },
+    {
+      "sample_id": "339b69be5177685a9281",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/339b69be5177685a9281",
+      "sha256": "2000c6b49cb9ffc6e087d8ccdcf46b695f2925ce9dd99ce02c425a8e4bf102f4"
+    },
+    {
+      "sample_id": "33d06557fb1ede265cf2",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/33d06557fb1ede265cf2",
+      "sha256": "f78f4a87974ebb83113568a1c316ac3da389f44ecd33b434740a8e3d51094445"
+    },
+    {
+      "sample_id": "359eef74cb58db35d4ee",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/359eef74cb58db35d4ee",
+      "sha256": "d5647c7814351bb35e7dc58df25539711970dfffb03d3e6a108b362d36093dc6"
+    },
+    {
+      "sample_id": "35fb3f7562899f49483d",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/35fb3f7562899f49483d",
+      "sha256": "d9cc87dd3a0445ee8f8b3129100c2715ccbdd867f25e46e6e7e3a0090cf1da1f"
+    },
+    {
+      "sample_id": "362594f2ec55ac52a15d",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/362594f2ec55ac52a15d",
+      "sha256": "d89b24c1e1dd23dba268b97b14a083824f0dd4c836ddf44b360555d12b83a7d4"
+    },
+    {
+      "sample_id": "366eb055bf34be05d641",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/366eb055bf34be05d641",
+      "sha256": "3914857bd6575a38744c8ed700ab4a0c891b23c907661ea2aeb3888e7cc56e4e"
+    },
+    {
+      "sample_id": "37066f9c758b0d76889d",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/37066f9c758b0d76889d",
+      "sha256": "eb4d69fa95e4536345b82b192eab44c0a41fdb4728dc270647b1ca4f0241a1a3"
+    },
+    {
+      "sample_id": "37f9e6fa735e0f1bfd77",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/37f9e6fa735e0f1bfd77",
+      "sha256": "dd8aef149b5ddd86610fd07c6fb983ce19f39d5d55429c468ba065055bcbc780"
+    },
+    {
+      "sample_id": "38d33ac3731234dc4250",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/38d33ac3731234dc4250",
+      "sha256": "b83ab4b4d85def8b7b15ce77f902c7521fee11ea370c723dfe41baa24b9dae18"
+    },
+    {
+      "sample_id": "39b15111f45b6e08df16",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/39b15111f45b6e08df16",
+      "sha256": "b47671dff8a78a8ce40f6a91a25155bd081745c4f0094e23d71d105d79202c9a"
+    },
+    {
+      "sample_id": "39cd8cf06997c82da576",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/39cd8cf06997c82da576",
+      "sha256": "7ade2f86018bdac17342fdf5b7165ddded317ee855cb8a0d9b0fb9062b60b564"
+    },
+    {
+      "sample_id": "3b672848ec4ffd951f77",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/3b672848ec4ffd951f77",
+      "sha256": "cb9bc84fe5ddb38b2ea46d19c2815fbb5ff0885f391ba02bc8538b755bff2bc8"
+    },
+    {
+      "sample_id": "3bb45c0251429ce3c40b",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/3bb45c0251429ce3c40b",
+      "sha256": "734ad042f5dadc22d678903acc1da3488511ecce4948d4a5f8ce51a6517e00bb"
+    },
+    {
+      "sample_id": "3d41a4898b1b3ef77b62",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/3d41a4898b1b3ef77b62",
+      "sha256": "b3ce70ac33caa3aa296d6a886a580d98d5cd687877aca9f941189432ae506af9"
+    },
+    {
+      "sample_id": "3ddd2cd4e83ae53b7a44",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/3ddd2cd4e83ae53b7a44",
+      "sha256": "8e2db2266902e72a76676f2e2c8937c3aa2a353a3c9c7d93a1220ea77c4eec1f"
+    },
+    {
+      "sample_id": "3e2c171db53fb01b3756",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/3e2c171db53fb01b3756",
+      "sha256": "ac1540c0fe73bb88607c04a67645447e4b81edc6b1bc4d3de8097ac168d5ca07"
+    },
+    {
+      "sample_id": "3edd802c392b59cb14af",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/3edd802c392b59cb14af",
+      "sha256": "599fd6fd5e4ce30ca69f58a5e082deef7aea63afe1a71c1793007a1cab89f230"
+    },
+    {
+      "sample_id": "3ef6e181a4b97aff5932",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/3ef6e181a4b97aff5932",
+      "sha256": "4834e39c3f88726c34f5db5bf03c5f6c63bc11dae1d3ccc7522f50c6332ad8dd"
+    },
+    {
+      "sample_id": "3f172cc4f8dd115fd5f6",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/3f172cc4f8dd115fd5f6",
+      "sha256": "6e92ae41b93c2b3ac43e0c8237d1382a0b61ed6fd6763ee621a66e38105c1dcf"
+    },
+    {
+      "sample_id": "40ce242de72d8ceb9f31",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/40ce242de72d8ceb9f31",
+      "sha256": "8afbbd03a4a38921774ccf8132c9f5055aab63cc2e25b6fdd01d505d6675fe9b"
+    },
+    {
+      "sample_id": "413743b9f223cf6363d5",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/413743b9f223cf6363d5",
+      "sha256": "50261f571ec077b04def70d97f74ca3f9cdc983efa8faca2ca48f1676e702c45"
+    },
+    {
+      "sample_id": "4180c4f4a119d4dca441",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/4180c4f4a119d4dca441",
+      "sha256": "f7a01016c50c0eba11460ef4321b6b33edc22923d17f31bdf78179efe7731134"
+    },
+    {
+      "sample_id": "41951456b2bbe21fcd57",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/41951456b2bbe21fcd57",
+      "sha256": "3d415bcb26012bd06ab53fad74ebe8998b2e5fb88c4a271745fc76cdf076a665"
+    },
+    {
+      "sample_id": "427839a2221eb42cbd00",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/427839a2221eb42cbd00",
+      "sha256": "249a9b7da1a2d0594ddb264a2e41e9e9afc881c4302e80c5fbef9151c5e46294"
+    },
+    {
+      "sample_id": "43404efa044ea7c0e551",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/43404efa044ea7c0e551",
+      "sha256": "3787b12a40f6e1be6b6d50ed8320b2cf9159db9562d25284136053a8a6cb5685"
+    },
+    {
+      "sample_id": "4426b1567f87f63009e2",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/4426b1567f87f63009e2",
+      "sha256": "31f64a128932f47555b3a501e9318f0a019096a1ab4e4efae03d307485dc20e0"
+    },
+    {
+      "sample_id": "45767ab0e67eea400eeb",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/45767ab0e67eea400eeb",
+      "sha256": "caab2df71bb4b96051cb5dff712b52adab9c6b9c9c74d3d708c2b3f08c35064c"
+    },
+    {
+      "sample_id": "45924fce7f447d45db75",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/45924fce7f447d45db75",
+      "sha256": "2f3941825ac2e2bf7c50c5ed2c2f48b6fe9ba29ae661549e4111f10f9a935bdb"
+    },
+    {
+      "sample_id": "45db9da3a059fdf12396",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/45db9da3a059fdf12396",
+      "sha256": "6e3e1b028f1ac9d43c77e035a4f6c5e8abb6d63c86893eb711c4569ec648291f"
+    },
+    {
+      "sample_id": "46443ec24ed3053c7b9b",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/46443ec24ed3053c7b9b",
+      "sha256": "83049ac698ecfd1c7cf1fc01f4f216f79c89d7d6aebfc230679d57cce0d4bdcf"
+    },
+    {
+      "sample_id": "4759368bf91ae001929f",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/4759368bf91ae001929f",
+      "sha256": "04147ee024b1be2602cdc0be80c77555afc1de06ed58a152976ac4462d645ee6"
+    },
+    {
+      "sample_id": "48161726c649a59a8481",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/48161726c649a59a8481",
+      "sha256": "2bb24420d7cc15be4a18429f7106cc7f185dae607852be7f03466bd83bd460f1"
+    },
+    {
+      "sample_id": "4b2a771c4abdbbf10bbe",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/4b2a771c4abdbbf10bbe",
+      "sha256": "f62de3feb08398cb47656f59096699f66b96ac3e65f7161b31d4665f47337fdc"
+    },
+    {
+      "sample_id": "4d1ac6dce2101f1c319e",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/4d1ac6dce2101f1c319e",
+      "sha256": "7a22cc4eecc79c0f5fb26a8992d37d16521f23d4c783c855bdce73b9dc54d667"
+    },
+    {
+      "sample_id": "4d467abb63fae21fb6ec",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/4d467abb63fae21fb6ec",
+      "sha256": "3dde2c735c844be1420f4c62df835fd1b584ffec3936b7252eb52d06a39646ab"
+    },
+    {
+      "sample_id": "4e19c7859169f98ff86a",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/4e19c7859169f98ff86a",
+      "sha256": "60c0f1056b39953aab0b5edd6b6db38f82c1fc07f6a8cf8f79dd12179b203d22"
+    },
+    {
+      "sample_id": "4e7cb3e7c229f6cda3ea",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/4e7cb3e7c229f6cda3ea",
+      "sha256": "c60f3b2916d31b1b4c92eceb268d0e95287331c2237c73a5113db4f1830c60f1"
+    },
+    {
+      "sample_id": "4fa1f9c960bac53997da",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/4fa1f9c960bac53997da",
+      "sha256": "7d0e965c56d19fa3aa98e2d68f4dc08e3e5f3e8811cd3f087529dc44da90e261"
+    },
+    {
+      "sample_id": "5045a939af16b3443d5a",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/5045a939af16b3443d5a",
+      "sha256": "ac6b69a1af6912399308aaf1a9c57c88d7866c65e671b8a31ffdd02993a5df8b"
+    },
+    {
+      "sample_id": "504cbc622e59e9b751de",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/504cbc622e59e9b751de",
+      "sha256": "80bd804bebf035cc7caf93da4545ce67504090f32447336b9afd28188e8bab33"
+    },
+    {
+      "sample_id": "523a13a68ee4198c3c77",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/523a13a68ee4198c3c77",
+      "sha256": "08b447028d2ff04b69e83b0f7671180bfc15ca0619d8621d65a917ca382b7844"
+    },
+    {
+      "sample_id": "530423818a710a1e17ce",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/530423818a710a1e17ce",
+      "sha256": "6c67e0fd7723c078774e7f7406c97e8eb21074f8aab8d84aa77b1a70404104ea"
+    },
+    {
+      "sample_id": "53c101be7a20e8d0f5d3",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/53c101be7a20e8d0f5d3",
+      "sha256": "d1e5cdd10e755d57ff1b221bcfd6784048e054fcf68597fc69078ea0cd7b5264"
+    },
+    {
+      "sample_id": "5407266188996c89de65",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/5407266188996c89de65",
+      "sha256": "c8cd9ee0d00b85e5b2cba2a1bbd4ce637c9ff619839330673872cb50346ec52c"
+    },
+    {
+      "sample_id": "5592dce99185054cde92",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/5592dce99185054cde92",
+      "sha256": "67069015db1f9144d7770884e9eb8362ff242bb55419378afe5bd03c9114bd04"
+    },
+    {
+      "sample_id": "55c74cfad20704cacfe8",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/55c74cfad20704cacfe8",
+      "sha256": "4610dd60338465921f4c01f9ec1bf476b7bf238bd6312ce42cd37f4997a91f96"
+    },
+    {
+      "sample_id": "560a08eaea316c263d90",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/560a08eaea316c263d90",
+      "sha256": "06bfe7c6c4db06db580f2bd99fa7fa12fc4be54093fee6d4ed60e55f4e427cd9"
+    },
+    {
+      "sample_id": "560cc7633a15b01929d5",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/560cc7633a15b01929d5",
+      "sha256": "be6eb5f994f23558a5b5824f8ea7b6716de3ec86331ccb8b2438f9d341fcc252"
+    },
+    {
+      "sample_id": "5678d4ecf5506ae5374a",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/5678d4ecf5506ae5374a",
+      "sha256": "8d11c5fd6894aab2eec8ba05d1cb171157c774713eb7e5cc9b072827357b38f8"
+    },
+    {
+      "sample_id": "572411d33ac2acd836fd",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/572411d33ac2acd836fd",
+      "sha256": "a29f9525178bad85533034c76f7835c11edf2d80985b34354049bb7362c5b71b"
+    },
+    {
+      "sample_id": "5791c00f370b3a1f834a",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/5791c00f370b3a1f834a",
+      "sha256": "276f87edfccdc34c07a2ac008f758c4e2fba62b9e3907867d3c7bd2122766fb8"
+    },
+    {
+      "sample_id": "57c6ef24684606087160",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/57c6ef24684606087160",
+      "sha256": "8770bdc1b46809f195706c2d0d8af19648966bf56eb1e6e89959cc2fbe56359b"
+    },
+    {
+      "sample_id": "57ea102c63689ef534a9",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/57ea102c63689ef534a9",
+      "sha256": "973ee8fa815ef6d7d472f722b742550d0e40756b31936c0c6c45a6a3efee54ad"
+    },
+    {
+      "sample_id": "58623e3530541644e53e",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/58623e3530541644e53e",
+      "sha256": "e01c51a24346a5ca0af9bf2ad0ef914b29fadc8c959cc0f24f38c2e0e1faeae6"
+    },
+    {
+      "sample_id": "58e44f5c64392fa93d45",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/58e44f5c64392fa93d45",
+      "sha256": "28f70c748de3db19edd886f2b7180dbed042197a9f65756e37aeb10d68f5292b"
+    },
+    {
+      "sample_id": "59659d7fc38f43700be6",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/59659d7fc38f43700be6",
+      "sha256": "7a442cc25546d7635d5e35a01fc952d6d86da3ad5f1bc11ad0334e0a7233cc38"
+    },
+    {
+      "sample_id": "59fd10479d4b211e1022",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/59fd10479d4b211e1022",
+      "sha256": "ce56bf749455d44cc228c939f16c8cddb9df4b2dc10c8f1940dc451f5746517a"
+    },
+    {
+      "sample_id": "5a8710fcd13e65465f11",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/5a8710fcd13e65465f11",
+      "sha256": "4d3e2e290c3c0a79b83e944e2ff83ef09a260416e96e88035ee646c32f50556e"
+    },
+    {
+      "sample_id": "5b179a218a1e83dde707",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/5b179a218a1e83dde707",
+      "sha256": "90c9596355a4eff8d422449a54b205e83f822c841bb66746838a58d3591e6f6e"
+    },
+    {
+      "sample_id": "5b320fd1c2eea8740fa4",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/5b320fd1c2eea8740fa4",
+      "sha256": "8086044bdecd8bd8247329d38b7ada3377cf3b4a7fce4415f49fec4d8d8eb2ef"
+    },
+    {
+      "sample_id": "624f4a0e8fe1cfaee1ea",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/624f4a0e8fe1cfaee1ea",
+      "sha256": "044fe15f969b0a2092bf1a19b772d210b7105a070b38ec587dd5d54efef44fd2"
+    },
+    {
+      "sample_id": "6274a4d5a5d284bbfc45",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/6274a4d5a5d284bbfc45",
+      "sha256": "b1f78403ea919c3d0b240de8da5764bdbc5c81c6d127cdc8565883315cd4a367"
+    },
+    {
+      "sample_id": "63419cef5a9e54054280",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/63419cef5a9e54054280",
+      "sha256": "c9b685f7f7ecb1c0b8b86203c0fc5d6398d4d0925e5ff42542bba66025fd9afb"
+    },
+    {
+      "sample_id": "63cc49f48d1f8a4fae82",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/63cc49f48d1f8a4fae82",
+      "sha256": "aa192befb9d0c897c835b6071d694c50b4d36edbc2938350718129c8d1b63dea"
+    },
+    {
+      "sample_id": "63f303fb7dc873603442",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/63f303fb7dc873603442",
+      "sha256": "54ec6365f0f199854d6bf32f0c43d6ba52f02b2e4624ce74404313561f126ba6"
+    },
+    {
+      "sample_id": "654a6ae55edcd74474e1",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/654a6ae55edcd74474e1",
+      "sha256": "5085f28649720ecdf591d7475e79b9c41a1af8a1b8fe813a344586a033b4bbf7"
+    },
+    {
+      "sample_id": "663264a80cca22a83b9d",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/663264a80cca22a83b9d",
+      "sha256": "25d37502376a35ed520681d91ac7b180b7bcb53841f077d9428ed99f7c3138d7"
+    },
+    {
+      "sample_id": "664b71563cc24c0a0b86",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/664b71563cc24c0a0b86",
+      "sha256": "e0ca8932584ed5ec317998b71b3b1ceb284d5a2e44177c3a5e48256603bf7709"
+    },
+    {
+      "sample_id": "6770c2282837ab9fca17",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/6770c2282837ab9fca17",
+      "sha256": "568b2ca4c11a01937f4f3c93684f2efc854014e72439aff0ea94b39f02bb9334"
+    },
+    {
+      "sample_id": "6c5c0f3b28ac8167ff3a",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/6c5c0f3b28ac8167ff3a",
+      "sha256": "6918b9f3b14dbd72243586aea5c0dec4c45bd2eb54fd2e3a5fcfe5cc4fb29041"
+    },
+    {
+      "sample_id": "6da96b7c75ce1c8a7bc3",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/6da96b7c75ce1c8a7bc3",
+      "sha256": "c82c5825927fcfcaabb545452f5a99289cefd5c4713fc4510e0aadf2b7cc3967"
+    },
+    {
+      "sample_id": "6e18b23cc8ebfaa77ca3",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/6e18b23cc8ebfaa77ca3",
+      "sha256": "ec0722db868210f15312a2b5ffa638bf795a242779d334ec1fae272fff5440a3"
+    },
+    {
+      "sample_id": "6fceb2b89f1aa1b491d2",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/6fceb2b89f1aa1b491d2",
+      "sha256": "65b782ff1d55ff3399b3c723f5d91ebad252cf7baacfbf316ef20ca76a051c12"
+    },
+    {
+      "sample_id": "70a30f465fd5511ab29c",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/70a30f465fd5511ab29c",
+      "sha256": "249ef568531ba03279a65dd28fa56895251eb9d5259095774bb244e480bba697"
+    },
+    {
+      "sample_id": "724f5e96b2a03f83c35b",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/724f5e96b2a03f83c35b",
+      "sha256": "f8afc811747dcfe1a59d3ebf8c6d3357af3e2798894e545006271398755b7493"
+    },
+    {
+      "sample_id": "725b612d767fae611ff1",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/725b612d767fae611ff1",
+      "sha256": "e2b14da371af21b57c8d9c601cbfffa5b628d9238ef708d722f61119d36021c4"
+    },
+    {
+      "sample_id": "7382975152f8ac7eba6b",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/7382975152f8ac7eba6b",
+      "sha256": "0373e5ca6fa93f77bd746604c16a174531f94bfea1836496dac6996ed331375a"
+    },
+    {
+      "sample_id": "74b9bb3381d61d9f2f30",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/74b9bb3381d61d9f2f30",
+      "sha256": "310408b94f2411456c40a07bdf22e0132da1570ce883d1d26c31dbaa32fb5be1"
+    },
+    {
+      "sample_id": "75954b2344dc43cc0348",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/75954b2344dc43cc0348",
+      "sha256": "5473a6806079af42753ad0f678319a9ae9118646d4f8aae89ceb5c82fe0bdb27"
+    },
+    {
+      "sample_id": "75da3647953adb60cbb9",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/75da3647953adb60cbb9",
+      "sha256": "4121dba9f5abaedb0daf9b9a5251e6ff1077b8de22f1bf50d97d56b752a928b7"
+    },
+    {
+      "sample_id": "77248657c8d38bce10b9",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/77248657c8d38bce10b9",
+      "sha256": "b793843367ab5f0b953925f4e77bcdb8f06394dbf5572db686938ccc9494d0e0"
+    },
+    {
+      "sample_id": "7836b492fc4d5e729a12",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/7836b492fc4d5e729a12",
+      "sha256": "a9b388abae9f6029134d4334a055a111fd0687a9ff5413bb09ea5c579b11fcfe"
+    },
+    {
+      "sample_id": "797c797d04981efb52a2",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/797c797d04981efb52a2",
+      "sha256": "60db166d83a04d990a9de0c026dd54af4bdf06cb5dc5f18d61be1427a66fe636"
+    },
+    {
+      "sample_id": "7c27545b6476cd3e9e9f",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/7c27545b6476cd3e9e9f",
+      "sha256": "b4186be214f82a1e7cc3b04445d929adf697696f40eab1b449146d8d3918501c"
+    },
+    {
+      "sample_id": "7c6e9e64a7c4dfa7049f",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/7c6e9e64a7c4dfa7049f",
+      "sha256": "122828ecea0a306cc50f422a5245716b22681debeb9a9ac25c9bcce131a914dd"
+    },
+    {
+      "sample_id": "80d7600e5f6b094a614d",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/80d7600e5f6b094a614d",
+      "sha256": "acdfdd648cf6b8116961126507707942ea0962e3929b18f8bb2a4937f92742e5"
+    },
+    {
+      "sample_id": "82a1ef729f1622ea7b93",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/82a1ef729f1622ea7b93",
+      "sha256": "94e4c822a53359e01065d3a02606b9252c51f57e39cb2fa3aad689ce18c03443"
+    },
+    {
+      "sample_id": "8377c87989703de022fe",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/8377c87989703de022fe",
+      "sha256": "b41dbb465d0a407377b8b0d865733c284c144b3eaa17c9ef1bc85a9b6705f264"
+    },
+    {
+      "sample_id": "83e24d4773db4d615e2f",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/83e24d4773db4d615e2f",
+      "sha256": "b0225fd82203faf1f6b65ddc0afe01137b1e244c3bb5719d78b7dcec10177e70"
+    },
+    {
+      "sample_id": "8410314af77a59cf3c1c",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/8410314af77a59cf3c1c",
+      "sha256": "3b6b36f1d5e194c929cc3e3ee0ef5c742c2ea6c744ce1d1f70154e95fa219e81"
+    },
+    {
+      "sample_id": "841f7166c756cc04fa84",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/841f7166c756cc04fa84",
+      "sha256": "6cc7ac1f779d7a1292c74f1b90ca7fbb80758fe3b52ff9aafcb2ec5c3c882e1b"
+    },
+    {
+      "sample_id": "845ca2d249998a35fde3",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/845ca2d249998a35fde3",
+      "sha256": "a8bda2e249cef215b6b8d68e839619fb4a909793ee77ece7c19192e2fe2f9250"
+    },
+    {
+      "sample_id": "84e5aad5c833ec93a863",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/84e5aad5c833ec93a863",
+      "sha256": "b1ca32d29da81cd21e7f79a56f3df974ce9122c47a04f81f46913572c9876fe8"
+    },
+    {
+      "sample_id": "85339be224bd5cb2c903",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/85339be224bd5cb2c903",
+      "sha256": "5b73491e544a6f69da46c3bd434376c280885057485453eece58da2bb2961c24"
+    },
+    {
+      "sample_id": "853ccbf017b1a535746c",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/853ccbf017b1a535746c",
+      "sha256": "c2898fd4299892b50359a1c711baa73e2fd1bc011f996dcdb70934e7b3570e85"
+    },
+    {
+      "sample_id": "87ceef973759a7900ed6",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/87ceef973759a7900ed6",
+      "sha256": "239aefb648dc19150d58a0c289fccfd316559ea46032da27caf73366bcc6aab1"
+    },
+    {
+      "sample_id": "88fcc13324d593c9c8ee",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/88fcc13324d593c9c8ee",
+      "sha256": "655218efba0454f4e81df8be9641eed8abc9af13e1fdf14a2af1e2a5780888c6"
+    },
+    {
+      "sample_id": "89a12e226cc42a6cf63f",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/89a12e226cc42a6cf63f",
+      "sha256": "f81a7374a93796b5b95fc322e5deb3556f3d80c5d277984a7318d27f2156a611"
+    },
+    {
+      "sample_id": "8a93af2116443499407b",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/8a93af2116443499407b",
+      "sha256": "14dcc660b540ecb6bd3c0e2cfb2a269576f3206fa01fa817ec053ffa18ec17f6"
+    },
+    {
+      "sample_id": "8b2c6f2c38eb246c6d89",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/8b2c6f2c38eb246c6d89",
+      "sha256": "e905fabcceb5f32f0592ba9bdb612b1d299c0bdeeccb665cf763fe8743c4002a"
+    },
+    {
+      "sample_id": "8bafa39da34c039d99b0",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/8bafa39da34c039d99b0",
+      "sha256": "8aa6c987379b951a468bf401ac0ef99754aaa720f84c22fe11d93299c5e1c26b"
+    },
+    {
+      "sample_id": "8bebadb8849ef47ef1b1",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/8bebadb8849ef47ef1b1",
+      "sha256": "fafab1db2bd4fce83e93c8b5a6bd4f1f836a712220fab911cc1a2fa336020f7c"
+    },
+    {
+      "sample_id": "8c5557e48519164c4017",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/8c5557e48519164c4017",
+      "sha256": "80b5833d09104330707030cc4905b0305b715c3547a21c73ce437c6b0e26234b"
+    },
+    {
+      "sample_id": "8cb6955e518ba3244a1a",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/8cb6955e518ba3244a1a",
+      "sha256": "da0919610e246ca7a8c969b58df7b752651f69dfe4811aec06dc8641438a8944"
+    },
+    {
+      "sample_id": "8d038b1c4906d12b8a7e",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/8d038b1c4906d12b8a7e",
+      "sha256": "f424114604a95dcf004e896d306bb978396fa71f61a326c2352702a5f37b1aa4"
+    },
+    {
+      "sample_id": "8d6eccac772c21bb4e0f",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/8d6eccac772c21bb4e0f",
+      "sha256": "79b7ce5e4567f59ccc70db60bc21202410e442fa75caa106e395f6291f6cf671"
+    },
+    {
+      "sample_id": "8e883d168f3a4c20e5ae",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/8e883d168f3a4c20e5ae",
+      "sha256": "c05b594ab358833677e0b0a95608d9bd1115af759bfe8869df73382727374696"
+    },
+    {
+      "sample_id": "8ec897ec807b69d909d3",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/8ec897ec807b69d909d3",
+      "sha256": "e39300b26c94ff5e0a4d57c31040d4e8ba4b6cd5e5c0728cd121d2e4dae9c953"
+    },
+    {
+      "sample_id": "907f57bd271f012eb463",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/907f57bd271f012eb463",
+      "sha256": "2c13b27a9b17cb02338da7bad6493d5c4ec217ad71b7e122f8662496442315b9"
+    },
+    {
+      "sample_id": "90aa6384c7711bdd72f2",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/90aa6384c7711bdd72f2",
+      "sha256": "4f2559ca70f5c6b187f9b6d77c6fc68a56a355d0fcc25093778aa8c09f07f24f"
+    },
+    {
+      "sample_id": "90ea5dd6ffd812c0e67d",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/90ea5dd6ffd812c0e67d",
+      "sha256": "0fe0f2276d652808dbe4b880ed787cfb2dae26a8666600ccdfa433266781a49c"
+    },
+    {
+      "sample_id": "919d8c5d98d364209d11",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/919d8c5d98d364209d11",
+      "sha256": "d89711ac659f7f439e1f6cf8cc9d74709dcdf349c30e3e61fb07ba0a9fcd0422"
+    },
+    {
+      "sample_id": "9460ce1eee78ad0c4321",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/9460ce1eee78ad0c4321",
+      "sha256": "7ff64e3515bb4c90892454cbe2f5a1f99ab27e8c11cb313e567b4fd7c284cac8"
+    },
+    {
+      "sample_id": "9464bcb36cb839f4d19e",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/9464bcb36cb839f4d19e",
+      "sha256": "34caa10e5a2d66a3603b68ba28adff6956d1594cbbbdb8bd6a1a296e955b92a9"
+    },
+    {
+      "sample_id": "9566c3409dc0f8ef1310",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/9566c3409dc0f8ef1310",
+      "sha256": "3c0673fdbeaa58b6bbab666b84af3f2f66b08d1d45397863074e70379cfc84a6"
+    },
+    {
+      "sample_id": "969e180f00847c928b15",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/969e180f00847c928b15",
+      "sha256": "e5eb495f6cd1b6d2ceb199dc8d54c71364b8c409f5210c6e154e41f5214db03f"
+    },
+    {
+      "sample_id": "96e4c890c65e45639a3e",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/96e4c890c65e45639a3e",
+      "sha256": "ca368513d9fa365851bd41beb2e8b93e28020352dc3a525a3f922a8601128e3c"
+    },
+    {
+      "sample_id": "9850fd019689c746b534",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/9850fd019689c746b534",
+      "sha256": "8b05f7ca861e4529c588f9d3e7f7a1b316431ba06bb3726baec7bf604ff5a4d3"
+    },
+    {
+      "sample_id": "98bf603897d1824f0728",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/98bf603897d1824f0728",
+      "sha256": "77d61bff14ad740a17ad48a0010b8bbd415483b67fa2bce7851173f55d6fa2b0"
+    },
+    {
+      "sample_id": "99155062fadce3122641",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/99155062fadce3122641",
+      "sha256": "41236c1ba7db1b35b868fdd1b7f72123f68ff4f50f1cd1557c62fa8307211941"
+    },
+    {
+      "sample_id": "9a5f089ef69a2b5828ed",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/9a5f089ef69a2b5828ed",
+      "sha256": "d7d2068493413349a4625881068c889e4e07ec317b393a15473e36ed279d1847"
+    },
+    {
+      "sample_id": "9ac3dd00ea80f53ea2b2",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/9ac3dd00ea80f53ea2b2",
+      "sha256": "92db06543e8ad5fd1155e7d736972ccb6b2119d8d89f4d86ab3e56e4090504ce"
+    },
+    {
+      "sample_id": "9b83149e03a8f3fb32a0",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/9b83149e03a8f3fb32a0",
+      "sha256": "8fa7eea8e4aae2a8c642a837f188bd649de46ac279fd2b65654173f3ec0b9d20"
+    },
+    {
+      "sample_id": "9bca6e96717fc2a1cd4f",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/9bca6e96717fc2a1cd4f",
+      "sha256": "a320169bfeb6d9ada3332179d5269fc372dcdfe08713f929507f53328351abda"
+    },
+    {
+      "sample_id": "9c118e3fa36bf8c47245",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/9c118e3fa36bf8c47245",
+      "sha256": "0ad6a3cfa7f0ad27fae8ac989cefbfe5966df11106869e6fbdb2c4b740df03fc"
+    },
+    {
+      "sample_id": "9dade6b843ac46d15f23",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/9dade6b843ac46d15f23",
+      "sha256": "0f928872a87014b816515ece3ec5b12268e3f315fd01506cc2e1fb9bfb55cdb0"
+    },
+    {
+      "sample_id": "9e393a66ecf446def723",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/9e393a66ecf446def723",
+      "sha256": "d9e9937422c204f69248da06adcb34f21782c82e4d8e119c3f613402203add9f"
+    },
+    {
+      "sample_id": "9f2c307f963b58884449",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/9f2c307f963b58884449",
+      "sha256": "a6b306b5f78d67daa6f0c31835839f52d4dcfd6a0c6ee36bf7e408b9690a9a8e"
+    },
+    {
+      "sample_id": "9f3aad99013f298ddee9",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/9f3aad99013f298ddee9",
+      "sha256": "1a908d3d6641cb43fb312e06e6adde489c18379308d8b405f7926ef3e2273cc7"
+    },
+    {
+      "sample_id": "9f56546cf2d80cf59e47",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/9f56546cf2d80cf59e47",
+      "sha256": "6447a1e461b1eb220ca59e1c292ea6a4f13f73668c51bb9487075254c4199e40"
+    },
+    {
+      "sample_id": "9f91dc78169c0f31d703",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/9f91dc78169c0f31d703",
+      "sha256": "67929b60aa0bc57890044c44387591f974ef2657f8ef2ea65f265645fa3afc79"
+    },
+    {
+      "sample_id": "a0353d13a724cdaf5f8d",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/a0353d13a724cdaf5f8d",
+      "sha256": "231561c256094186cf4a0e4da4775e461c61acbb4e5afe2df95a49453bd38c98"
+    },
+    {
+      "sample_id": "a0a30fef15be75e7a01b",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/a0a30fef15be75e7a01b",
+      "sha256": "d788c107811e64de7e1603f27cf081f45698a4d221746eb8868603918eab5a69"
+    },
+    {
+      "sample_id": "a14fa1d6a63b82401c4b",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/a14fa1d6a63b82401c4b",
+      "sha256": "11eca592197987e671ff907eb6af92b4ccc8eea9b5d056425602b92683bb4232"
+    },
+    {
+      "sample_id": "a1b3ee0349fb1c0eff2a",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/a1b3ee0349fb1c0eff2a",
+      "sha256": "fabd8160403e3728d1cccb79d88bbd067cfd1697cb3b658e24fd0817c0420111"
+    },
+    {
+      "sample_id": "a372c0820ffdaf1b9b44",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/a372c0820ffdaf1b9b44",
+      "sha256": "61ee4315257f545f5bf7fa2b3c1560a68a4c12dcc599cac8f4357f9759e0457f"
+    },
+    {
+      "sample_id": "a3b3b834aa466a586fb2",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/a3b3b834aa466a586fb2",
+      "sha256": "94ddd364f7325a55d46a969f18adbc104d8512e37e6da6267936deddecf3e2be"
+    },
+    {
+      "sample_id": "a3f414ba685e1d5938be",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/a3f414ba685e1d5938be",
+      "sha256": "e4cbe271de732a2b81315bd8db840b8952c7ace2d2cd9c5b73226b879fe9e308"
+    },
+    {
+      "sample_id": "a605a6ae185017fd557d",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/a605a6ae185017fd557d",
+      "sha256": "247e7e974ad568f17eb398150e0d0cec31a463b67a48eaf9c458f26bbe8b2858"
+    },
+    {
+      "sample_id": "a6083bc141f25f2a66f4",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/a6083bc141f25f2a66f4",
+      "sha256": "a5bb90f2b3e05a21b4ae59c9f876bd07aa18118b7a1fa29379f17949f7af612f"
+    },
+    {
+      "sample_id": "a75044c556c7f768f44d",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/a75044c556c7f768f44d",
+      "sha256": "c74795ff069e3f49c9799c6cb1dc997435ab60eb7fce2e9eb9424bc82272a44c"
+    },
+    {
+      "sample_id": "a8f328a4e0291f6feb7b",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/a8f328a4e0291f6feb7b",
+      "sha256": "f63166ef871099f2be42d4fc80e4b9d4483efbab80a063b784d6335c801246a8"
+    },
+    {
+      "sample_id": "aad9fe6da3140cff72b7",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/aad9fe6da3140cff72b7",
+      "sha256": "3f0e54a401b5fab77ceff12e34edcc3522bfdbcb4558987e5a6c61bc1311d931"
+    },
+    {
+      "sample_id": "ab2f66b54534a515108a",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/ab2f66b54534a515108a",
+      "sha256": "e4d9a926a039242cd31dfce8bdaaf6819d65587ffaaca722a609e0af6b59d322"
+    },
+    {
+      "sample_id": "abd3bce38e4723c1633c",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/abd3bce38e4723c1633c",
+      "sha256": "a932e173d78e0bae00960b0a045b6f29d08bcb560cbf3cda775f21acc2a121b0"
+    },
+    {
+      "sample_id": "ace03ee6851414c391e0",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/ace03ee6851414c391e0",
+      "sha256": "a0abf5498187da12d635ac8fec1936444764fde45a6d4faf15b4736c4637bbec"
+    },
+    {
+      "sample_id": "adf2f1748d43e64181d0",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/adf2f1748d43e64181d0",
+      "sha256": "f9c3ba785124330e0f0bb376a829005bc9d9611e92f7c09d0ebbba7995b2f86e"
+    },
+    {
+      "sample_id": "af68c4a058f49b73a349",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/af68c4a058f49b73a349",
+      "sha256": "11fd61a8afc6687a812ff09dd1f986eb200a12c3f5bf947cde50ecdb76a72c2a"
+    },
+    {
+      "sample_id": "b0a5ec47886925ebca97",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/b0a5ec47886925ebca97",
+      "sha256": "b4f0babf50ed8cc4f92ff820242db83fc04163ec7515d85747a7ca71c5f574a6"
+    },
+    {
+      "sample_id": "b0c5d3dfdbb5a1c023a7",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/b0c5d3dfdbb5a1c023a7",
+      "sha256": "b00d8699de62d7b8f339e2064e735a78c4de47e5767172fef641de260cc4eb3c"
+    },
+    {
+      "sample_id": "b20078cc2f68dd5ac015",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/b20078cc2f68dd5ac015",
+      "sha256": "5077a602c138b6b8857bf959f433b1e64a957e85f43ce8be80e59164966ddb4b"
+    },
+    {
+      "sample_id": "b206be8e55c97d64bd54",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/b206be8e55c97d64bd54",
+      "sha256": "f4e7f937f92b2362e22c208de480cf8a4851b3266fd121b8496c623687a39967"
+    },
+    {
+      "sample_id": "b27cb55857eafd10b47e",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/b27cb55857eafd10b47e",
+      "sha256": "f4b133fec6d3759f2b9db385e7d2f6891ffda63916749a1fe489a28ac7d21389"
+    },
+    {
+      "sample_id": "b4d2cd5adc3dcc1a0ed4",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/b4d2cd5adc3dcc1a0ed4",
+      "sha256": "7ba6f2f369ec1b4482a034481a09b2fc6da99b955eff55bbb3ad2d65f8f04fc6"
+    },
+    {
+      "sample_id": "b6d6f42b530cea7cc7ba",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/b6d6f42b530cea7cc7ba",
+      "sha256": "80a9144294df2f250515a9e5f2d1ba14574ffc7d5e0bdcac358b2e9723d3072e"
+    },
+    {
+      "sample_id": "b6d911b7eda5b813c510",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/b6d911b7eda5b813c510",
+      "sha256": "dbf09d16308202c8043d476eebd582e61dcc1d7d9637e54069282f271dac020f"
+    },
+    {
+      "sample_id": "b6e268fe2bc30735f02d",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/b6e268fe2bc30735f02d",
+      "sha256": "65f53e9a41721356e5073d27f4f7a7b3ff59970432bd645d49c0798242064163"
+    },
+    {
+      "sample_id": "b7aedf82bdea12af8be5",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/b7aedf82bdea12af8be5",
+      "sha256": "65890098a8bcb1431653b6f97dd3d2e0f4feea29e1adbdbd39974e9f0aa7070b"
+    },
+    {
+      "sample_id": "b93f8cfe571a91cb044f",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/b93f8cfe571a91cb044f",
+      "sha256": "be3f5dbceb3a61d36a075a56b77351a95d7f345aef473bfefecd3e795b6590c7"
+    },
+    {
+      "sample_id": "ba19ff77533b17f0e9cd",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/ba19ff77533b17f0e9cd",
+      "sha256": "605ca04fd3a46e23852ea7e473c357018d3151edbe7dc6fe818b517752bfcae7"
+    },
+    {
+      "sample_id": "ba87f74c81f3bbe0c7dc",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/ba87f74c81f3bbe0c7dc",
+      "sha256": "75388fcbcbf9e04d8fe4f36a42b4a56ed0589e735f84b1caf0dcf083eb531e08"
+    },
+    {
+      "sample_id": "bb05add9345ef3c61a0a",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/bb05add9345ef3c61a0a",
+      "sha256": "2453c1b6f45b2a22c9ec25d0efb14d9b27087c2d8f9cb9d9894de9db938bf887"
+    },
+    {
+      "sample_id": "be295d2007c9a912e297",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/be295d2007c9a912e297",
+      "sha256": "e208550b60e2c98c7285fd42a0e4523b4705c623429220ade25a7abf95c0440d"
+    },
+    {
+      "sample_id": "be6945f8aa67b814e162",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/be6945f8aa67b814e162",
+      "sha256": "b67b6bf9d70fa73e01a1ad3bad2d6b4dff06570fe9d3b6c889c3ba45af111aea"
+    },
+    {
+      "sample_id": "bf3fd5842b9f5df58d7e",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/bf3fd5842b9f5df58d7e",
+      "sha256": "74e4457099d4e6532316436d49271667aa958aa46b82205356eb3b6977ae57c0"
+    },
+    {
+      "sample_id": "c03090afc4d06cb07dbf",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/c03090afc4d06cb07dbf",
+      "sha256": "fb0b874c3e20c51f2e61393a98d13c007ba2c77e70e0b98f2f200e67c8965706"
+    },
+    {
+      "sample_id": "c052730ab5fb6550a351",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/c052730ab5fb6550a351",
+      "sha256": "6410ed8b9aa0e5ff3063058caff5eccdeb6b29555766c233892afbc89e9009f4"
+    },
+    {
+      "sample_id": "c0fdb2324a3bb992ecbf",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/c0fdb2324a3bb992ecbf",
+      "sha256": "6abfa35bd5bfd0fec6f4b617260d7d3aa82b99c064ff0732e1aab4fd152daeca"
+    },
+    {
+      "sample_id": "c2e28f9653ac09bafbb3",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/c2e28f9653ac09bafbb3",
+      "sha256": "32a907edf488be5abc4361908aa64f0852a57b3a096e0f12cf5ba25c1d59ccc4"
+    },
+    {
+      "sample_id": "c3426469f2306d005956",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/c3426469f2306d005956",
+      "sha256": "374f2a8edab21f41c8c4c2058fb0bcf6a2f08dd01e3370bbe10618a032202838"
+    },
+    {
+      "sample_id": "c5ec49eb159ce2bd05d6",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/c5ec49eb159ce2bd05d6",
+      "sha256": "54f98e24e86cd28c6c2671524e7a8016b47400e1bbad7ecf076f24eff4f03624"
+    },
+    {
+      "sample_id": "c61ba7c490e3091c05b8",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/c61ba7c490e3091c05b8",
+      "sha256": "50095bf2fd8d78a49d806f4abe0ea21e2888071910e4118a113fb085fd8c266e"
+    },
+    {
+      "sample_id": "c6400c62d9de8a1c90c6",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/c6400c62d9de8a1c90c6",
+      "sha256": "880ca3300ac9ff0066f4be3149b3522ee49fc7900e628240697ff8949856457c"
+    },
+    {
+      "sample_id": "c6e7c914bf50f245fe10",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/c6e7c914bf50f245fe10",
+      "sha256": "5bad5a0e610645a44545d73f7afff619936e0e0a0d5d989a40f90e66708602a3"
+    },
+    {
+      "sample_id": "c7f311d8ede9ed318d44",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/c7f311d8ede9ed318d44",
+      "sha256": "331585f07932914bbfa597242798b091d923bff2d61bd8acfa70f3a96483236e"
+    },
+    {
+      "sample_id": "c84ca7eb66b1de6f3fa8",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/c84ca7eb66b1de6f3fa8",
+      "sha256": "379483aaa66130287b07f130e3798e7e9c8f0268bda1b2a04918cb434d7842b2"
+    },
+    {
+      "sample_id": "cb27c5afade660b2edbd",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/cb27c5afade660b2edbd",
+      "sha256": "56a9343a06612e44e758bbf17d7e3854483f89ba0d84e826afc3b76c26238bf2"
+    },
+    {
+      "sample_id": "cbe1fef59f8bd38fe808",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/cbe1fef59f8bd38fe808",
+      "sha256": "faaf0b36fc819abd5789e32c9dd97bc1e2f40cc0a5f06c318906c1b18743825a"
+    },
+    {
+      "sample_id": "ce47e52e3be0a92d8084",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/ce47e52e3be0a92d8084",
+      "sha256": "3d57373e8152536c140c1cf93dfa451a84d62ca027ad520dc696732efb28d723"
+    },
+    {
+      "sample_id": "ce53b40be74cdee98814",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/ce53b40be74cdee98814",
+      "sha256": "dce1841ee6e4e12de4506662417840d6b5fe399951fab0adc0c60fba3a57bad6"
+    },
+    {
+      "sample_id": "cf030d22485d35b7de73",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/cf030d22485d35b7de73",
+      "sha256": "659e905d8cbad0465260b14befa9f840e57f597f611c23cc09ad962beeb35721"
+    },
+    {
+      "sample_id": "cf132c2f78f5422fd6f8",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/cf132c2f78f5422fd6f8",
+      "sha256": "e6ba1df5d70bd945d4d826672f51c2c9f381d52302664c7f2119503b5b9f970e"
+    },
+    {
+      "sample_id": "cfa6f07950600ae7dd34",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/cfa6f07950600ae7dd34",
+      "sha256": "b8ff70c5a105a6f0bc9a9936cdaa952ccdbe8bc361db80aaa3c63bb178621146"
+    },
+    {
+      "sample_id": "d06ecdcee8a35106cd3a",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/d06ecdcee8a35106cd3a",
+      "sha256": "2f071a1684e2c5aea07b5e001ef0fa3a55e5c5aaca84e42747415150f8d86cfe"
+    },
+    {
+      "sample_id": "d2a717e1f28292557796",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/d2a717e1f28292557796",
+      "sha256": "da702d55a7877645eac98c8cd7e4086deddaa8eaa9387423c080b67c25c6ae53"
+    },
+    {
+      "sample_id": "d57bd6ec4c6a9ac8273b",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/d57bd6ec4c6a9ac8273b",
+      "sha256": "803f5dc26e5f67ee4cd6f8767c19f6eab1eeaf062e1dacb38c17c449810c1075"
+    },
+    {
+      "sample_id": "d6e27e195ae61cbca723",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/d6e27e195ae61cbca723",
+      "sha256": "e7f7f8da864737277e7c52a47fb9787b3f6ae486c0ebf362205fa8be5678fdf2"
+    },
+    {
+      "sample_id": "d77daa3542f2f4b28ef1",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/d77daa3542f2f4b28ef1",
+      "sha256": "33b8affcef956901c6c818479dbe13d2c3b6b8119b951fc56c722eb693830f4d"
+    },
+    {
+      "sample_id": "d783b015ab1a5982a423",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/d783b015ab1a5982a423",
+      "sha256": "3419491a8cd5efd4618446a2d19be82ddad9b5227e39a0ad1a499c49ca5a6597"
+    },
+    {
+      "sample_id": "d8da11fbd90b3c9e26ae",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/d8da11fbd90b3c9e26ae",
+      "sha256": "c8a64214eb8d68723e825a7c88fef8386cabb29db38b2b8793ba59deb0e91828"
+    },
+    {
+      "sample_id": "dad83543f3191b9f0974",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/dad83543f3191b9f0974",
+      "sha256": "6746344fcafd9366f1c99a5d7400556e5a9e39cbb4b881c26cc539114133b98b"
+    },
+    {
+      "sample_id": "daf7e96fcc38f284d588",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/daf7e96fcc38f284d588",
+      "sha256": "570d6f8df5f0a833286e38a1ecdad488d9f56613c88a9dd471e2908b6d2ee538"
+    },
+    {
+      "sample_id": "dafdcc36b342d9532453",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/dafdcc36b342d9532453",
+      "sha256": "4d561bd2665403535b83b1b2a8d255f9e002b60e94e52cf6be089619f71980c4"
+    },
+    {
+      "sample_id": "dbec53984303714eef66",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/dbec53984303714eef66",
+      "sha256": "7728b724b06824ef5e562b35903311c1a057d29506dec85117c426c490c1c69e"
+    },
+    {
+      "sample_id": "dc0eddf988a09719dffb",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/dc0eddf988a09719dffb",
+      "sha256": "61cfe39b86d9005f7b1cc8b35237ae2dbb6d2ee89534250f101c9fc45d9ec8bd"
+    },
+    {
+      "sample_id": "ddb2ff29a042bac496ba",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/ddb2ff29a042bac496ba",
+      "sha256": "1ed623d7a81ec69ec9ac50596bb8fa6c58b06a5ac9c55e5661e5030b34b2e0d6"
+    },
+    {
+      "sample_id": "de963b63336f6f9c434a",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/de963b63336f6f9c434a",
+      "sha256": "41b0ced5cca4cd5a335c0e92736c8dab1035bc721b87eebe651ad1d9b17bfd1b"
+    },
+    {
+      "sample_id": "de9661938e1874542642",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/de9661938e1874542642",
+      "sha256": "a88e22d4c7cedb6df1063a0f5516c1a61e5186c9e3110669557df775da6507e8"
+    },
+    {
+      "sample_id": "df185417157c3e7bd45a",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/df185417157c3e7bd45a",
+      "sha256": "20f0c3399ea92340c3bb305822e109069f9cfdd4b2b4b26b1199665cd1555677"
+    },
+    {
+      "sample_id": "e12a9939dc7a978d8323",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/e12a9939dc7a978d8323",
+      "sha256": "d08de202f3d0e83ec747c1603958f91aa466acd1b45bfdb7728013a3eaf3bed0"
+    },
+    {
+      "sample_id": "e1c4e959d48b4bd1471d",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/e1c4e959d48b4bd1471d",
+      "sha256": "9543a6697db90a4b8fbac8676ad728ed29b8843871a2de70af2bd8f3c761ce66"
+    },
+    {
+      "sample_id": "e2080075e41627ab8359",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/e2080075e41627ab8359",
+      "sha256": "7f1df09a61bb1d69314e4d2884a98491ef62b1c2f11a5e6576c6d6bda2a44aa7"
+    },
+    {
+      "sample_id": "e2c6332187955365d709",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/e2c6332187955365d709",
+      "sha256": "1a45114b100ba49b6be1d683b8d2a6fbff3f1d3888783eab213078e81104f466"
+    },
+    {
+      "sample_id": "e35fa1e93085640bfbc0",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/e35fa1e93085640bfbc0",
+      "sha256": "1ff52f39c3f0f6ab90f07ba52049fe5398d3f9ce833899e5185fd90759d1eb0d"
+    },
+    {
+      "sample_id": "e38c4fe67a216f1e62f5",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/e38c4fe67a216f1e62f5",
+      "sha256": "3e9b15650c80ee54739ceabdf32848615819eea11aa80596226104aadc436d86"
+    },
+    {
+      "sample_id": "e412d962f0ecac9efe17",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/e412d962f0ecac9efe17",
+      "sha256": "ae1220a02e49de22e858603fa698405307ae53d8714bfccd690b36e241fc64da"
+    },
+    {
+      "sample_id": "e47dab82baf3a7c0b5ed",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/e47dab82baf3a7c0b5ed",
+      "sha256": "4d0d65ed9bfcd70d5babaa0234def06a553d5c453b3311e84739b2048bc0c7ed"
+    },
+    {
+      "sample_id": "e49af05293021075a2b5",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/e49af05293021075a2b5",
+      "sha256": "597698ef28607e0d85f836a9a45b91d1ba91ad37353fa351e69bb3b966502824"
+    },
+    {
+      "sample_id": "e4d09d1fbde39a74fe8d",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/e4d09d1fbde39a74fe8d",
+      "sha256": "fea34c091860575716516bfb38e2d54bb29151746d95573e61f86efb45224187"
+    },
+    {
+      "sample_id": "e4fd5acabaeeb3a0253d",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/e4fd5acabaeeb3a0253d",
+      "sha256": "aa0eb5fab8c92150523d93030559d2c67459cf3207a87ed11ffdeca15eb907b5"
+    },
+    {
+      "sample_id": "e66166879d67809864ce",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/e66166879d67809864ce",
+      "sha256": "186b3034f5665cf0a3080cfd104175590b3efcd3ee3113ad53fc24f3dfbfd68f"
+    },
+    {
+      "sample_id": "e6aa611935843e9c0993",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/e6aa611935843e9c0993",
+      "sha256": "08fc80c79986d4831eaf3d054cb65507ab4c8c47c8ae389d1314fe7a04664ec5"
+    },
+    {
+      "sample_id": "e722c968433277d0cdce",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/e722c968433277d0cdce",
+      "sha256": "b48d00886a50645c9b848d0997e520c4a680731b78e44fdf9b314735e8d398fa"
+    },
+    {
+      "sample_id": "e764ee99a7457966bd14",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/e764ee99a7457966bd14",
+      "sha256": "e75777afeec162030efe50d52bae428916e08f3219e92e10f96a3554bc3a0444"
+    },
+    {
+      "sample_id": "e76681c5fa8a396df425",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/e76681c5fa8a396df425",
+      "sha256": "f8801a6d5e2eb71c0d55854756dde8c051854989e3a74140c90a0879fe5ee1a8"
+    },
+    {
+      "sample_id": "e89c680458df9362ed57",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/e89c680458df9362ed57",
+      "sha256": "193cc7cd88b0648341dc26b06e28146ccbe054cc316a7be51a75c2ffee7cbcb6"
+    },
+    {
+      "sample_id": "ea20277cbea4115b0ac4",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/ea20277cbea4115b0ac4",
+      "sha256": "7ee83dc6f547d70de69a68e929dce848b55d663fd0cfc080031e53ac52c5a85e"
+    },
+    {
+      "sample_id": "eb7bcc7280f9a7c0edb5",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/eb7bcc7280f9a7c0edb5",
+      "sha256": "4b4491034fe75c3b5ede1e7fad79193e710a84946e3a08c863346de83546fc16"
+    },
+    {
+      "sample_id": "eb7fbddb16f6243776a0",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/eb7fbddb16f6243776a0",
+      "sha256": "7f69e30ab349d0a2a251ed9a58f0ea4c2d1fa5c165940a5fe36da3ba1c4018c7"
+    },
+    {
+      "sample_id": "eb9226e7847eb1755a53",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/eb9226e7847eb1755a53",
+      "sha256": "ce1c8a2c77d60fcbdf8a07dbeaa88eb4c2c20f797c275d2e22571d827ff712d6"
+    },
+    {
+      "sample_id": "ecc72ece90b513735807",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/ecc72ece90b513735807",
+      "sha256": "9b4eda84644859b88000caec438f8d42cb682f4b7807eede9385a07c27aa283b"
+    },
+    {
+      "sample_id": "ecf47c571bc258352008",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/ecf47c571bc258352008",
+      "sha256": "d87cdae3121528491f1cf9028997cb06fbbc70df6356ca16255f09ac116286db"
+    },
+    {
+      "sample_id": "ed6c05bfabc72869a540",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/ed6c05bfabc72869a540",
+      "sha256": "15d70d49b2c6d4dd010b6aa903c57364360b8fa27b1fe21e6f416d4f41664982"
+    },
+    {
+      "sample_id": "ee8dc7928aee1ec95641",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/ee8dc7928aee1ec95641",
+      "sha256": "5a5389ad2d07d2add76578f77956d2525c384b2b1e6cbacb398c155a6ea84012"
+    },
+    {
+      "sample_id": "eebdd450e7a7cfca5e9c",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/eebdd450e7a7cfca5e9c",
+      "sha256": "32d85d5db64ef38a1c85d56f2d5f68bb6f00d3eab49575d4b6e6fa0c475c072d"
+    },
+    {
+      "sample_id": "efc51149b097e7738489",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/efc51149b097e7738489",
+      "sha256": "892ce0349b61cbb2992b76dd995a81f67d0c8e859a16044a8d92cdd7fe170a7a"
+    },
+    {
+      "sample_id": "efd7c1e7eedbd60113db",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/efd7c1e7eedbd60113db",
+      "sha256": "09988dadc0d5ce84aad970fa9ad11fda4d28c5f1faaa4968da3969de6aa193dc"
+    },
+    {
+      "sample_id": "f02a05d22ae8aa61ac23",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/f02a05d22ae8aa61ac23",
+      "sha256": "cfb816fa4132bb9715e1ed2abc5074371a45d03c4436c9539e552276370cfc71"
+    },
+    {
+      "sample_id": "f0f2e5c6fb0eaa123083",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/f0f2e5c6fb0eaa123083",
+      "sha256": "6fc0d7a946310eb321d3e668a5c89060aae983eca9bde34eb57bcb7c04f60690"
+    },
+    {
+      "sample_id": "f347aa52ebf3e0e08aaa",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/f347aa52ebf3e0e08aaa",
+      "sha256": "bd9c08c855c6bcb0343bf0b9a97eadbf8cfbb9901a4999fd3444312c3430768b"
+    },
+    {
+      "sample_id": "f380789ccdeb205f5a04",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/f380789ccdeb205f5a04",
+      "sha256": "c6d1522a6a3faecdf58a8662013f3b937db985c70c3861f985dec8355085689f"
+    },
+    {
+      "sample_id": "f3eb6c9c102a28e9be7d",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/f3eb6c9c102a28e9be7d",
+      "sha256": "991c7c4678fcb7c025157d9e2ba9143c2692ccba403bb2fc57539a8cb1b20907"
+    },
+    {
+      "sample_id": "f4335db158385a2f7247",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/f4335db158385a2f7247",
+      "sha256": "6eb8c4bbed3c59f69cd0ec485b292930f2b8fdeb211de15af71d3705c3c886b4"
+    },
+    {
+      "sample_id": "f596d88681c090fb24b1",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/f596d88681c090fb24b1",
+      "sha256": "e2b5e72340ced25e8ff5b974570ed4c7f465b78ca5046580287024ebde0398cd"
+    },
+    {
+      "sample_id": "f84de4ad34bf1c30ef99",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/f84de4ad34bf1c30ef99",
+      "sha256": "31b2df088c225750a7ee3f10bb655eba2f15353e6296b3f947d0892ec004b558"
+    },
+    {
+      "sample_id": "f9622698db0ebe0d2be5",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/f9622698db0ebe0d2be5",
+      "sha256": "f70e85e16f5fb27a6fda39c8ec223347723a4fc3b6e6d60f2677d05858f8ee54"
+    },
+    {
+      "sample_id": "f98a1ced621d6c73d6d0",
+      "label": 2,
+      "class_name": "loose",
+      "url": "/validation-frame/f98a1ced621d6c73d6d0",
+      "sha256": "5ad8da3c569d2161e03e0d755018d9ffd9983493bc2659d7b3330fe3bc21a5ee"
+    },
+    {
+      "sample_id": "fa1ca076d54b1c9d883f",
+      "label": 4,
+      "class_name": "pierced",
+      "url": "/validation-frame/fa1ca076d54b1c9d883f",
+      "sha256": "2edc0f12abe20a219f03790ed2fc1da5560a6e13fc701435c5e875e8be9be8be"
+    },
+    {
+      "sample_id": "facf77c0e712141f68de",
+      "label": 3,
+      "class_name": "missing",
+      "url": "/validation-frame/facf77c0e712141f68de",
+      "sha256": "ee5b7ce78dfbe4db7908815007b03099aef5642368171392802cea53560edb59"
+    },
+    {
+      "sample_id": "fbbed31ac5d78bdb501f",
+      "label": 1,
+      "class_name": "bent",
+      "url": "/validation-frame/fbbed31ac5d78bdb501f",
+      "sha256": "79e54b4f3694cfcf9ba5babb322b77fa870ca4e225d1516c7a909bd6e0d06a60"
+    },
+    {
+      "sample_id": "fe6238f3e0df9b65e7ff",
+      "label": 0,
+      "class_name": "good",
+      "url": "/validation-frame/fe6238f3e0df9b65e7ff",
+      "sha256": "96abb8f35a66e1ffc7a76cb63a4d8b3d635fea7f0ba91820b0e4245ad9776c6f"
+    }
+  ],
+  "parity": {
+    "n": 20,
+    "max_probability_abs_error": 1.1920928955078125e-07,
+    "embedded_normalize_error": 0.0,
+    "changed_predictions": 0
+  },
+  "preprocessing": "RGB float 0..255 NCHW; normalization embedded in ONNX; square resize",
+  "artifact_variant": "b1_stream_512_pose_v1",
+  "config_file": "straw_realtime_stream512_pose_v1.json"
+}

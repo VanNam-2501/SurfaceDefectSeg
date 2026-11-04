@@ -1,0 +1,43 @@
+<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kiểm tra ống hút</title>
+<style>body{font:17px system-ui;max-width:1040px;margin:32px auto;padding:0 20px;background:#f5f6f8;color:#172333}button,input{font:inherit;padding:10px;margin:6px 6px 6px 0}section{background:white;padding:20px;border-radius:14px;margin:16px 0}.views{display:flex;gap:18px;flex-wrap:wrap}video,img{width: min(440px,100%);height:330px;object-fit:contain;background:#e9edf1;border-radius:10px}pre{white-space:pre-wrap;font:14px system-ui}#decision{font-size:28px;font-weight:700}.muted{color:#526278}</style>
+<h1>Kiểm tra lỗi ống hút</h1><p class="muted">Ảnh → xác định sản phẩm tốt hoặc loại lỗi. Kết quả camera gắn với ảnh đã phân tích.</p>
+<section><button id="start">Bật camera</button><button id="stop" disabled>Dừng camera</button><input id="file" type="file" accept="image/*"><button id="upload">Phân tích ảnh</button><button id="example">Thử ảnh validation mẫu</button><p id="status">Đang kiểm tra mô hình…</p></section>
+<section class="views"><div><p>Camera trực tiếp</p><video id="video" autoplay playsinline muted></video></div><div><p>Ảnh đã phân tích</p><img id="snapshot" alt="Ảnh được gửi đi phân tích"></div></section>
+<section><div id="decision">Chưa có kết quả</div><pre id="metrics"></pre><pre id="scores"></pre></section>
+<script>
+const $=id=>document.getElementById(id);let cfg,stream,running=false,busy=false,frame=0,generation=0,lastUrl;const latencies=[];
+const frameCanvas=document.createElement('canvas');let frameContext;
+const names={good:'good',bent:'bent',loose:'loose',missing:'missing',pierced:'pierced'};
+async function send(source,token,startedAt){if(busy)return;busy=true;let url;try{
+ const begin=startedAt??performance.now(),encodeBegin=performance.now(),canvas=frameCanvas;
+ if(canvas.width!==cfg.size||canvas.height!==cfg.size){canvas.width=canvas.height=cfg.size;frameContext=canvas.getContext('2d');}
+ frameContext.clearRect(0,0,cfg.size,cfg.size);frameContext.drawImage(source,0,0,cfg.size,cfg.size);
+ const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',cfg.camera_jpeg_quality));
+ if(!blob)throw Error('Không tạo được ảnh');
+ const encodedAt=performance.now();
+ const id=++frame,form=new FormData();form.append('file',blob,'frame.jpg');form.append('frame_id',id);
+ const response=await fetch('/predict',{method:'POST',body:form});
+ if(response.status===429){$('status').textContent='Máy đang bận, đang chờ khung hình mới.';return;}
+ if(!response.ok)throw Error(await response.text());const data=await response.json();
+ if(token!==generation || data.frame_id!==id)return;
+ const end=performance.now();url=URL.createObjectURL(blob);$('snapshot').src=url;
+ if(lastUrl)URL.revokeObjectURL(lastUrl);lastUrl=url;url=null;
+ $('decision').textContent=names[data.class];$('decision').style.color=data.defective?'#a43b12':'#18704a';
+ await $('snapshot').decode();await new Promise(requestAnimationFrame);await new Promise(requestAnimationFrame);
+ if(token!==generation)return;const displayed=performance.now();latencies.push(displayed-begin);if(latencies.length>200)latencies.shift();
+ const sorted=[...latencies].sort((a,b)=>a-b),p95=sorted[Math.ceil(sorted.length*.95)-1];
+ $('metrics').textContent=`Bắt đầu xử lý → nhận JSON: ${(end-begin).toFixed(1)} ms\nBắt đầu xử lý → cập nhật hiển thị: ${(displayed-begin).toFixed(1)} ms · p95 (${latencies.length} lượt gần nhất): ${p95.toFixed(1)} ms\nĐọc/giải mã nguồn tại trình duyệt: ${(encodeBegin-begin).toFixed(1)} ms · Resize/nén: ${(encodedAt-encodeBegin).toFixed(1)} ms · HTTP/JSON: ${(end-encodedAt).toFixed(1)} ms\nXử lý yêu cầu tại máy chủ: ${data.timings_ms.server_request.toFixed(1)} ms\nTiền xử lý: ${data.timings_ms.preprocess.toFixed(1)} ms · Mô hình: ${data.timings_ms.infer_with_transfer.toFixed(1)} ms · Hậu xử lý: ${data.timings_ms.postprocess.toFixed(2)} ms\nDung lượng ảnh gửi: ${(blob.size/1024).toFixed(1)} KiB · Khung hình #${id}`;
+ $('scores').textContent=Object.entries(data.probabilities).map(([k,v])=>`${names[k]}: ${(100*v).toFixed(2)}%`).join('\n')+'\nĐiểm mô hình chưa được hiệu chuẩn xác suất.';
+ $('status').textContent=running?'Camera đang chạy.':'Đã phân tích ảnh.';
+ }catch(e){$('status').textContent='Lỗi: '+e.message;}finally{if(url)URL.revokeObjectURL(url);busy=false;}}
+async function loop(token){while(running&&token===generation){const started=performance.now();if($('video').readyState>=2)await send($('video'),token);await new Promise(r=>setTimeout(r,Math.max(5,1000/cfg.camera_target_fps-(performance.now()-started))));}}
+$('start').onclick=async()=>{try{if(!cfg)throw Error('Mô hình chưa sẵn sàng');if(busy)return;
+ stream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:640,max:640},height:{ideal:480,max:480}},audio:false});
+ $('video').srcObject=stream;await $('video').play();running=true;const token=++generation;$('start').disabled=true;$('stop').disabled=false;$('upload').disabled=true;loop(token);
+ }catch(e){$('status').textContent='Không bật được camera: '+e.message;}};
+$('stop').onclick=()=>{running=false;++generation;if(stream)stream.getTracks().forEach(t=>t.stop());$('start').disabled=false;$('stop').disabled=true;$('upload').disabled=false;$('status').textContent='Đã dừng camera.';};
+$('upload').onclick=async()=>{if(!cfg||busy||running)return;const file=$('file').files[0];if(!file)return;const started=performance.now();const bitmap=await createImageBitmap(file);try{await send(bitmap,++generation,started);}finally{bitmap.close();}};
+$('example').onclick=async()=>{if(!cfg||busy||running)return;try{const started=performance.now(),image=new Image();image.src='/example';await image.decode();await send(image,++generation,started);}catch(e){$('status').textContent=e.message;}};
+fetch('/health').then(r=>{if(!r.ok)throw Error('Máy chủ chưa sẵn sàng');return r.json()}).then(x=>{cfg=x;$('status').textContent='Mô hình sẵn sàng.'}).catch(e=>$('status').textContent=e.message);
+</script></html>

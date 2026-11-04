@@ -56,7 +56,7 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-from scripts.data.make_degraded_set import degrade_image
+from scripts.data.make_degraded_set import degrade_image, degraded_filename
 from src.straw_defect_cls.dataset import StrawDefectDataset, get_val_transform
 from src.straw_defect_cls.decide import decide
 from src.straw_defect_cls.metrics import compute_audit_metrics
@@ -70,9 +70,17 @@ def ensure_degraded_test_set(test_csv: Path, output_dir: Path, seed: int = 42) -
     """Generate degraded test set if not already created."""
     out_csv = output_dir / "test_degraded.csv"
     if out_csv.exists():
-        return out_csv
+        existing = pd.read_csv(out_csv)
+        paths = existing["image_path"].astype(str)
+        expected_count = len(pd.read_csv(test_csv))
+        if len(existing) == expected_count and paths.nunique() == len(existing) and all(Path(p).is_file() for p in paths):
+            return out_csv
+        raise ValueError(f"Existing degraded set has duplicate or missing image files: {out_csv}")
 
     print(f"\n[INFO] Generating factory-degraded test set at {output_dir}...")
+    import random
+    random.seed(seed)
+    np.random.seed(seed)
     output_dir.mkdir(parents=True, exist_ok=True)
     images_dir = output_dir / "images"
     images_dir.mkdir(parents=True, exist_ok=True)
@@ -90,7 +98,7 @@ def ensure_degraded_test_set(test_csv: Path, output_dir: Path, seed: int = 42) -
         pil_im = Image.open(orig_p).convert("RGB")
         deg_np = degrade_image(np.asarray(pil_im))
 
-        out_img_p = images_dir / f"degraded_{orig_p.stem}.jpg"
+        out_img_p = images_dir / degraded_filename(orig_p, row)
         Image.fromarray(deg_np).save(out_img_p, quality=88)
 
         rec = dict(row)
@@ -99,6 +107,11 @@ def ensure_degraded_test_set(test_csv: Path, output_dir: Path, seed: int = 42) -
         records.append(rec)
 
     deg_df = pd.DataFrame(records)
+    if len(deg_df) != len(df_test) or deg_df["image_path"].nunique() != len(deg_df):
+        raise RuntimeError(
+            f"Generated degraded test set is incomplete or has path collisions: "
+            f"rows={len(deg_df)}/{len(df_test)}, unique_paths={deg_df['image_path'].nunique()}"
+        )
     deg_df.to_csv(out_csv, index=False)
     print(f"[DONE] Degraded test set created: {len(deg_df)} samples at {out_csv}")
     return out_csv
@@ -138,7 +151,8 @@ def evaluate_cascade_on_set(
     model_s1.eval()
     model_s2.eval()
 
-    ds = StrawDefectDataset(csv_file=csv_path, task="full", transform=get_val_transform(image_size))
+    # Legacy stage checkpoints predate EXIF normalization; match their training input.
+    ds = StrawDefectDataset(csv_file=csv_path, task="full", transform=get_val_transform(image_size), exif_transpose=False)
     loader = DataLoader(ds, batch_size=32, shuffle=False, num_workers=2)
 
     all_y_true: List[int] = []
@@ -190,7 +204,8 @@ def evaluate_full5_on_set(
 ) -> Dict[str, Any]:
     """Evaluate Single-Stage 5-Class Baseline Model."""
     model_full5.eval()
-    ds = StrawDefectDataset(csv_file=csv_path, task="full", transform=get_val_transform(image_size))
+    # Legacy full5 checkpoint predates EXIF normalization; match training input.
+    ds = StrawDefectDataset(csv_file=csv_path, task="full", transform=get_val_transform(image_size), exif_transpose=False)
     loader = DataLoader(ds, batch_size=32, shuffle=False, num_workers=2)
 
     all_y_true: List[int] = []
@@ -237,7 +252,7 @@ def run_locked_test_evaluation(
     tables_dir.mkdir(parents=True, exist_ok=True)
 
     test_clean_csv = REPO_ROOT / "data" / "straw_defects_splits" / "test.csv"
-    test_degraded_dir = REPO_ROOT / "data" / "test_degraded"
+    test_degraded_dir = REPO_ROOT / "data" / "test_degraded_v2"
     test_degraded_csv = ensure_degraded_test_set(test_clean_csv, test_degraded_dir, seed=seed)
 
     # Load thresholds and post-processing configs
@@ -318,7 +333,7 @@ def run_locked_test_evaluation(
     # Generate Markdown Table ready for thesis inclusion
     md_content = "# Bảng Kết Quả Đánh Giá Trên Tập Kiểm Thử Khóa (Locked Test Set)\n\n"
     md_content += res_df.to_markdown(index=False)
-    md_content += "\n\n*Ghi chú: Đánh giá duy nhất một lần (single-pass locked test). Chi phí dự tính trên 1.000 hộp đồ uống dựa trên ma trận chi phí c_FN:c_REVIEW:c_FP = 100:10:1 và tỉ lệ lỗi sản xuất pi_deploy = 5%.*\n"
+    md_content += "\n\n*Ghi chú: Đánh giá duy nhất một lần (single-pass locked test). Ảnh degraded được dựng từ từng dòng test bằng tên file có thương hiệu và mã băm để tránh ghi đè; ngưỡng cascade được hiệu chuẩn trên `val_degraded_v2`. Chi phí dự tính trên 1.000 hộp đồ uống dựa trên ma trận chi phí c_FN:c_REVIEW:c_FP = 100:10:1 và tỉ lệ lỗi sản xuất pi_deploy = 5%.*\n"
     out_md = tables_dir / "test_results.md"
     out_md.write_text(md_content, encoding="utf-8")
     print(f"[DONE] Saved markdown report table to: {out_md}")

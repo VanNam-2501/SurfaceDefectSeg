@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b1728">
+  <title>Băng chuyền · Straw QC</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font: 14px/1.5 Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: #142237;
+      background: #f3f6fa;
+      --ink: #142237;
+      --muted: #66768b;
+      --line: #e3e9f1;
+      --blue: #2563eb;
+      --blue-dark: #1746aa;
+      --green: #08784e;
+      --red: #b42318;
+      --amber: #946200;
+      --card: #fff;
+      --shadow: 0 8px 28px rgba(21, 39, 67, .055);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; }
+    button, input, select { font: inherit; }
+    button, select, input[type="range"], input[type="file"] { accent-color: var(--blue); }
+    .topbar { color: #f7faff; background: linear-gradient(115deg, #0b1728 0%, #132844 68%, #17395e 100%); }
+    .topbar-inner { max-width: 1440px; margin: auto; padding: 20px 28px 22px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: flex; align-items: center; gap: 13px; min-width: 0; }
+    .brand-mark { display: grid; place-items: center; width: 42px; height: 42px; flex: 0 0 42px; border: 1px solid #ffffff30; border-radius: 13px; background: #ffffff12; color: #a9ccff; font-size: 12px; font-weight: 850; letter-spacing: .08em; }
+    h1 { margin: 0; color: #fff; font-size: clamp(20px, 2vw, 25px); font-weight: 700; letter-spacing: -.025em; }
+    .topbar-right { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+    .status { display: inline-flex; align-items: center; gap: 8px; border: 1px solid #ffffff24; border-radius: 999px; padding: 8px 12px; color: #d6e2f0; background: #ffffff0c; font-size: 12px; font-weight: 650; }
+    .status { border-color: #e4b94a55; color: #ffe7a5; background: #8b640d33; }
+    .status::before { width: 7px; height: 7px; border-radius: 50%; background: #efb73e; content: ""; }
+    .status.ready { border-color: #49c99355; color: #bcf5d9; background: #0a795039; }
+    .status.ready::before { background: #39d98a; box-shadow: 0 0 0 3px #39d98a24; }
+    .workspace { max-width: 1440px; margin: auto; padding: 24px 28px 36px; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(310px, .82fr); align-items: start; gap: 18px; }
+    .main-column, .side-column { display: grid; gap: 18px; min-width: 0; }
+    .panel { min-width: 0; border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: var(--shadow); }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 18px 20px 14px; }
+    .panel-head h2, .panel-head h3 { margin: 0; font-size: 15px; letter-spacing: -.01em; }
+    .panel-head p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+    .scene-wrap { padding: 0 18px; }
+    #scene { display: block; width: 100%; height: auto; overflow: hidden; border: 1px solid #dce5ee; border-radius: 11px; background: #aebcca; }
+    .scene-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 20px 17px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 8px 14px; color: #52647a; font-size: 11px; }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend i { width: 8px; height: 8px; border-radius: 3px; background: #e3aa20; }
+    .legend span:nth-child(2) i { background: #3b82f6; }
+    .legend span:nth-child(3) i { background: #18a66c; }
+    .flow-status { margin: 0; padding: 10px 20px; border-top: 1px solid #edf1f6; color: #53657a; background: #fafbfd; font-size: 12px; }
+    .controls { padding: 18px 20px 20px; }
+    .field-label { display: block; margin: 0 0 7px; color: #34445a; font-size: 12px; font-weight: 750; }
+    .upload-zone { display: block; padding: 16px; border: 1px dashed #9fb4cc; border-radius: 12px; background: #f8fbff; transition: border-color .16s ease, background .16s ease; }
+    .upload-zone:hover, .upload-zone.dragover { border-color: #2563eb; background: #edf5ff; }
+    .upload-title { display: block; margin-bottom: 3px; color: #1f3553; font-weight: 750; }
+    .upload-hint { display: block; margin-bottom: 12px; color: var(--muted); font-size: 11px; }
+    #imageFiles { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+    #mask { display: block; width: 100%; height: auto; border: 1px solid #263648; border-radius: 9px; background: #111c2b; }
+    .upload-button { min-height: 34px; padding: 7px 11px; border: 0; color: #fff; background: var(--blue); font-size: 12px; }
+    .upload-button:hover { color: #fff; background: var(--blue-dark); }
+    .small { color: var(--muted); font-size: 11px; }
+    #uploadStatus { display: block; min-height: 18px; margin-top: 10px; }
+    .control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+    .control-box { min-width: 0; padding: 12px; border: 1px solid var(--line); border-radius: 11px; background: #fff; }
+    .control-box select { width: 100%; min-height: 38px; padding: 0 9px; border: 1px solid #d4deea; border-radius: 8px; color: #24364d; background: #fff; }
+    .range-line { display: flex; align-items: center; gap: 8px; }
+    .range-line input { width: 100%; min-width: 30px; }
+    #speedValue { min-width: 28px; color: #20334b; font-weight: 800; text-align: right; }
+    .button-row { display: flex; gap: 10px; margin-top: 12px; }
+    button { min-height: 40px; padding: 9px 13px; border: 1px solid #cbd6e3; border-radius: 9px; color: #24364d; background: #fff; font-weight: 700; cursor: pointer; transition: background .15s ease, border-color .15s ease, transform .15s ease; }
+    button:hover { border-color: #8fa9c7; background: #f7faff; }
+    button:active { transform: translateY(1px); }
+    #pause { flex: 1; border-color: #1f5dc4; color: #fff; background: var(--blue); }
+    #pause:hover { background: var(--blue-dark); }
+    .metrics { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+    .metric { min-width: 0; padding: 14px 15px; border: 1px solid var(--line); border-radius: 13px; background: #fff; box-shadow: var(--shadow); }
+    .metric span { display: block; color: #708096; font-size: 10px; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
+    .metric b { display: block; margin-top: 6px; overflow-wrap: anywhere; color: #172a42; font-size: clamp(17px, 2vw, 23px); line-height: 1.2; font-variant-numeric: tabular-nums; }
+    .hardware-panel, .gate-panel { padding-bottom: 16px; }
+    .threshold-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; padding: 0 16px; }
+    .threshold-cell { min-width: 0; padding: 10px 11px; border: 1px solid var(--line); border-radius: 10px; background: #fbfcfe; }
+    .threshold-cell span { display: block; color: #718096; font-size: 10px; font-weight: 700; }
+    .threshold-cell b { display: block; margin-top: 4px; overflow-wrap: anywhere; color: #22364f; font-size: 12px; line-height: 1.4; }
+    .hardware-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; padding: 0 16px 12px; }
+    .hardware-spec { min-width: 0; padding: 10px 11px; border: 1px solid var(--line); border-radius: 10px; background: #fbfcfe; }
+    .hardware-spec.wide { grid-column: 1 / -1; }
+    .hardware-spec span { display: block; color: #718096; font-size: 10px; font-weight: 700; }
+    .hardware-spec b { display: block; margin-top: 3px; overflow-wrap: anywhere; color: #22364f; font-size: 12px; line-height: 1.35; }
+    .chart-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; padding: 0 16px; }
+    .chart-card { min-width: 0; padding: 10px; border: 1px solid var(--line); border-radius: 11px; background: #fff; }
+    .chart-head { display: flex; align-items: baseline; justify-content: space-between; gap: 5px; }
+    .chart-head span { color: #718096; font-size: 10px; font-weight: 700; }
+    .chart-value { color: #1e3149; font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .chart-card canvas { display: block; width: 100%; height: 62px; margin-top: 7px; }
+    .chart-wide { grid-column: 1 / -1; }
+    .chart-note { display: flex; justify-content: space-between; color: #8996a7; font-size: 9px; }
+    .gate-live { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin: 0 16px 12px; padding: 10px 12px; border-radius: 9px; background: #f2f7fd; color: #38516c; font-size: 11px; }
+    .gate-live b { color: #1746aa; font-size: 12px; }
+    .mask-wrap { padding: 0 16px 12px; }
+    .mask-legend { margin: 0 16px 12px; color: var(--muted); font-size: 10px; }
+    .live-chip { white-space: nowrap; color: #40566f; font-size: 11px; font-weight: 750; }
+    .results { overflow: hidden; }
+    .results .panel-head { align-items: end; }
+    .table-wrap { overflow: auto; }
+    table { width: 100%; min-width: 600px; border-collapse: collapse; font-size: 12px; }
+    thead { color: #687990; background: #f7f9fc; }
+    th { padding: 10px 12px; border-top: 1px solid #edf1f5; border-bottom: 1px solid #e5ebf2; font-size: 10px; font-weight: 800; letter-spacing: .06em; text-align: left; text-transform: uppercase; white-space: nowrap; }
+    td { padding: 11px 12px; border-bottom: 1px solid #edf1f5; color: #314259; vertical-align: middle; }
+    tbody tr:hover { background: #fafcff; }
+    td:first-child { max-width: 240px; overflow-wrap: anywhere; color: #66768b; font-size: 11px; }
+    td:nth-child(2) { color: var(--ink); font-weight: 750; }
+    td:nth-child(3), td:nth-child(4) { white-space: nowrap; font-variant-numeric: tabular-nums; }
+    td.good, td.bad, td.pending { display: table-cell; }
+    td.good { color: var(--green); }
+    td.bad { color: var(--red); }
+    td.pending { color: var(--amber); }
+    #emptyRow td { padding: 22px 12px; color: #8794a5; text-align: center; }
+    :focus-visible { outline: 3px solid #76a7ff; outline-offset: 2px; }
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: minmax(0, 1.35fr) minmax(285px, .9fr); }
+      .topbar-inner, .workspace { padding-right: 20px; padding-left: 20px; }
+      .scene-footer { align-items: start; flex-direction: column; }
+    }
+    @media (max-width: 760px) {
+      .topbar-inner { align-items: flex-start; flex-direction: column; gap: 13px; padding-top: 16px; padding-bottom: 17px; }
+      .topbar-right { justify-content: flex-start; }
+      .workspace { padding: 19px 13px 28px; }
+      .layout { grid-template-columns: 1fr; }
+      .side-column { grid-row: 1; }
+      .main-column { grid-row: 2; }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .control-grid { grid-template-columns: 1fr 1fr; }
+      .panel-head { padding-right: 15px; padding-left: 15px; }
+      .scene-wrap { padding-right: 10px; padding-left: 10px; }
+      .scene-footer { padding-right: 14px; padding-left: 14px; }
+    }
+    @media (max-width: 420px) {
+      .control-grid { grid-template-columns: 1fr; }
+      .legend { gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">QC</div>
+        <div>
+          <h1>Băng chuyền kiểm tra ống hút</h1>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <a href="/" style="color:#c9dcf1;font-size:13px">← Không gian kiểm định</a>
+        <div id="runtime" class="status" role="status" aria-live="polite">Đang nạp TensorRT và làm nóng GPU một lần…</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <div class="layout">
+      <div class="main-column">
+        <section class="panel conveyor-panel" aria-labelledby="conveyorTitle">
+          <div class="panel-head">
+            <div><h2 id="conveyorTitle">Băng chuyền</h2></div>
+          </div>
+          <div class="scene-wrap"><canvas id="scene" width="1000" height="430" aria-label="Băng chuyền mô phỏng sản phẩm"></canvas></div>
+          <p id="flowStatus" class="flow-status" aria-live="polite">Thả ảnh vào để bắt đầu. AI phân loại khi sản phẩm đi qua ROI.</p>
+        </section>
+
+        <section class="panel results" aria-labelledby="resultsTitle">
+          <div class="panel-head">
+            <div><h2 id="resultsTitle">Kết quả từng sản phẩm</h2></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Ảnh / track</th><th>Nhãn</th><th>Độ tin cậy</th><th>Thời gian</th></tr></thead>
+              <tbody id="results"><tr id="emptyRow"><td colspan="4">Chưa có sự kiện ROI.</td></tr></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <aside class="side-column" aria-label="Điều khiển và trạng thái">
+        <section class="panel" aria-labelledby="controlsTitle">
+          <div class="panel-head"><div><h2 id="controlsTitle">Điều khiển</h2></div></div>
+          <div class="controls">
+            <div id="dropZone" class="upload-zone">
+              <span class="upload-title">Thả ảnh vào đây hoặc chọn ảnh</span>
+              <span class="upload-hint">Ảnh sẽ tự chạy lần lượt trên băng chuyền</span>
+              <input id="imageFiles" type="file" multiple accept="image/jpeg,image/png,image/webp,image/bmp,.jpg,.jpeg,.png,.webp,.bmp" aria-hidden="true" tabindex="-1">
+              <button id="chooseFiles" class="upload-button" type="button">Chọn ảnh</button>
+              <span id="uploadStatus" class="small" role="status" aria-live="polite">Không giới hạn số ảnh · tối đa 30 MB/ảnh, 2 GB/lượt.</span>
+            </div>
+            <div class="control-grid">
+              <div class="control-box"><label class="field-label" for="imageRotation">Hướng ảnh đầu vào</label><select id="imageRotation"><option value="0">Giữ hướng ảnh</option><option value="90">Xoay 90° sang phải</option><option value="180">Xoay 180°</option><option value="270">Xoay 90° sang trái</option></select></div>
+              <div class="control-box"><label class="field-label" for="speed">Tốc độ mô phỏng</label><div class="range-line"><input id="speed" type="range" min="80" max="180" value="120"><span id="speedValue">120</span></div><span class="small">px/s</span></div>
+            </div>
+            <div class="button-row"><button id="pause" type="button">Tạm dừng băng chuyền</button></div>
+          </div>
+        </section>
+
+        <section class="metrics" aria-label="Chỉ số vận hành">
+          <div class="metric"><span>Đã phân loại / tổng đã chạy</span><b id="doneCount">0 / 0</b></div>
+        </section>
+
+        <section class="panel gate-panel" aria-labelledby="gateTitle">
+          <div class="panel-head"><h2 id="gateTitle">Mask kích hoạt AI</h2><span id="roiFill" class="live-chip">ROI 0%</span></div>
+          <div class="gate-live"><span id="gateState">Chưa thấy vật thể đạt ngưỡng mask.</span><b id="trackState">—</b></div>
+          <div class="mask-wrap"><canvas id="mask" width="320" height="138" aria-label="Mask tiền cảnh, vùng ROI và vạch gọi AI"></canvas></div>
+          <p class="mask-legend">Trắng: điểm ảnh đạt ngưỡng · viền xanh: ROI · vạch vàng: vị trí gọi AI.</p>
+          <div class="threshold-grid" aria-label="Điều kiện gọi AI">
+            <div class="threshold-cell"><span>Ngưỡng mask</span><b id="thresholdPixel">—</b></div>
+            <div class="threshold-cell"><span>Vùng mask tối thiểu</span><b id="thresholdComponent">—</b></div>
+            <div class="threshold-cell"><span>Xác nhận track</span><b id="thresholdTrack">—</b></div>
+            <div class="threshold-cell"><span>Điều kiện gọi AI</span><b id="thresholdTrigger">—</b></div>
+          </div>
+        </section>
+
+        <section class="panel hardware-panel" aria-labelledby="hardwareTitle">
+          <div class="panel-head"><h2 id="hardwareTitle">Phần cứng & tải hệ thống</h2><span id="telemetryStatus" class="live-chip">Đang đọc</span></div>
+          <div class="hardware-specs">
+            <div class="hardware-spec wide"><span>GPU · TensorRT</span><b id="gpuName">—</b></div>
+            <div class="hardware-spec wide"><span>CPU</span><b id="cpuName">—</b></div>
+            <div class="hardware-spec"><span>Model / driver</span><b id="engineSpec">—</b></div>
+            <div class="hardware-spec"><span>Luồng CPU</span><b id="cpuThreads">—</b></div>
+          </div>
+          <div class="chart-grid" aria-label="Biểu đồ tài nguyên theo thời gian">
+            <article class="chart-card"><div class="chart-head"><span>Tải GPU</span><b id="gpuUtilization" class="chart-value">—</b></div><canvas id="gpuUtilChart" width="280" height="62" aria-label="Biểu đồ tải GPU gần đây"></canvas><div class="chart-note"><span>0%</span><span>100%</span></div></article>
+            <article class="chart-card"><div class="chart-head"><span>VRAM</span><b id="gpuMemory" class="chart-value">—</b></div><canvas id="gpuMemoryChart" width="280" height="62" aria-label="Biểu đồ bộ nhớ GPU gần đây"></canvas><div class="chart-note"><span>0 GB</span><span id="vramMax">—</span></div></article>
+            <article class="chart-card"><div class="chart-head"><span>Nhiệt độ GPU</span><b id="gpuTemperature" class="chart-value">—</b></div><canvas id="gpuTempChart" width="280" height="62" aria-label="Biểu đồ nhiệt độ GPU gần đây"></canvas><div class="chart-note"><span>0°C</span><span>100°C</span></div></article>
+            <article class="chart-card"><div class="chart-head"><span>Công suất GPU</span><b id="gpuPower" class="chart-value">—</b></div><canvas id="gpuPowerChart" width="280" height="62" aria-label="Biểu đồ công suất GPU gần đây"></canvas><div class="chart-note"><span>0 W</span><span>80 W</span></div></article>
+            <article class="chart-card chart-wide"><div class="chart-head"><span>RAM đã dùng</span><b id="ramUsed" class="chart-value">—</b></div><canvas id="ramChart" width="280" height="62" aria-label="Biểu đồ RAM sử dụng gần đây"></canvas><div class="chart-note"><span>0 GB</span><span id="ramMax">—</span></div></article>
+          </div>
+          <div class="hardware-specs" style="padding-top:10px;padding-bottom:0">
+            <div class="hardware-spec wide"><span>RAM đang dùng / tổng</span><b id="ramAvailable">—</b></div>
+            <div class="hardware-spec wide"><span>Driver GPU</span><b id="gpuDriver">—</b></div>
+          </div>
+        </section>
+
+      </aside>
+    </div>
+
+  </div>
+  <script src="/conveyor_gate.js"></script>
+  <script src="/conveyor_app.js"></script>
+</body>
+</html>

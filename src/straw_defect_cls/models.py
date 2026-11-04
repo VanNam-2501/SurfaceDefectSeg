@@ -149,6 +149,8 @@ class VMambaTClassifier(nn.Module):
 
         try:
             from vmamba import VSSM
+            if pretrained:
+                raise RuntimeError("VMamba pretrained weights must be loaded explicitly; automatic pretrained loading is not implemented.")
             self.model = VSSM(
                 depths=[2, 2, 9, 2],
                 dims=[96, 192, 384, 768],
@@ -156,9 +158,7 @@ class VMambaTClassifier(nn.Module):
                 drop_path_rate=0.2,
             )
         except Exception as e:
-            print(f"[WARN] Failed to load official VSSM: {e}. Using fallback Mamba classifier.")
-            from torchvision.models import convnext_tiny
-            self.model = convnext_tiny(num_classes=num_classes)
+            raise RuntimeError("VMamba is unavailable. Refusing to report a different architecture as VMamba.") from e
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)

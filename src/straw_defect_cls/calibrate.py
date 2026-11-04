@@ -125,7 +125,9 @@ def extract_logits(
 ) -> Tuple[np.ndarray, np.ndarray]:
     """Extract raw model output logits and ground-truth labels."""
     model.eval()
-    ds = StrawDefectDataset(csv_file=csv_path, task=task, transform=get_val_transform(image_size))
+    # These saved 2026-10-16 checkpoints were trained before EXIF transpose
+    # was added to the dataset loader. Keep calibration pixels identical.
+    ds = StrawDefectDataset(csv_file=csv_path, task=task, transform=get_val_transform(image_size), exif_transpose=False)
     loader = DataLoader(ds, batch_size=32, shuffle=False, num_workers=2)
 
     all_logits = []
@@ -157,7 +159,10 @@ def run_calibration(
     tables_dir.mkdir(parents=True, exist_ok=True)
 
     val_clean_csv = REPO_ROOT / "data" / "straw_defects_splits" / "val.csv"
-    val_degraded_csv = REPO_ROOT / "data" / "val_degraded" / "val_degraded.csv"
+    val_degraded_csv = REPO_ROOT / "data" / "val_degraded_v2" / "val_degraded.csv"
+    degraded_rows = pd.read_csv(val_degraded_csv)
+    if degraded_rows["image_path"].nunique() != len(degraded_rows):
+        raise ValueError(f"Degraded validation manifest contains duplicate image paths: {val_degraded_csv}")
 
     # Read project configuration
     proj_cfg_path = configs_dir / "project.yaml"

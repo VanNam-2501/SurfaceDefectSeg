@@ -19,7 +19,9 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import random
+import re
 import sys
 from pathlib import Path
 from typing import Tuple
@@ -27,11 +29,20 @@ from typing import Tuple
 import cv2
 import numpy as np
 import pandas as pd
-from PIL import Image
+from PIL import Image, ImageOps
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+
+
+def degraded_filename(orig_path: Path, row: dict) -> str:
+    """Return a stable output filename that is unique across brands."""
+    brand = str(row.get("brand", orig_path.parent.parent.name)).strip() or "unknown"
+    safe_brand = re.sub(r"[^A-Za-z0-9.-]+", "_", brand).strip("_") or "unknown"
+    identity = f"{brand}|{orig_path.parent.name}|{orig_path.name}"
+    suffix = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:10]
+    return f"degraded_{safe_brand}_{orig_path.stem}_{suffix}.jpg"
 
 
 def apply_motion_blur(img: np.ndarray, max_kernel_size: int = 13) -> np.ndarray:
@@ -85,11 +96,25 @@ def apply_perspective_distortion(img: np.ndarray, max_distortion_pct: float = 0.
     return warped
 
 
-def replace_studio_bg_with_conveyor(img_rgb: np.ndarray) -> np.ndarray:
-    """Replace studio white background with simulated factory conveyor belt texture."""
+def studio_background_mask(img_rgb: np.ndarray) -> np.ndarray:
+    """Select bright regions connected to the image border, preserving white objects.
+
+    Gray studio backgrounds are left unchanged. Color alone cannot safely infer
+    their boundary against a white straw or carton; an empty mask is preferable
+    to erasing a defect cue inside the product.
+    """
+    white = np.all(img_rgb > 238, axis=2).astype(np.uint8)
+    _, components = cv2.connectedComponents(white)
+    border = np.unique(np.concatenate((components[0], components[-1], components[:, 0], components[:, -1])))
+    border = border[border != 0]
+    return (white != 0) & np.isin(components, border)
+
+
+def replace_studio_bg_with_conveyor(img_rgb: np.ndarray, *, legacy_all_white: bool = False) -> np.ndarray:
+    """Replace only supported background pixels; legacy mode is explicit."""
     h, w = img_rgb.shape[:2]
     # Mask studio white background: R,G,B > 238
-    is_bg = (img_rgb[:, :, 0] > 238) & (img_rgb[:, :, 1] > 238) & (img_rgb[:, :, 2] > 238)
+    is_bg = np.all(img_rgb > 238, axis=2) if legacy_all_white else studio_background_mask(img_rgb)
 
     # Generate conveyor background: dark gray brushed surface (mean ~ 95)
     base_gray = random.randint(85, 110)
@@ -122,6 +147,8 @@ def build_degraded_val_set(
     val_csv: Path,
     output_dir: Path,
     seed: int = 42,
+    exif_transpose: bool = False,
+    manifest_name: str = "val_degraded.csv",
 ) -> pd.DataFrame:
     """Generate degraded validation set from val.csv.
 
@@ -129,12 +156,16 @@ def build_degraded_val_set(
         val_csv: Path to original val.csv.
         output_dir: Directory to save degraded images and val_degraded.csv.
         seed: Random seed.
+        exif_transpose: Match B1 training by applying EXIF before degradation.
+        manifest_name: Output CSV basename, e.g. test_degraded.csv.
 
     Returns:
         DataFrame pointing to the new degraded images with identical labels.
     """
     random.seed(seed)
     np.random.seed(seed)
+    if Path(manifest_name).name != manifest_name or not manifest_name.endswith(".csv"):
+        raise ValueError("manifest_name must be a CSV basename")
 
     output_dir.mkdir(parents=True, exist_ok=True)
     images_dir = output_dir / "images"
@@ -152,25 +183,39 @@ def build_degraded_val_set(
             print(f"[WARN] Val image missing: {orig_path}")
             continue
 
-        pil_im = Image.open(orig_path).convert("RGB")
+        with Image.open(orig_path) as source:
+            source_orientation = int(source.getexif().get(274, 1))
+            if exif_transpose:
+                source = ImageOps.exif_transpose(source)
+            pil_im = source.convert("RGB")
         img_np = np.asarray(pil_im)
 
         # Apply degradation pipeline
         degraded_np = degrade_image(img_np)
 
         # Save degraded image
-        out_filename = f"degraded_{orig_path.stem}.jpg"
+        out_filename = degraded_filename(orig_path, row)
         out_img_path = images_dir / out_filename
         Image.fromarray(degraded_np).save(out_img_path, quality=88)
 
         # Build duplicate row with updated image path
         record = dict(row)
+        record["source_image_path"] = str(orig_path)
+        record["source_sha256"] = hashlib.sha256(orig_path.read_bytes()).hexdigest()
+        record["sha256"] = hashlib.sha256(out_img_path.read_bytes()).hexdigest()
+        record["source_exif_orientation"] = source_orientation
+        record["exif_transpose_applied"] = exif_transpose
         record["image_path"] = str(out_img_path)
         record["is_degraded"] = True
         degraded_records.append(record)
 
     deg_df = pd.DataFrame(degraded_records)
-    out_csv = output_dir / "val_degraded.csv"
+    if len(deg_df) != len(val_df) or deg_df["image_path"].nunique() != len(deg_df):
+        raise RuntimeError(
+            f"Generated degraded validation set is incomplete or has path collisions: "
+            f"rows={len(deg_df)}/{len(val_df)}, unique_paths={deg_df['image_path'].nunique()}"
+        )
+    out_csv = output_dir / manifest_name
     deg_df.to_csv(out_csv, index=False)
     print(f"[DONE] Degraded validation set generated: {len(deg_df)} images.")
     print(f"Saved manifest to: {out_csv}")
@@ -188,16 +233,21 @@ def main():
     parser.add_argument(
         "--output-dir",
         type=str,
-        default=str(REPO_ROOT / "data" / "val_degraded"),
+        default=str(REPO_ROOT / "data" / "val_degraded_v2"),
         help="Output directory for degraded images",
     )
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
+    parser.add_argument(
+        "--exif-transpose", action="store_true",
+        help="Apply EXIF orientation before degradation (use for B1-aligned inputs).",
+    )
     args = parser.parse_args()
 
     build_degraded_val_set(
         val_csv=Path(args.val_csv),
         output_dir=Path(args.output_dir),
         seed=args.seed,
+        exif_transpose=args.exif_transpose,
     )
 
 

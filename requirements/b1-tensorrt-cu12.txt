@@ -1,0 +1,2 @@
+# NVIDIA TensorRT Python builder/runtime for CUDA 12.x on Windows x64.
+tensorrt-cu12==11.4.0.106

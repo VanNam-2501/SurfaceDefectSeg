@@ -1,0 +1,10 @@
+{
+  "checkpoint": "artifacts/local_b1_check/B1_s42/best.pt",
+  "checkpoint_sha256": "f95bbd2b4983f31710db861a61f60b801d8da023ddb1aa4504b31c3bcb52870f",
+  "size": 512,
+  "precision": "fp32",
+  "channels_last": false,
+  "device": "cuda",
+  "autotune": true,
+  "temperature": 1.0
+}

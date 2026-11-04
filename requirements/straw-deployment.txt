@@ -1,0 +1,11 @@
+# Environment measured on this Windows laptop; retain an installed compatible
+# torch/torchvision CUDA pair (measured: torch 2.11.0+cu128, torchvision 0.26.0+cu128).
+# Recovery QAT currently uses the tested torch.ao eager API in that environment.
+-r straw-thesis.txt
+onnx==1.23.2
+onnxruntime==1.31.0
+fastapi==0.141.1
+uvicorn==0.52.1
+python-multipart
+psutil
+httpx

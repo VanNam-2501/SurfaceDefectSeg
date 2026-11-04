@@ -1,0 +1,27 @@
+<!doctype html><html lang="vi"><meta charset="utf-8"><title>Kiểm thử B1 qua trình duyệt</title>
+<style>body{font:17px system-ui;max-width:1000px;margin:36px auto;padding:20px;background:#f6f7f9}button{font:inherit;padding:12px}pre{white-space:pre-wrap;background:white;padding:20px}img{height:300px;background:white}#progress{font-size:22px}</style>
+<h1>Kiểm thử validation qua trình duyệt</h1><p>300 ảnh tĩnh được đưa về 640 px để mô phỏng kích thước nguồn camera. Đây là kiểm thử đường xử lý web, chưa phải dữ liệu camera/video thực tế.</p>
+<button id="run">Chạy đủ 300 ảnh</button><p id="progress">Sẵn sàng</p><img id="image" alt="Khung hình đang kiểm thử"><pre id="report"></pre>
+<script>
+const $=id=>document.getElementById(id);
+$('run').onclick=async()=>{ $('run').disabled=true;const frames=[];let previewUrl;
+ try{const cfg=await(await fetch('/health')).json(),cases=await(await fetch('/validation-cases')).json();
+ const canvas=document.createElement('canvas');canvas.width=canvas.height=cfg.size;const ctx=canvas.getContext('2d');
+ for(const [i,item] of cases.cases.entries()){
+  const begin=performance.now(),source=new Image();source.src=item.url;await source.decode();
+  const encodeStart=performance.now();ctx.clearRect(0,0,cfg.size,cfg.size);ctx.drawImage(source,0,0,cfg.size,cfg.size);
+  const blob=await new Promise(r=>canvas.toBlob(r,'image/jpeg',cfg.camera_jpeg_quality));
+  const encoded=performance.now(),form=new FormData();form.append('file',blob,'frame.jpg');form.append('frame_id',i);
+  const response=await fetch('/predict',{method:'POST',body:form});if(!response.ok)throw Error(`HTTP ${response.status} ở ảnh ${i}`);
+  const data=await response.json(),received=performance.now();if(data.frame_id!==i)throw Error('Sai frame_id');
+  const url=URL.createObjectURL(blob);$('image').src=url;if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl=url;
+  $('progress').textContent=`Đã xử lý ${i+1}/300 · ${data.class}`;
+  await $('image').decode();await new Promise(requestAnimationFrame);await new Promise(requestAnimationFrame);
+  frames.push({sample_id:item.sample_id,prediction:data.class,client_ms:performance.now()-begin,http_ms:received-encoded,encode_ms:encoded-encodeStart});
+  const remaining=100-(performance.now()-begin);if(remaining>0)await new Promise(r=>setTimeout(r,remaining));
+ }
+ const result=await fetch('/validation-results',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({frames})});
+ if(!result.ok)throw Error(await result.text());const report=await result.json();$('report').textContent=JSON.stringify(report,null,2);$('progress').textContent='Hoàn tất 300/300';
+ }catch(e){$('progress').textContent='Dừng: '+e.message;}finally{$('run').disabled=false;}
+};
+</script></html>

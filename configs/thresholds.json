@@ -18,6 +18,6 @@
   "fnr_degraded": 0.0,
   "fnr_ci_low_95": 0.0,
   "fnr_ci_high_95": 0.0158,
-  "calibration_timestamp": "2026-10-16T15:15:01Z",
+  "calibration_timestamp": "2026-10-21T05:45:04Z",
   "status": "calibrated_industrial"
 }

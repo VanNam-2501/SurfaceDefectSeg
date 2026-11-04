@@ -13,7 +13,7 @@ from typing import Callable, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-from PIL import Image
+from PIL import Image, ImageOps
 from sklearn.model_selection import train_test_split
 
 import torch
@@ -83,9 +83,11 @@ class StrawDefectDataset(Dataset):
         split: str = "train",
         task: str = "full",
         transform: Optional[Callable] = None,
+        exif_transpose: bool = True,
     ) -> None:
         self.transform = transform
         self.task = task.lower()
+        self.exif_transpose = bool(exif_transpose)
         self.samples: list[Tuple[str, int, str]] = []  # (image_path, label, raw_class)
         self.bbox_map: dict[str, Tuple[int, int, int, int]] = {}
 
@@ -175,7 +177,8 @@ class StrawDefectDataset(Dataset):
 
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, int]:
         img_path, label, _ = self.samples[idx]
-        image = Image.open(img_path).convert("RGB")
+        with Image.open(img_path) as source:
+            image = (ImageOps.exif_transpose(source) if self.exif_transpose else source).convert("RGB")
         if self.transform is not None:
             if isinstance(self.transform, StrawTrainTransform):
                 bbox = self.bbox_map.get(Path(img_path).name, None)
@@ -258,13 +261,26 @@ class StrawTrainTransform:
         return self.post_crop(cropped)
 
 
-def get_train_transform(image_size: int = 224, use_bbox_preserving: bool = True) -> Callable:
+def get_train_transform(image_size: int = 224, use_bbox_preserving: bool = True, augmentation: str = "legacy") -> Callable:
     """Industrial training-time augmentations:
     - Rotate(limit=5)
     - KHÔNG VerticalFlip (chỉ RandomHorizontalFlip)
     - RandomResizedCrop scale (0.7, 1.0)
     - ColorJitter nhẹ + RandomGrayscale p=0.2
     """
+    if augmentation == "none":
+        return get_val_transform(image_size, preprocessing="resize")
+    if augmentation == "safe":
+        # Keep the complete image: random/center crops can remove the actual defect.
+        return transforms.Compose([
+            transforms.Resize((image_size, image_size)),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ColorJitter(brightness=0.15, contrast=0.15, saturation=0.05),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
+        ])
+    if augmentation != "legacy":
+        raise ValueError(f"Unknown augmentation: {augmentation}")
     if use_bbox_preserving:
         return StrawTrainTransform(image_size=image_size, scale=(0.7, 1.0))
     return transforms.Compose([
@@ -278,8 +294,16 @@ def get_train_transform(image_size: int = 224, use_bbox_preserving: bool = True)
     ])
 
 
-def get_val_transform(image_size: int = 224) -> transforms.Compose:
+def get_val_transform(image_size: int = 224, preprocessing: str = "legacy") -> transforms.Compose:
     """Validation / test time transforms (deterministic)."""
+    if preprocessing == "resize":
+        return transforms.Compose([
+            transforms.Resize((image_size, image_size)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
+        ])
+    if preprocessing != "legacy":
+        raise ValueError(f"Unknown preprocessing: {preprocessing}")
     return transforms.Compose([
         transforms.Resize((int(image_size * 1.15), int(image_size * 1.15))),
         transforms.CenterCrop(image_size),
@@ -301,38 +325,40 @@ def build_dataloaders(
     image_size: int = 224,
     batch_size: int = 32,
     num_workers: int = 4,
+    augmentation: str = "legacy",
+    preprocessing: str = "legacy",
 ) -> dict[str, DataLoader]:
     """Build train / val / test DataLoaders for 'full', 'stage1', or 'stage2'."""
     loaders: dict[str, DataLoader] = {}
 
     if train_csv and Path(train_csv).exists():
         train_ds = StrawDefectDataset(
-            csv_file=train_csv, masks_csv=masks_csv, task=task, transform=get_train_transform(image_size)
+            csv_file=train_csv, masks_csv=masks_csv, task=task, transform=get_train_transform(image_size, augmentation=augmentation)
         )
         loaders["train"] = DataLoader(train_ds, batch_size=batch_size, shuffle=True,
                                       num_workers=num_workers, pin_memory=True, drop_last=len(train_ds) > batch_size)
     elif data_dir and (Path(data_dir) / "train").exists():
         train_ds = StrawDefectDataset(
-            root_dir=data_dir, split="train", masks_csv=masks_csv, task=task, transform=get_train_transform(image_size)
+            root_dir=data_dir, split="train", masks_csv=masks_csv, task=task, transform=get_train_transform(image_size, augmentation=augmentation)
         )
         loaders["train"] = DataLoader(train_ds, batch_size=batch_size, shuffle=True,
                                       num_workers=num_workers, pin_memory=True, drop_last=len(train_ds) > batch_size)
 
     if val_csv and Path(val_csv).exists():
-        val_ds = StrawDefectDataset(csv_file=val_csv, task=task, transform=get_val_transform(image_size))
+        val_ds = StrawDefectDataset(csv_file=val_csv, task=task, transform=get_val_transform(image_size, preprocessing=preprocessing))
         loaders["val"] = DataLoader(val_ds, batch_size=batch_size, shuffle=False,
                                     num_workers=num_workers, pin_memory=True)
     elif data_dir and (Path(data_dir) / "val").exists():
-        val_ds = StrawDefectDataset(root_dir=data_dir, split="val", task=task, transform=get_val_transform(image_size))
+        val_ds = StrawDefectDataset(root_dir=data_dir, split="val", task=task, transform=get_val_transform(image_size, preprocessing=preprocessing))
         loaders["val"] = DataLoader(val_ds, batch_size=batch_size, shuffle=False,
                                     num_workers=num_workers, pin_memory=True)
 
     if test_csv and Path(test_csv).exists():
-        test_ds = StrawDefectDataset(csv_file=test_csv, task=task, transform=get_val_transform(image_size))
+        test_ds = StrawDefectDataset(csv_file=test_csv, task=task, transform=get_val_transform(image_size, preprocessing=preprocessing))
         loaders["test"] = DataLoader(test_ds, batch_size=batch_size, shuffle=False,
                                      num_workers=num_workers, pin_memory=True)
     elif data_dir and (Path(data_dir) / "test").exists():
-        test_ds = StrawDefectDataset(root_dir=data_dir, split="test", task=task, transform=get_val_transform(image_size))
+        test_ds = StrawDefectDataset(root_dir=data_dir, split="test", task=task, transform=get_val_transform(image_size, preprocessing=preprocessing))
         loaders["test"] = DataLoader(test_ds, batch_size=batch_size, shuffle=False,
                                      num_workers=num_workers, pin_memory=True)
 

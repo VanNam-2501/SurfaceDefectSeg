@@ -27,6 +27,7 @@ import platform
 import random
 import sys
 import time
+import importlib.metadata
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Optional, Tuple
@@ -38,7 +39,7 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
+os.environ.setdefault("MPLCONFIGDIR", str(Path(__file__).resolve().parents[2] / "artifacts" / ".matplotlib"))
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -112,6 +113,11 @@ class TrainConfig:
     # Run tag and directories
     output_dir: str = "experiments/runs"
     tag: str = ""
+    augmentation: str = "legacy"
+    preprocessing: str = "legacy"
+    stage1_defect_weight: float = 3.0
+    resume: bool = False
+    protocol_fingerprint: str = ""
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -135,6 +141,7 @@ def environment_info(device: torch.device) -> dict[str, Any]:
         "platform": platform.platform(),
         "torch": torch.__version__,
         "device": str(device),
+        "packages": {name: importlib.metadata.version(name) for name in ["torch", "torchvision", "numpy", "pandas", "scipy", "scikit-learn", "Pillow", "matplotlib"]},
     }
     if device.type == "cuda":
         info["gpu_name"] = torch.cuda.get_device_name(device)
@@ -197,7 +204,9 @@ def train_one_epoch(
 
         with torch.amp.autocast(device_type=device.type, enabled=(cfg.use_amp and device.type == "cuda")):
             outputs = model(images)
-            loss = criterion(outputs, labels) / cfg.grad_accum
+            # The last accumulation window can contain fewer mini-batches.
+            window_size = min(cfg.grad_accum, len(loader) - ((step - 1) // cfg.grad_accum) * cfg.grad_accum)
+            loss = criterion(outputs, labels) / window_size
 
         scaler.scale(loss).backward()
 
@@ -209,7 +218,7 @@ def train_one_epoch(
             scaler.update()
             optimizer.zero_grad(set_to_none=True)
 
-        running_loss += loss.item() * cfg.grad_accum
+        running_loss += loss.item() * window_size
         preds = outputs.argmax(dim=1)
         all_preds.extend(preds.detach().cpu().numpy().tolist())
         all_labels.extend(labels.detach().cpu().numpy().tolist())
@@ -304,6 +313,8 @@ def plot_training_curves(history: list[dict], save_dir: Path) -> None:
 # ──────────────────────────────────────────────────────────────────────────────
 def run_training(cfg: TrainConfig) -> Path:
     """Execute training run according to industrial specifications."""
+    if cfg.epochs < 1 or cfg.grad_accum < 1 or cfg.batch_size < 1:
+        raise ValueError("epochs, grad_accum and batch_size must be positive")
     set_seed(cfg.seed)
     device = torch.device(
         cfg.device if cfg.device == "cpu" or torch.cuda.is_available() else "cpu"
@@ -352,7 +363,14 @@ def run_training(cfg: TrainConfig) -> Path:
             cfg.val_csv = str(splits_dir / "val.csv")
 
     # Save initial config and environment
-    (run_dir / "config.json").write_text(json.dumps(asdict(cfg), indent=2), encoding="utf-8")
+    config_path = run_dir / "config.json"
+    if cfg.resume and config_path.exists():
+        previous = json.loads(config_path.read_text(encoding="utf-8"))
+        current = asdict(cfg)
+        ignored = {"resume", "device", "num_workers"}
+        if {k: v for k, v in previous.items() if k not in ignored} != {k: v for k, v in current.items() if k not in ignored}:
+            raise ValueError("Resume configuration differs from the saved run")
+    config_path.write_text(json.dumps(asdict(cfg), indent=2), encoding="utf-8")
     (run_dir / "environment.json").write_text(
         json.dumps(environment_info(device), indent=2), encoding="utf-8"
     )
@@ -362,11 +380,13 @@ def run_training(cfg: TrainConfig) -> Path:
     loaders = build_dataloaders(
         train_csv=cfg.train_csv,
         val_csv=cfg.val_csv,
-        masks_csv=masks_path if masks_path.exists() else None,
+        masks_csv=masks_path if masks_path.is_file() else None,
         task=task,
         image_size=cfg.image_size,
         batch_size=cfg.batch_size,
         num_workers=cfg.num_workers,
+        augmentation=cfg.augmentation,
+        preprocessing=cfg.preprocessing,
     )
     train_loader = loaders["train"]
     val_loader = loaders["val"]
@@ -385,14 +405,14 @@ def run_training(cfg: TrainConfig) -> Path:
     # Loss function configuration
     if task == "stage1":
         # Class-weighted CE penalizing False Negatives heavily (Good=0, Defect=1)
-        weight = torch.tensor([1.0, 3.0], device=device, dtype=torch.float32)
-        criterion = nn.CrossEntropyLoss(weight=weight)
+        weight = torch.tensor([1.0, cfg.stage1_defect_weight], device=device, dtype=torch.float32)
+        criterion = nn.CrossEntropyLoss(weight=weight, label_smoothing=cfg.label_smoothing)
     elif task == "stage2":
         # Stage 2: 4 balanced classes with label smoothing 0.1
-        criterion = CrossEntropyWithLabelSmoothing(num_classes=4, smoothing=0.1).to(device)
+        criterion = CrossEntropyWithLabelSmoothing(num_classes=4, smoothing=cfg.label_smoothing).to(device)
     else:
         # Full5 baseline: label smoothing 0.05
-        criterion = CrossEntropyWithLabelSmoothing(num_classes=5, smoothing=0.05).to(device)
+        criterion = CrossEntropyWithLabelSmoothing(num_classes=5, smoothing=cfg.label_smoothing).to(device)
 
     # Optimizer & Scheduler
     encoder_params = list(model.encoder_parameters()) if hasattr(model, "encoder_parameters") else []
@@ -416,6 +436,25 @@ def run_training(cfg: TrainConfig) -> Path:
     best_epoch = 0
     bad_epochs = 0
     history: list[dict[str, Any]] = []
+    start_epoch = 1
+    previous_seconds = 0.0
+    if cfg.resume and (ckpt_dir / "last.pt").exists():
+        saved = torch.load(ckpt_dir / "last.pt", map_location=device, weights_only=False)
+        model.load_state_dict(saved["model"])
+        optimizer.load_state_dict(saved["optimizer"])
+        scheduler.load_state_dict(saved["scheduler"])
+        scaler.load_state_dict(saved["scaler"])
+        best_metric = saved["best_metric"]
+        best_epoch = saved["best_epoch"]
+        bad_epochs = saved["bad_epochs"]
+        history = saved["history"]
+        start_epoch = saved["epoch"] + 1
+        previous_seconds = saved.get("elapsed_seconds", 0.0)
+        random.setstate(saved["python_rng"])
+        np.random.set_state(saved["numpy_rng"])
+        torch.set_rng_state(saved["torch_rng"].cpu())
+        if device.type == "cuda" and saved.get("cuda_rng") is not None:
+            torch.cuda.set_rng_state_all([state.cpu() for state in saved["cuda_rng"]])
     total_start = time.perf_counter()
 
     print(f"\n{'='*70}")
@@ -423,7 +462,9 @@ def run_training(cfg: TrainConfig) -> Path:
     print(f"Best weight tracked by: {metric_name}")
     print(f"{'='*70}")
 
-    for epoch in range(1, cfg.epochs + 1):
+    for epoch in range(start_epoch, cfg.epochs + 1):
+        if bad_epochs >= cfg.early_stopping_patience:
+            break
         epoch_start = time.perf_counter()
 
         train_metrics = train_one_epoch(model, train_loader, criterion, optimizer, scaler, device, cfg)
@@ -460,16 +501,6 @@ def run_training(cfg: TrainConfig) -> Path:
         history_df.to_csv(run_dir / "training_history.csv", index=False)
         plot_training_curves(history, run_dir / "curves")
 
-        # Save last checkpoint
-        torch.save({
-            "epoch": epoch,
-            "model": model.state_dict(),
-            "optimizer": optimizer.state_dict(),
-            "config": asdict(cfg),
-            "primary_metric": primary_metric,
-            "val_f1": val_metrics["weighted_f1"],
-        }, ckpt_dir / "last.pt")
-
         # Checkpoint evaluation
         is_best = primary_metric > best_metric + cfg.early_stopping_min_delta
         if is_best:
@@ -501,6 +532,20 @@ def run_training(cfg: TrainConfig) -> Path:
             bad_epochs += 1
             save_star = ""
 
+        # Save selection state and RNGs together after updating the best epoch.
+        last_state = {
+            "epoch": epoch, "model": model.state_dict(), "optimizer": optimizer.state_dict(),
+            "scheduler": scheduler.state_dict(), "scaler": scaler.state_dict(),
+            "config": asdict(cfg), "best_metric": best_metric, "best_epoch": best_epoch,
+            "bad_epochs": bad_epochs, "history": history, "python_rng": random.getstate(),
+            "numpy_rng": np.random.get_state(), "torch_rng": torch.get_rng_state(),
+            "cuda_rng": torch.cuda.get_rng_state_all() if device.type == "cuda" else None,
+            "elapsed_seconds": previous_seconds + time.perf_counter() - total_start,
+        }
+        last_temp = ckpt_dir / "last.tmp"
+        torch.save(last_state, last_temp)
+        last_temp.replace(ckpt_dir / "last.pt")
+
         print(
             f"Epoch {epoch:02d}/{cfg.epochs} [{epoch_seconds:.1f}s] | "
             f"TrainLoss={train_metrics['loss']:.4f} Acc={train_metrics['accuracy']:.3f} | "
@@ -512,7 +557,7 @@ def run_training(cfg: TrainConfig) -> Path:
             print(f"Early stopping triggered at epoch {epoch}.")
             break
 
-    total_seconds = time.perf_counter() - total_start
+    total_seconds = previous_seconds + time.perf_counter() - total_start
     summary = {
         "tag": tag,
         "backbone": cfg.model_name,
@@ -524,6 +569,9 @@ def run_training(cfg: TrainConfig) -> Path:
         "best_metric": best_metric,
         "epochs_completed": len(history),
         "total_seconds": round(total_seconds, 1),
+        "protocol_fingerprint": cfg.protocol_fingerprint,
+        "pretrained": cfg.pretrained,
+        "completion_reason": "early_stopping" if bad_epochs >= cfg.early_stopping_patience else "max_epochs",
     }
     (run_dir / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(f"\n[DONE] {tag} completed in {total_seconds:.1f}s | Best {metric_name}: {best_metric:.4f}")

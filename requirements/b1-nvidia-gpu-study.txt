@@ -1,0 +1,4 @@
+# Install this file into artifacts/b1_deployment/onnxruntime_gpu_1_26.
+# TensorRT and float16 converter are installed into their own isolated targets
+# by the launcher because TensorRT's Windows runtime bundle is very large.
+onnxruntime-gpu==1.26.0

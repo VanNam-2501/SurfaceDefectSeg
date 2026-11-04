@@ -1,5 +1,12 @@
 # Local environments and caches
 .venv/
+.venv-demo/
+demo_samples/
+.venv-release-check/
+build/
+dist/
+*.egg-info/
+onnxruntime_profile__*.json
 archive/**
 !archive/learned_verifier/
 !archive/learned_verifier/README.md
@@ -28,6 +35,9 @@ best/
 wheels-*/
 *.zip
 
+# Generated straw training outputs (source experiments stay tracked)
+experiments/runs/**
+
 # Notebook and editor state
 .ipynb_checkpoints/
 .vscode/
@@ -49,3 +59,15 @@ submission/04_demo_video/*.mkv
 # OS noise
 Thumbs.db
 Desktop.ini
+
+# Isolated WSL/Docker environment for RTSP/DeepStream experiments
+.stream-runtime/
+
+# Docker build staging contains model weights and generated demo media
+.docker/
+*.onnx
+*.engine
+# Resume caches and job state; retain reusable analysis code
+straw_resume/**
+!straw_resume/error_analysis/
+!straw_resume/error_analysis/*.py

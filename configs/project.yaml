@@ -8,7 +8,7 @@ dataset:
   raw_dir: "data/straw_defects_raw"
   splits_dir: "data/straw_defects_splits"
   masks_dir: "data/masks"
-  degraded_val_dir: "data/val_degraded"
+  degraded_val_dir: "data/val_degraded_v2"
   image_size_default: 224
   image_size_highres: 384
   brands:

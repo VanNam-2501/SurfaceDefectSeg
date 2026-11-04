@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "experiment_name": "straw_thesis_v1",
+  "seeds": [42, 43, 44],
+  "backbones": ["resnet18", "efficientnet_b0", "swin_t"],
+  "stages": ["1", "2", "full5"],
+  "training": {
+    "epochs": 40,
+    "early_stopping_patience": 10,
+    "encoder_lr": 0.0001,
+    "classifier_lr": 0.001,
+    "weight_decay": 0.0001,
+    "num_workers": 2,
+    "pretrained": true,
+    "use_amp": true,
+    "stage1_defect_weight": 1.0,
+    "label_smoothing": 0.05
+  },
+  "batches": {
+    "resnet18": {"batch_size": 32, "grad_accum": 1},
+    "efficientnet_b0": {"batch_size": 32, "grad_accum": 1},
+    "swin_t": {"batch_size": 8, "grad_accum": 4}
+  },
+  "core_resolution": 224,
+  "extensions": {
+    "high_resolution": {"backbone": "resnet18", "resolution": 384},
+    "augmentation": {"backbone": "resnet18", "mode": "none"},
+    "class_weight": {"backbone": "resnet18", "defect_weight": 3.0}
+  },
+  "policy": {
+    "pi_deploy": 0.05,
+    "max_fnr": 0.01,
+    "max_deployment_review": 0.30,
+    "costs": {"fn": 100.0, "review": 2.0, "fp": 5.0, "misdiagnosis": 5.0},
+    "grid": {
+      "tau_pass": [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 0.99, 0.995, 0.999, 1.000001],
+      "tau_defect": [0.1, 0.25, 0.4, 0.5],
+      "confidence": [0.0, 0.5, 0.7, 0.9],
+      "margin": [0.0, 0.1, 0.2],
+      "full5_confidence": [0.0, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 1.000001]
+    }
+  },
+  "conditions": ["clean", "blur_1", "blur_2", "blur_3", "dark_1", "dark_2", "dark_3", "noise_1", "noise_2", "noise_3", "jpeg_1", "jpeg_2", "jpeg_3"],
+  "bootstrap_replicates": 1000,
+  "notes": "Assumed deployment prior/costs; sensitivity analysis required. Synthetic corruptions are stress tests, not real factory evidence."
+}

@@ -1,0 +1,2 @@
+# Convert the ONNX graph to FP16 while preserving FP32 input/output tensors.
+onnxconverter-common==1.16.0

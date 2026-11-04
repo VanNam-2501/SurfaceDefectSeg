@@ -1,0 +1,10 @@
+{
+  "checkpoint": "artifacts/local_b1_check/B1_pose_illum_v1/best.pt",
+  "checkpoint_sha256": "8bed6f0944af36a616f663da534c0007514bb16f1e0442dc61bc550d3a4484e6",
+  "size": 512,
+  "precision": "fp32",
+  "channels_last": false,
+  "device": "cuda",
+  "autotune": true,
+  "temperature": 1.0
+}

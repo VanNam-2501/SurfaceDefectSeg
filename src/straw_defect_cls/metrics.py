@@ -8,7 +8,7 @@ from typing import Optional, Tuple
 
 import numpy as np
 import matplotlib
-os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
+os.environ.setdefault("MPLCONFIGDIR", str(Path(__file__).resolve().parents[2] / "artifacts" / ".matplotlib"))
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from sklearn.metrics import (
@@ -63,11 +63,12 @@ def compute_metrics(
     weighted_f1 = float(f1_score(y_true, y_pred, average="weighted", zero_division=0))
     macro_f1 = float(f1_score(y_true, y_pred, average="macro", zero_division=0))
 
-    per_precision = precision_score(y_true, y_pred, average=None, zero_division=0)
-    per_recall = recall_score(y_true, y_pred, average=None, zero_division=0)
-    per_f1 = f1_score(y_true, y_pred, average=None, zero_division=0)
+    labels = list(range(len(class_names)))
+    per_precision = precision_score(y_true, y_pred, labels=labels, average=None, zero_division=0)
+    per_recall = recall_score(y_true, y_pred, labels=labels, average=None, zero_division=0)
+    per_f1 = f1_score(y_true, y_pred, labels=labels, average=None, zero_division=0)
 
-    cm = sk_confusion_matrix(y_true, y_pred)
+    cm = sk_confusion_matrix(y_true, y_pred, labels=labels)
 
     return {
         "accuracy": acc,
@@ -128,6 +129,8 @@ def plot_roc_curves(
     """Plot one-vs-rest ROC curves for each class."""
     n_classes = len(class_names)
     y_true_bin = label_binarize(y_true, classes=range(n_classes))
+    if n_classes == 2:
+        y_true_bin = np.column_stack([1 - y_true_bin[:, 0], y_true_bin[:, 0]])
 
     plt.figure(figsize=(10, 8))
     for i in range(n_classes):

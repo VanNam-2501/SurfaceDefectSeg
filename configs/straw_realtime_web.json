@@ -1,0 +1,14 @@
+{
+  "checkpoint": "artifacts/local_b1_check/B1_s42/best.pt",
+  "checkpoint_sha256": "f95bbd2b4983f31710db861a61f60b801d8da023ddb1aa4504b31c3bcb52870f",
+  "decision_policy": "straw_resume/error_analysis/b1_postprocess/B1_s42.json",
+  "size": 512,
+  "precision": "fp32",
+  "channels_last": false,
+  "device": "cuda",
+  "autotune": true,
+  "temperature": 1.0,
+  "camera_jpeg_quality": 0.9,
+  "camera_target_fps": 10,
+  "note": "B1 seed 42 at 512 FP32 with validation-fitted defect threshold. Validated on 300 JPEG q90 validation frames; no independent realtime-camera claim."
+}

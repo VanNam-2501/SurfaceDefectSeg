@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "purpose": "confirmatory",
+  "variants": ["B0", "B1", "B2", "B3", "B4", "B5", "B6"],
+  "seeds": [42, 43, 44],
+  "epochs": 40,
+  "patience": 10,
+  "batch_size": 4,
+  "grad_accum": 8,
+  "batches": {"B1": {"batch_size": 2, "grad_accum": 16}},
+  "encoder_lr": 0.0001,
+  "head_lr": 0.001,
+  "weight_decay": 0.0001,
+  "pretrained": true,
+  "freeze_bn": true,
+  "amp": true,
+  "augmentation": true,
+  "workers": 0
+}

@@ -1,0 +1,13 @@
+{
+  "checkpoint": "artifacts/b1_deployment/models/b1_web384_fp16.pt",
+  "checkpoint_sha256": "2a1881fcd9c17201ecfc6b6547b699c07e9d0ff8ba1a250ee943adf0f27cf852",
+  "size": 384,
+  "precision": "fp16",
+  "channels_last": true,
+  "device": "cuda",
+  "autotune": true,
+  "temperature": 1.0,
+  "camera_jpeg_quality": 0.9,
+  "camera_target_fps": 10,
+  "note": "Seed 42 fixed; recovered 384 JPEG q90, FP16 artifact validated by state roundtrip and validation. Exploratory deployment study; no new test selection."
+}

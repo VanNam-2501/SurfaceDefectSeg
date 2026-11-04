@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "purpose": "smoke",
+  "variants": ["B0", "B1", "B2", "B3", "B4", "B5", "B6"],
+  "seeds": [42],
+  "epochs": 1,
+  "patience": 1,
+  "batch_size": 2,
+  "grad_accum": 2,
+  "encoder_lr": 0.0001,
+  "head_lr": 0.001,
+  "weight_decay": 0.0001,
+  "pretrained": false,
+  "freeze_bn": true,
+  "amp": true,
+  "augmentation": false,
+  "workers": 0
+}

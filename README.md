@@ -1,75 +1,128 @@
-# 3CAD-ANI Aluminum Surface Defect Segmentation
+# Phân loại khuyết tật ống hút trên hộp đồ uống
 
-Dự án thực tập tốt nghiệp về phân đoạn khuyết tật bề mặt nhôm trên tập con
-**ANI (Aluminum New iPad) của 3CAD**. Hệ thống gồm U-Net ResNet-18,
-SegFormer-B0, VMamba-T, lựa chọn ngưỡng chỉ trên Validation, đánh giá Test cố
-định, logic giảm dương tính giả và hai ứng dụng review/demo.
+**v3.5:** demo Docker độc lập, tự build engine trên GPU máy nhận; đã bỏ trang
+Nghiên cứu khỏi demo. CPU/GPU/RAM/tracking chuyển sang trang **Hiệu năng**
+với biểu đồ thời gian thực. [Chạy Docker và chuyển máy](docs/STRAW_DOCKER_DEMO.md).
 
-## Bắt đầu nhanh
+**v3.4:** tách nguồn ảnh 1920×1080 khỏi preview 960×540, tránh mất chi tiết
+khi chạy ba sản phẩm. Giữ nguyên ngưỡng chất lượng và tốc độ hiển thị.
+[Sửa cảnh báo độ nét](docs/STRAW_PHOTO_QUALITY_V3_4.md).
+
+**v3.3:** sửa tracking khi ảnh có nền gần màu băng chuyền, giữ ID theo PTS và
+hiển thị rõ lý do không gọi GPU. [Kiểm chứng 39 ảnh](docs/STRAW_TRACKING_FIX_V3_3.md).
+
+**Nâng cấp v3:** băng chuyền từ ảnh chọn, 1–3 sản phẩm cùng lúc, sáu ảnh xử lý
+trung gian, CPU/RAM và số lần gọi GPU theo phiên. [Hướng dẫn v3](docs/STRAW_UPGRADE_V3.md).
+
+Dự án nghiên cứu CNN phân loại năm trạng thái **Good, Bent, Loose, Missing,
+Pierced**, kèm demo băng chuyền dùng **TensorRT engine trong môi trường
+NVIDIA DeepStream/WSL2**. Bản demo mặc định là `b1_stream_512_pose_v1`, 512 px,
+worker GPU thường trú, kích hoạt khi ảnh qua ROI.
+
+**Nâng cấp v2:** video tệp/RTSP giải mã GPU, tracking và chọn frame, kiểm tra
+ảnh mờ/tối, lịch sử SQLite có xuất CSV, giao diện thống nhất và dashboard
+thí nghiệm có bản offline. [Hướng dẫn và giới hạn v2](docs/STRAW_UPGRADE_V2.md).
+
+## Chạy demo
+
+Với bộ Docker offline, đặt image và hai script chạy trong cùng thư mục:
 
 ```powershell
-# Kiểm tra mã, protocol, model tests và các artifact bắt buộc
-.\verify.ps1
-
-# Review và sửa nhãn/mask
-.\run_review.ps1
-
-# Demo dự báo U-Net + SegFormer + VMamba
-.\run_demo.ps1
+.\run_demo_docker.ps1
+# Docker Desktop (Linux containers / WSL2), GPU NVIDIA và driver tương thích
 ```
 
-Thêm `-IncludeWeb` vào `verify.ps1` để chạy cả test frontend.
+Linux: `bash run_demo_docker.sh`. Mở `http://127.0.0.1:8033/`.
+Container chứa giao diện, xử lý ảnh/video, ONNX và worker TensorRT; máy nhận
+không cần Python, PyTorch hoặc source. Lần đầu tự tạo engine; các lần sau
+dùng cache trong volume. Xem yêu cầu GPU/runtime và hướng dẫn build lại trong
+[hướng dẫn Docker](docs/STRAW_DOCKER_DEMO.md).
 
-## Cấu trúc chính
+Đường Windows/WSL dành cho phát triển vẫn có sẵn:
+
+```powershell
+.\setup_demo.ps1
+.\verify_demo.ps1 -Runtime
+.\run_b1_conveyor.ps1
+```
+
+Mở **http://127.0.0.1:8033/**, chọn nguồn video hoặc **Phát lại mẫu**. Tab
+**Kiểm tra ảnh** nhận ảnh riêng; mô phỏng cũ tại `/conveyor`. ZIP đầy đủ có ảnh thử trong
+`demo_samples/input/`. Windows viewer chỉ cần Python 3.12 + NumPy/Pillow;
+GPU inference chạy trong container NVIDIA của distro `TTTN-DeepStream`.
+
+```powershell
+.\verify_demo.ps1 -Runtime -Inference  # Kiểm tra API và engine bằng ảnh kèm gói
+.\stop_demo.ps1                      # Dừng đúng server/container của thư mục này
+.\package_project.ps1                # Tạo lại gói đầy đủ và gói source
+```
+
+Đọc [START_HERE.md](START_HERE.md) và
+[hướng dẫn cài/runtime/build engine trên máy nhận](docs/DEEPSTREAM_HANDOVER.md).
+Engine được kiểm theo GPU/driver/image build; máy khác cần build và kiểm chứng
+lại từ ONNX đi kèm. Luồng canvas dùng TensorRT native; RTSP replay dùng
+DeepStream `nvinfer`. Không dùng ONNX Runtime để thay đường suy luận GPU.
+
+## Gói bàn giao
+
+Đầu ra v3.5 tại `artifacts/releases/v3_5/`; bộ Docker offline nằm dưới
+`artifacts/releases/docker_v3_5_2026-11-04/` (giữ nguyên các bản trước):
+
+- `straw_deepstream_v3_5_YYYY-MM-DD.zip`: source ống hút, checkpoint, ONNX, engine,
+  clip replay, ảnh mẫu, báo cáo Word/PDF và bằng chứng chọn lọc.
+- `straw_source_v3_5_YYYY-MM-DD.zip`: source/config/tài liệu/notebook, không có
+  checkpoint, ảnh, clip hoặc báo cáo nhị phân.
+- `.sha256` và `release_index.json`: hash toàn gói; `release_manifest.json`
+  trong mỗi ZIP ghi kích thước/hash từng tệp. `SOURCE_STATE.json` ghi commit
+  nền và trạng thái working tree tại lúc đóng gói.
+
+Gói không mang theo dataset đầy đủ, credential, môi trường ảo hoặc ổ đĩa WSL.
+Lệnh đóng gói dùng trong kho phát triển có đủ artifact và dữ liệu ảnh mẫu.
+Notebook trong ZIP được xóa output/execution count; notebook gốc không đổi.
+Phần hồ sơ cần xác nhận được ghi tại [HANDOVER_STATUS.md](HANDOVER_STATUS.md).
+
+## Nghiên cứu và kết quả
+
+B0–B6 so sánh độ phân giải toàn ảnh, local views, pooling, attention, ngữ cảnh
+và tọa độ với ba seed. Hồ sơ xác nhận tại
+`straw_resume/artifacts/straw_global_local/confirmatory_kaggle_v1/` có 21 run,
+split Train/Val/Test 1.401/300/299. Bảng nghiên cứu ghi B1 macro-F1 trung bình
+99,34%; B6 thấp hơn B1 khoảng 1,35 điểm phần trăm. Đọc phạm vi và giới hạn trong
+[báo cáo tổng quan](docs/BAO_CAO_TONG_QUAN_TIEN_DO_DU_AN_ONG_HUT.md).
+Checkpoint pose/illumination của demo khác checkpoint B1 nghiên cứu; không
+gán điểm nghiên cứu cho engine demo.
+
+Các trường reviewer/notes trong freeze ledger còn là mẫu; cần biên bản rà
+nhãn/nhóm/quyền dữ liệu thực. Demo ảnh tĩnh và replay không chứng minh đã
+kiểm chứng camera nhà máy độc lập.
+
+- [Kế hoạch nghiên cứu](docs/STRAW_RESEARCH_PLAN.md)
+- [Hướng dẫn global-local](docs/STRAW_GLOBAL_LOCAL_RUNBOOK.md)
+- [Điều kiện đủ bằng chứng](docs/STRAW_COMPLETION_REQUIREMENTS.md)
+- [Kaggle và resume](docs/KAGGLE_ALL_IN_ONE.md)
+- [Luồng DeepStream/RTSP lịch sử](docs/STRAW_RTSP_DEEPSTREAM.md)
+- [Gate kích hoạt inference](docs/STRAW_INTELLIGENT_INFERENCE_GATE.md)
+
+## Cấu trúc
 
 ```text
-apps/          ứng dụng Dataset Review và web demo
-src/           model, dataset, loss và logic quyết định dùng lại được
-scripts/       lệnh train, evaluation, experiment, reporting và verification
-tests/         kiểm thử mã ML
-data/          dữ liệu 3CAD-ANI cục bộ (không đưa vào Git)
-artifacts/     checkpoint, prediction, kết quả và báo cáo sinh ra
-experiments/   notebook audit dữ liệu và pipeline Kaggle
-docs/          protocol, hướng dẫn và hồ sơ cấu trúc
-runtime/       wheel nhị phân VMamba theo môi trường
-submission/    hồ sơ nộp bài và hồ sơ sử dụng AI
-archive/       dữ liệu cũ và ứng viên cleanup có thể khôi phục
+apps/stream_demo/       viewer, gate pixel, worker TensorRT, probe DeepStream
+src/straw_global_local/ dữ liệu, B0–B6, train/evaluate/deployment
+src/straw_defect_cls/   pipeline và công cụ phân loại ống hút trước đây
+src/inspection_research/ công cụ nghiên cứu bổ trợ
+scripts/deployment/     preflight, smoke và xác minh gói
+scripts/packaging/      đóng gói theo danh mục cho phép
+scripts/research/       thí nghiệm, export, Kaggle/resume
+configs/               cấu hình/checkpoint hashes
+tests/                 kiểm thử model, protocol, stream contract, gate
+docs/                  hướng dẫn và báo cáo
+artifacts/             model/kết quả/gói sinh ra; không đưa vào Git
 ```
 
-Chi tiết trách nhiệm từng thư mục nằm tại
-[`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md). Lịch sử đổi đường dẫn
-nằm tại [`docs/MIGRATION_MANIFEST.md`](docs/MIGRATION_MANIFEST.md).
+Kho làm việc còn giữ nhánh nhôm ANI và web demo cũ để truy nguyên. Các phần đó
+được loại khỏi ZIP ống hút. Hướng dẫn trước đây được giữ ở
+`docs/LEGACY_PROJECT_README.md`; chúng không phải lối chạy demo bàn giao này.
 
-## Quy trình thí nghiệm đúng
-
-1. Kiểm tra split và rò rỉ dữ liệu bằng `scripts/verification/check_protocol.py`.
-2. Train từng kiến trúc độc lập nếu cần; checkpoint tốt nhất chọn theo
-   Validation, không theo Test.
-3. Chọn threshold/policy trên Validation.
-4. Khóa threshold/policy và đánh giá đúng một lần trên Test.
-5. Dùng toàn bộ Train/Validation/Test chỉ cho data audit riêng, không dùng các
-   kết quả đó để điều chỉnh lại bảng Test.
-
-Chạy lại toàn bộ logic ba model từ probability cache:
-
-```powershell
-.\scripts\experiments\run_three_model_experiments.ps1
-```
-
-Train lại một model:
-
-```powershell
-.\scripts\training\retrain_models.ps1 -Model unet -RunName unet_seed42_v2
-```
-
-## Kết quả và hồ sơ nộp
-
-- Dashboard kết quả: `artifacts/reports/final/visualizations/index.html`.
-- Checkpoint cuối: `artifacts/checkpoints/final/`.
-- Checklist nộp bài: `submission/CHECKLIST.md`.
-- AI Development Log: `submission/05_logs/AI_DEVELOPMENT_LOG.md`.
-- Nguồn gốc dataset: `submission/07_evidence/DATASET_PROVENANCE.md`.
-
-Dataset, checkpoint, artifact sinh ra, môi trường ảo và `archive` được loại khỏi
-Git. Mã nguồn, cấu hình, tài liệu, notebook và lịch sử commit phải được lưu đầy
-đủ để có thể giải thích và tái tạo quy trình.
+Để cài thư viện nghiên cứu từ source, dùng `python -m pip install -e ".[research,dev]"`
+trong môi trường riêng với cặp torch/torchvision phù hợp thiết bị. Các kiểm thử
+mặc định theo đề tài ống hút; pipeline nhôm cũ có lệnh xác minh riêng trong kho.
