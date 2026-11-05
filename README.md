@@ -119,10 +119,12 @@ docs/                  hướng dẫn và báo cáo
 artifacts/             model/kết quả/gói sinh ra; không đưa vào Git
 ```
 
-Kho làm việc còn giữ nhánh nhôm ANI và web demo cũ để truy nguyên. Các phần đó
-được loại khỏi ZIP ống hút. Hướng dẫn trước đây được giữ ở
-`docs/LEGACY_PROJECT_README.md`; chúng không phải lối chạy demo bàn giao này.
+Nhánh `straw-defect-classification` chỉ theo dõi đề tài ống hút. Dự án nhôm
+3CAD-ANI nằm trên [nhánh main](https://github.com/VanNam-2501/SurfaceDefectSeg/tree/main).
+`apps/web_demo/backend/` giữ hai API ống hút trước đây phục vụ đối chiếu;
+demo hiện tại chạy từ `apps/stream_demo/`. Phạm vi file được đưa lên Git và
+các đầu ra bàn giao riêng nằm trong [quy tắc mã nguồn](docs/SOURCE_SCOPE.md).
 
 Để cài thư viện nghiên cứu từ source, dùng `python -m pip install -e ".[research,dev]"`
 trong môi trường riêng với cặp torch/torchvision phù hợp thiết bị. Các kiểm thử
-mặc định theo đề tài ống hút; pipeline nhôm cũ có lệnh xác minh riêng trong kho.
+mặc định theo đề tài ống hút; chạy bằng `python -m pytest` hoặc `./verify.ps1`.

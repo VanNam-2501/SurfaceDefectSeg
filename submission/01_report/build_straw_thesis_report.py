@@ -267,7 +267,7 @@ def main():
             continue
         image_match = re.fullmatch(r"!\[(.*?)\]\((.*?)\)", line.strip())
         if image_match:
-            image_path = (ROOT / image_match.group(2)).resolve()
+            image_path = (SOURCE.parent / image_match.group(2)).resolve()
             if image_path.exists():
                 p = doc.add_paragraph()
                 p.alignment = WD_ALIGN_PARAGRAPH.CENTER

@@ -6,7 +6,7 @@
 > Phần bên dưới giữ hồ sơ thí nghiệm lịch sử; các mặc định 384/512 cũ không
 > thay thế bản bàn giao hiện hành.
 
-> **Cập nhật 21/10/2026:** Các launcher mặc định vẫn dùng bản TensorRT 384 tại `artifacts/b1_stream`. Bản 512 ở `artifacts/b1_stream_512` là nhánh thử nghiệm vì chỉ sửa 2/300 ảnh và chưa được kiểm trên camera độc lập. [So sánh và điều kiện triển khai](../straw_resume/error_analysis/B1_REALTIME_UPGRADE.md).
+> **Cập nhật 21/10/2026:** Các launcher mặc định vẫn dùng bản TensorRT 384 tại `artifacts/b1_stream`. Bản 512 ở `artifacts/b1_stream_512` là nhánh thử nghiệm vì chỉ sửa 2/300 ảnh và chưa được kiểm trên camera độc lập. So sánh và điều kiện triển khai: `straw_resume/error_analysis/B1_REALTIME_UPGRADE.md` trong gói artifact; [điều kiện kiểm chứng](STRAW_COMPLETION_REQUIREMENTS.md).
 
 Nhánh Git `codex/rtsp-deepstream`; mã tại `apps/stream_demo/`, kết quả tại `artifacts/b1_stream/`. Dùng checkpoint B1 phục vụ web đã khóa; không chọn lại seed, không dùng test và không sửa cấu hình web HTTP.
 

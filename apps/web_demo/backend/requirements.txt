@@ -1,4 +1,7 @@
 fastapi
 uvicorn[standard]
 python-multipart
--r ../../../requirements/ml-kaggle.txt
+-r ../../../requirements/straw-thesis.txt
+PyYAML>=6
+opencv-python-headless
+# Install a matching torch/torchvision pair separately.

@@ -1,6 +1,6 @@
 # Nghiên cứu tối ưu B1 cho ứng dụng web kiểm tra lỗi ống hút
 
-> **Cập nhật 21/10/2026:** Web mặc định vẫn dùng cấu hình 384. B1 512 và ngưỡng Good/lỗi là nhánh thử nghiệm; ngưỡng chỉ đổi bỏ sót thành sai loại, chưa giảm tổng lỗi validation. [Báo cáo so sánh và tiêu chí trước triển khai](../straw_resume/error_analysis/B1_REALTIME_UPGRADE.md).
+> **Cập nhật 21/10/2026:** Web mặc định vẫn dùng cấu hình 384. B1 512 và ngưỡng Good/lỗi là nhánh thử nghiệm; ngưỡng chỉ đổi bỏ sót thành sai loại, chưa giảm tổng lỗi validation. Báo cáo so sánh và tiêu chí trước triển khai: `straw_resume/error_analysis/B1_REALTIME_UPGRADE.md` trong gói artifact; [điều kiện kiểm chứng](STRAW_COMPLETION_REQUIREMENTS.md).
 
 ## Mục tiêu và phạm vi kết luận
 

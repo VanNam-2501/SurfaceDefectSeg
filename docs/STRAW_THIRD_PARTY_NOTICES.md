@@ -5,6 +5,7 @@
 | NumPy, Pillow | Viewer Windows; khóa tại `requirements/deepstream-demo.txt` |
 | NVIDIA DeepStream / TensorRT / CUDA | Runtime GPU trong image NVIDIA; `engine_cache.json`, `sdk_version.txt` |
 | PyTorch / Torchvision / pretrained ResNet18 | Huấn luyện, export; environment trong hồ sơ thí nghiệm |
+| VMamba (tùy chọn) | Mã và license gốc tại `src/straw_defect_cls/third_party/VMamba/`; classifier VMamba vẫn cần CUDA/selective-scan tương thích |
 | pandas, SciPy, scikit-learn, Matplotlib, tqdm | Nghiên cứu/đánh giá; `requirements/straw-thesis.txt` |
 | Docker, WSL, Ubuntu, GStreamer, FFmpeg | Môi trường, decode và replay; cài riêng bằng runbook |
 

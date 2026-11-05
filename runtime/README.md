@@ -1,6 +1,8 @@
 # Runtime binaries
 
-`wheels/vmamba/` chứa wheel Mamba được build cho đúng phiên bản Python, PyTorch,
-CUDA và compute capability. Wheel là binary lớn, không commit vào Git; phải ghi
-rõ môi trường tương thích trong hướng dẫn setup.
+`wheels/demo/` chứa wheel NumPy/Pillow phục vụ bộ bàn giao offline; không đưa
+binary vào Git. DeepStream/TensorRT và engine GPU được cung cấp qua bộ bàn
+giao riêng, với kiểm tra môi trường trong `docs/DEEPSTREAM_HANDOVER.md`.
 
+Thí nghiệm VMamba tùy chọn cần CUDA/selective-scan tương thích; mã bên thứ ba
+và license nằm trong `src/straw_defect_cls/third_party/VMamba/`.

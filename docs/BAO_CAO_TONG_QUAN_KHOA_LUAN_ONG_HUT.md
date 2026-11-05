@@ -152,7 +152,7 @@ Cấu hình xác nhận gồm 7 mô hình × 3 seed (42, 43, 44) = 21 run, tất
 
 Lịch sử học B1 seed 42 có 25 epoch: train cross-entropy giảm từ 1,196 xuống gần 0; validation cross-entropy thấp nhất 0,0128 tại epoch 8, sau đó dao động; validation macro-F1 đạt 0,99682 từ epoch 15. Các đường cong cho thấy mô hình khớp rất nhanh trên bộ dữ liệu hiện tại và train CE tiếp tục tiến gần 0 trong khi validation CE không giảm đơn điệu. Đây là dấu hiệu cần thận trọng về overfit/độ dễ của tập, nhưng riêng đường cong không chứng minh rò rỉ ảnh. Checkpoint của mỗi run được chọn theo validation macro-F1; biểu đồ dưới đây chỉ minh họa một run đại diện, không thay cho trung bình ba seed.
 
-![Hình 3.2. Train CE, validation CE và validation macro-F1 theo epoch của B1 seed 42](docs/assets/straw_overview/b1_s42_learning_curves.png)
+![Hình 3.2. Train CE, validation CE và validation macro-F1 theo epoch của B1 seed 42](assets/straw_overview/b1_s42_learning_curves.png)
 
 Pilot phát triển có recipe ngắn riêng: seed 42, ba epoch, patience 3, chỉ Train/Validation. Pilot không chạy Test. Checkpoint chọn bằng macro-F1 validation; validation cross-entropy là tiêu chí phụ khi hòa. Resume lưu trạng thái huấn luyện; fingerprint source/config/protocol/cache ngăn dùng lẫn output sau khi thay đổi.
 
@@ -235,7 +235,7 @@ Cascade đạt FNR 0% trên mẫu test nhưng đánh đổi bằng review 83–9
 | B5 | 97,98 ± 1,21 | 97,99 ± 1,21 | 1,11 ± 1,20 | 0,00 ± 0,00 |
 | B6 | 97,99 ± 0,89 | 97,99 ± 0,88 | 1,24 ± 0,72 | 1,72 ± 0,00 |
 
-![Hình 5.1. So sánh macro-F1 trên tập test khóa của bảy cấu hình B0–B6](docs/assets/straw_overview/confirmatory_macro_f1.png)
+![Hình 5.1. So sánh macro-F1 trên tập test khóa của bảy cấu hình B0–B6](assets/straw_overview/confirmatory_macro_f1.png)
 
 Mỗi giá trị là trung bình và độ lệch chuẩn giữa ba seed trên cùng tập test khóa gồm 299 ảnh (241 lỗi, 58 tốt). Vì test có 299 ảnh, các lần chạy trên cùng ảnh không phải các mẫu độc lập. B1 cho kết quả trung bình cao nhất và ổn định nhất trong bảng; B2 đứng kế tiếp về macro-F1. So sánh chính B6−B1 là -1,35 điểm phần trăm macro-F1, CI 95% theo paired group bootstrap [-2,63; -0,32] (1.000 lần lấy mẫu). Kết quả này là bằng chứng B6 thấp hơn B1 trong phạm vi dataset/protocol này; không chứng minh B1 sẽ tốt hơn trên nhà máy hay camera khác.
 

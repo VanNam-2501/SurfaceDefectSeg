@@ -17,7 +17,7 @@ from apps.stream_demo.research_catalog import ResearchCatalog
 
 ARTIFACT = "b1_stream_512_pose_v1"
 SOURCE_EXTENSIONS = {".py", ".ps1", ".sh", ".js", ".cjs", ".mjs", ".html", ".css", ".cpp",
-                     ".json", ".md", ".toml", ".txt", ".ipynb", ".svg", ".yaml", ".yml"}
+                     ".json", ".md", ".toml", ".txt", ".ipynb", ".svg", ".png", ".yaml", ".yml"}
 
 
 def source_files():
@@ -26,7 +26,7 @@ def source_files():
         relative = path.relative_to(ROOT).as_posix()
         if path.is_symlink() or any(part in {"__pycache__", "node_modules", ".pytest_cache"} for part in path.parts):
             return
-        if path.suffix in SOURCE_EXTENSIONS or path.name in {"Dockerfile", ".gitignore", ".dockerignore", ".gitattributes"}:
+        if path.suffix in SOURCE_EXTENSIONS or path.name in {"Dockerfile", "LICENSE", ".gitignore", ".dockerignore", ".gitattributes"}:
             files[relative] = path
     for directory in ("src/straw_global_local", "src/straw_defect_cls", "src/inspection_research",
                       "apps/stream_demo", "scripts/research", "scripts/deployment", "scripts/packaging", "docker/demo"):
@@ -48,7 +48,8 @@ def source_files():
                  "verify_inspection_math.ps1", "configs/project.yaml", "configs/thresholds.json",
                  "scripts/data/make_degraded_set.py", "scripts/data/make_b1_degraded_set.py",
                  "scripts/export_onnx.py", "STRAW_KAGGLE_ALL_EXPERIMENTS.ipynb",
-                 "run_demo_docker.ps1", "run_demo_docker.sh", ".dockerignore", ".gitattributes"):
+                 "run_demo_docker.ps1", "run_demo_docker.sh", ".dockerignore", ".gitattributes",
+                 "docs/SOURCE_SCOPE.md"):
         add(ROOT / name)
     add(ROOT / 'scripts/reporting/build_straw_dashboard.py')
     for path in (ROOT / "tests").glob("test_*"):

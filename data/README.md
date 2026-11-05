@@ -1,11 +1,11 @@
-# Local data
+# Dữ liệu ống hút cục bộ
 
-`3cad_ani/` là tập con ANI (Aluminum New iPad) của 3CAD, gồm ảnh, mask và frozen
-splits trong `dataset_audit/splits`. Dữ liệu lớn không được commit vào Git. Xem
-`submission/07_evidence/DATASET_PROVENANCE.md` trước khi phân phối dữ liệu.
+Ảnh gốc nằm trong `straw_defects_raw/`; split và mask được sinh bằng công cụ
+trong `scripts/data/` hoặc protocol nghiên cứu. Xem `configs/project.yaml`,
+`configs/straw_thesis.json` và `docs/STRAW_THESIS.md` cho từng pipeline.
+Dữ liệu ảnh, mask và cache không được commit. Hồ sơ nguồn/quyền sử dụng cần
+xác nhận trong `HANDOVER_STATUS.md`.
 
-Với bộ ảnh ống hút, dùng `val_degraded_v2/` và `test_degraded_v2/` cho ảnh suy
-giảm. Bộ cũ `val_degraded/` và `test_degraded/` có thể chứa ảnh bị ghi đè vì
-tên file trước đây không phân biệt thương hiệu; không dùng các manifest cũ để
-hiệu chuẩn hoặc báo cáo metric.
-
+Dùng `val_degraded_v2/` và `test_degraded_v2/` cho ảnh suy giảm. Bộ cũ
+`val_degraded/` và `test_degraded/` có thể chứa ảnh bị ghi đè do tên file
+không phân biệt thương hiệu; không dùng manifest cũ để hiệu chuẩn/báo cáo.

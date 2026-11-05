@@ -23,7 +23,7 @@ namespaces = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--ignore=tests/ml --ignore=tests/test_web_api.py --ignore=tests/test_b1_deployment.py"
-pythonpath = ["src/threecad_segmentation", "apps/dataset_review"]
+pythonpath = [".", "src"]
 markers = [
     "gpu: requires a CUDA-enabled runtime",
     "integration: optional integration test",

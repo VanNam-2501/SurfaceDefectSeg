@@ -142,8 +142,7 @@ class VMambaTClassifier(nn.Module):
 
     def __init__(self, num_classes: int = NUM_CLASSES, pretrained: bool = True) -> None:
         super().__init__()
-        repo_root = Path(__file__).resolve().parents[2]
-        vmamba_dir = repo_root / "src" / "threecad_segmentation" / "third_party" / "VMamba"
+        vmamba_dir = Path(__file__).resolve().parent / "third_party" / "VMamba"
         if str(vmamba_dir) not in sys.path:
             sys.path.insert(0, str(vmamba_dir))
 
